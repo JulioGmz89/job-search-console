@@ -5,7 +5,12 @@
  * several sort modes, links to report and PDF. Filters come from the server's
  * state vocabulary rather than from whichever statuses this tracker happens to
  * contain, so a status that appears for the first time still gets a tab.
+ *
+ * The Status column is the one editable cell (PROJECT_PLAN.md §8, M2); see
+ * StatusCell for why it stops its own clicks from opening the row.
  */
+
+import StatusCell from './StatusCell.jsx';
 
 const COLUMNS = [
   { key: 'id', label: '#', className: 'id num', sortable: true },
@@ -22,7 +27,7 @@ const COLUMNS = [
 /** Score formatting: the API sends a JS number, so 4.0 arrives as 4. */
 const formatScore = (score) => (typeof score === 'number' ? score.toFixed(1) : '—');
 
-export default function PipelineTable({ rows, sort, onSortChange, selectedId, onSelect }) {
+export default function PipelineTable({ rows, statuses, sort, onSortChange, selectedId, onSelect, onStatusChanged }) {
   const toggleSort = (key) => {
     // Numbers and dates are most useful highest-first; text A–Z.
     const numeric = key === 'score' || key === 'id' || key === 'date';
@@ -70,9 +75,7 @@ export default function PipelineTable({ rows, sort, onSortChange, selectedId, on
                 <span className={`score ${row.scoreBand ?? ''}`}>{formatScore(row.score)}</span>
               </td>
               <td>
-                <span className={`badge ${row.statusId ? '' : 'unknown'}`} title={row.statusId ? '' : 'Not in templates/states.yml'}>
-                  {row.status ?? '—'}
-                </span>
+                <StatusCell row={row} statuses={statuses} onChanged={onStatusChanged} />
               </td>
               <td>{row.report?.decision ?? <span className="muted">—</span>}</td>
               <td className="notes">{row.report?.advertisedComp ?? <span className="muted">not stated</span>}</td>
