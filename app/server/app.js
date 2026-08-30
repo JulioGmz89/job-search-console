@@ -1,11 +1,18 @@
 /**
  * app.js — the REST surface over the service seam.
  *
- * M1 is read-only (PROJECT_PLAN.md §8): every route here is a GET, and nothing
- * in this file writes to the user's files. Status changes arrive in M2.
- *
  * The routes are deliberately thin. All format knowledge lives in services/;
- * this file only shapes responses and turns "not found" into a 404.
+ * this file only shapes responses, turns "not found" into a 404, and maps the
+ * services' typed refusals onto status codes.
+ *
+ * M2 adds the first writes (PROJECT_PLAN.md §8). Three rules hold for all of
+ * them, and each is enforced a layer down rather than here:
+ *   - Nothing this server writes is written by hand. Tracker edits go through
+ *     upstream's `set-status.mjs`; portals.yml is edited surgically and then
+ *     re-validated by upstream's own `validate-portals.mjs`.
+ *   - The client never names a command. It names a run *kind* from
+ *     `queue/specs.js`, which rebuilds every argument from constants.
+ *   - Anything that rewrites the tracker needs a successful dry run first.
  */
 
 import { createReadStream, existsSync } from 'node:fs';
@@ -16,10 +23,46 @@ import { fileURLToPath } from 'node:url';
 import fastifyStatic from '@fastify/static';
 import Fastify from 'fastify';
 
+import { createRunner } from './queue/runner.js';
+import { buildSpec, describeKinds, RUN_KINDS } from './queue/specs.js';
+import { readInbox } from './services/inbox.js';
+import { repoRoot } from './services/paths.js';
 import { readPipeline, SCORE_BANDS } from './services/pipeline.js';
+import { createEntry, deleteEntry, readPortals, updateEntry } from './services/portals.js';
 import { listReports, readReport, resolveReportPdf } from './services/reports.js';
+import { readLastScanRun, readPortalHealth } from './services/scanner.js';
+import { setStatus } from './services/status.js';
 
 const uiDist = join(dirname(fileURLToPath(import.meta.url)), '..', 'ui', 'dist');
+
+/**
+ * Turn a service's typed refusal into a response.
+ *
+ * The services carry their own `status`/`code` because they are the layer that
+ * knows *why* something was refused — a stale etag is a 409, an unscannable
+ * entry is a 400, a held tracker lock is a 503. Anything without a status is a
+ * genuine fault and is rethrown for Fastify to log and turn into a 500.
+ */
+function fail(reply, error) {
+  if (typeof error?.status !== 'number') throw error;
+  return reply.code(error.status).send({
+    error: error.message,
+    code: error.code,
+    ...(error.detail === undefined ? {} : { detail: error.detail }),
+  });
+}
+
+/** Request bodies are user input from a browser; treat a non-object as a 400, not a crash. */
+function body(request) {
+  const value = request.body;
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    const error = new Error('Expected a JSON object body');
+    error.status = 400;
+    error.code = 'body-invalid';
+    throw error;
+  }
+  return value;
+}
 
 /**
  * Build the Fastify instance.
@@ -33,6 +76,12 @@ const uiDist = join(dirname(fileURLToPath(import.meta.url)), '..', 'ui', 'dist')
  */
 export function buildApp({ root, logger = false, serveUi = true } = {}) {
   const app = Fastify({ logger });
+
+  // One runner per app instance, not a module singleton: each test file builds
+  // its own app, and shared mutable run state across parallel test files would
+  // be a flake generator.
+  const runner = createRunner({ repoRoot, root });
+  app.addHook('onClose', async () => runner.close());
 
   // The built SPA is served by this same process, so M1's acceptance criterion
   // ("browse the pipeline without touching a terminal") is one command on one
@@ -170,5 +219,168 @@ export function buildApp({ root, logger = false, serveUi = true } = {}) {
       .send(createReadStream(pdf.absolutePath));
   });
 
+  // ── inline status changes ──────────────────────────────────────────
+
+  app.patch('/api/pipeline/rows/:id/status', async (request, reply) => {
+    try {
+      const input = body(request);
+      const result = await setStatus({
+        rowId: request.params.id,
+        statusId: input.statusId,
+        note: input.note,
+        on: input.on,
+        root,
+      });
+      return { ok: true, result };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  // ── the URL inbox ──────────────────────────────────────────────────
+
+  app.get('/api/inbox', async () => {
+    const inbox = readInbox({ root });
+    return { ...inbox, lastScan: readLastScanRun({ root }) };
+  });
+
+  // ── portals ────────────────────────────────────────────────────────
+
+  app.get('/api/portals', async () => ({
+    ...readPortals({ root }),
+    health: readPortalHealth({ root }),
+  }));
+
+  app.post('/api/portals/entries', async (request, reply) => {
+    try {
+      const input = body(request);
+      const result = createEntry({ root, kind: input.kind, entry: input.entry, etag: input.etag });
+      return reply.code(201).send({ ok: true, ...result });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.patch('/api/portals/entries/:kind/:index', async (request, reply) => {
+    try {
+      const input = body(request);
+      return {
+        ok: true,
+        ...updateEntry({
+          root,
+          kind: request.params.kind,
+          index: Number(request.params.index),
+          // The name is the client's checksum on the index: indices shift when
+          // an entry is deleted, and a stale one must fail rather than edit the
+          // neighbouring company.
+          name: input.name,
+          entry: input.entry,
+          etag: input.etag,
+        }),
+      };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.delete('/api/portals/entries/:kind/:index', async (request, reply) => {
+    try {
+      const input = body(request);
+      return {
+        ok: true,
+        ...deleteEntry({
+          root,
+          kind: request.params.kind,
+          index: Number(request.params.index),
+          name: input.name,
+          etag: input.etag,
+        }),
+      };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  // ── runs ───────────────────────────────────────────────────────────
+
+  app.get('/api/runs', async () => ({ ...runner.list(), kinds: describeKinds() }));
+
+  app.post('/api/runs', async (request, reply) => {
+    try {
+      const input = body(request);
+      const spec = buildSpec(input.kind, input.options ?? {});
+      // Burn the confirmation before spawning: if the token is bad, nothing has
+      // run, and a valid token can never authorise a second write.
+      if (spec.confirmRequired) runner.consumeConfirmation(input.confirmToken, spec.kind);
+      return reply.code(202).send(runner.start(spec));
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.get('/api/runs/:id', async (request, reply) => {
+    const run = runner.get(request.params.id);
+    if (!run) return reply.code(404).send({ error: 'No such run' });
+    return run;
+  });
+
+  app.post('/api/runs/:id/cancel', async (request, reply) => {
+    try {
+      return reply.code(202).send(runner.cancel(request.params.id));
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  /**
+   * Live output for one run.
+   *
+   * `subscribe` replays everything captured so far before the first live event,
+   * so a reconnecting browser sees the whole log rather than joining halfway
+   * through — which matters most for `scan.mjs`, whose fetch sweep is silent for
+   * a long stretch and then prints its entire summary at once.
+   */
+  app.get('/api/runs/:id/events', (request, reply) => {
+    if (!runner.get(request.params.id)) {
+      return reply.code(404).send({ error: 'No such run' });
+    }
+
+    reply.raw.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+      // Neither the Vite dev proxy nor any local reverse proxy may buffer this;
+      // a buffered event stream is an empty log pane until the run ends.
+      'X-Accel-Buffering': 'no',
+    });
+
+    const send = (event) => {
+      if (reply.raw.writableEnded) return;
+      reply.raw.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
+      if (event.type === 'done') reply.raw.end();
+    };
+
+    const unsubscribe = runner.subscribe(request.params.id, send);
+    // Comment frames keep intermediaries from timing the connection out during
+    // the sweep, when a real scan can print nothing for minutes.
+    const heartbeat = setInterval(() => {
+      if (!reply.raw.writableEnded) reply.raw.write(': ping\n\n');
+    }, 15_000);
+
+    request.raw.on('close', () => {
+      clearInterval(heartbeat);
+      unsubscribe();
+    });
+    reply.raw.on('finish', () => clearInterval(heartbeat));
+
+    reply.hijack();
+    return reply;
+  });
+
+  /** The structured result of the last scan, from `data/scan-runs.tsv`. */
+  app.get('/api/scan/summary', async () => ({ lastRun: readLastScanRun({ root }) }));
+
   return app;
 }
+
+export { RUN_KINDS };

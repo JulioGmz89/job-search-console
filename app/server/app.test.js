@@ -103,3 +103,157 @@ test('the SPA shell is served for client routes but /api stays JSON', async () =
   assert.equal(missing.statusCode, 404);
   assert.equal(missing.json().error, 'Not found');
 });
+
+// ── M2: writes, runs and streaming ───────────────────────────────────
+//
+// These tests deliberately exercise only the REFUSAL paths of the write and run
+// routes. The success paths spawn real upstream scripts against real files, and
+// the fixture workspace is committed to the repository — a route test that
+// "succeeded" here would rewrite the fixture on every run. Those paths are
+// covered in services/status.test.js and queue/runner.test.js, which each build
+// a throwaway copy first.
+
+const send = (method, url, payload) => app.inject({ method, url, payload });
+
+test('GET /api/portals reads the sources with an etag and a provider vocabulary', async () => {
+  const body = (await get('/api/portals')).json();
+
+  assert.equal(body.exists, true);
+  assert.equal(body.editable, true);
+  assert.deepEqual(body.companies.map((c) => c.name), ['Acme', 'Globex', 'Initech', 'Umbrella']);
+  assert.equal(typeof body.etag, 'string');
+  assert.ok(body.providers.includes('greenhouse'), 'the dropdown is fed from providers/');
+  assert.deepEqual(body.scanMethods, ['playwright', 'websearch', 'local_parser']);
+  // Health comes from portal-health.tsv, latest row per company.
+  assert.equal(body.health.Acme.status, 'slug_gone');
+});
+
+test('a portals write without a fresh etag is refused', async () => {
+  const res = await send('PATCH', '/api/portals/entries/company/0', {
+    name: 'Acme',
+    entry: { enabled: false },
+    etag: 'not-the-current-one',
+  });
+  assert.equal(res.statusCode, 409);
+  assert.equal(res.json().code, 'stale-etag');
+});
+
+test('a portals write whose index no longer holds that name is refused', async () => {
+  const { etag } = (await get('/api/portals')).json();
+  const res = await send('PATCH', '/api/portals/entries/company/0', {
+    name: 'Globex',
+    entry: { enabled: false },
+    etag,
+  });
+  assert.equal(res.statusCode, 409);
+  assert.equal(res.json().code, 'entry-moved');
+});
+
+test('a portals entry the scanner could never reach is refused', async () => {
+  const { etag } = (await get('/api/portals')).json();
+  const res = await send('POST', '/api/portals/entries', {
+    kind: 'company',
+    entry: { name: 'Nowhere' },
+    etag,
+  });
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.json().code, 'entry-unreachable');
+});
+
+test('GET /api/inbox parses pipeline.md and carries the last scan', async () => {
+  const body = (await get('/api/inbox')).json();
+
+  assert.equal(body.pending.length, 6);
+  assert.equal(body.processed.length, 2);
+  assert.equal(body.lastScan.new_added, 5);
+});
+
+test('an unknown status is refused before set-status.mjs is ever spawned', async () => {
+  const res = await send('PATCH', '/api/pipeline/rows/2/status', { statusId: 'pondering' });
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.json().code, 'status-unknown');
+});
+
+test('a note that would break the tracker table is refused', async () => {
+  const res = await send('PATCH', '/api/pipeline/rows/2/status', { statusId: 'applied', note: 'a | b' });
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.json().code, 'note-pipe');
+});
+
+test('a non-object body is a 400, not a crash', async () => {
+  const res = await send('PATCH', '/api/pipeline/rows/2/status', ['applied']);
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.json().code, 'body-invalid');
+});
+
+test('GET /api/runs lists the run vocabulary without any argv builders', async () => {
+  const body = (await get('/api/runs')).json();
+
+  assert.equal(body.active, null);
+  assert.deepEqual(body.recent, []);
+  const scan = body.kinds.find((k) => k.kind === 'scan');
+  assert.equal(scan.label, 'Scan portals');
+  assert.equal(scan.supportsDryRun, true);
+  assert.equal(body.kinds.find((k) => k.kind === 'dedup').confirmRequired, true);
+  // The wire vocabulary carries no way to influence what actually gets run.
+  for (const kind of body.kinds) assert.equal(kind.args, undefined);
+});
+
+test('the client cannot name a command, only a kind', async () => {
+  for (const payload of [
+    { kind: 'rm', options: {} },
+    { kind: '../../evil', options: {} },
+    { script: 'scan.mjs', args: ['--force'] },
+    { kind: 'scan', options: { since: -1 } },
+  ]) {
+    const res = await send('POST', '/api/runs', payload);
+    assert.equal(res.statusCode, 400, `refused: ${JSON.stringify(payload)}`);
+  }
+});
+
+test('a tracker-rewriting run is refused without a spent dry run', async () => {
+  for (const payload of [
+    { kind: 'dedup' },
+    { kind: 'dedup', confirmToken: 'made-up' },
+    { kind: 'reconcile', confirmToken: 'made-up' },
+  ]) {
+    const res = await send('POST', '/api/runs', payload);
+    assert.equal(res.statusCode, 409, `refused: ${JSON.stringify(payload)}`);
+    assert.equal(res.json().code, 'confirm-required');
+  }
+});
+
+test('an unknown run id 404s on every run route', async () => {
+  assert.equal((await get('/api/runs/nope')).statusCode, 404);
+  assert.equal((await get('/api/runs/nope/events')).statusCode, 404);
+  assert.equal((await send('POST', '/api/runs/nope/cancel')).statusCode, 404);
+});
+
+test('a run streams its output as SSE and ends the stream when it finishes', async () => {
+  // validate-portals.mjs is the one kind that is read-only, fast, and needs no
+  // network — the only spawn this file can safely make.
+  const started = await send('POST', '/api/runs', { kind: 'validate-portals' });
+  assert.equal(started.statusCode, 202);
+  const { id } = started.json();
+
+  const stream = await app.inject({ method: 'GET', url: `/api/runs/${id}/events` });
+  assert.equal(stream.statusCode, 200);
+  assert.match(stream.headers['content-type'], /text\/event-stream/);
+  assert.equal(stream.headers['x-accel-buffering'], 'no');
+
+  const events = stream.payload
+    .split('\n\n')
+    .filter((frame) => frame.startsWith('event:'))
+    .map((frame) => JSON.parse(frame.slice(frame.indexOf('data: ') + 6)));
+
+  assert.ok(events.some((e) => e.type === 'line'), 'the log is replayed and streamed');
+  const done = events.at(-1);
+  assert.equal(done.type, 'done');
+  assert.equal(done.run.status, 'succeeded');
+
+  // And the finished run is retrievable afterwards, with its whole log.
+  const record = (await get(`/api/runs/${id}`)).json();
+  assert.equal(record.status, 'succeeded');
+  assert.equal(record.exitCode, 0);
+  assert.ok(record.lines.some((l) => l.text.includes('0 errors')));
+});
