@@ -1,0 +1,19 @@
+{
+  "name": "job-search-console-app",
+  "version": "0.0.0",
+  "description": "Local web console for job-search-console: server, agent runner, skills layer, and UI",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.9.1",
+    "globals": "^16.0.0"
+  }
+}

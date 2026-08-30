@@ -1,0 +1,50 @@
+name: App CI
+
+# CI for app/ — the fork-owned application (server, agent runner, skills, UI).
+# Path-scoped on purpose: this never fires on upstream-only changes, and upstream's
+# test.yml never fires on ours. Modeled on web-ci.yml, upstream's own precedent for
+# a subtree that versions as its own npm package.
+
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - '.github/workflows/app-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - '.github/workflows/app-ci.yml'
+
+permissions:
+  contents: read
+
+# A force-push supersedes the running matrix; cancel it rather than let stale legs
+# occupy runners.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: lint + test
+    runs-on: ubuntu-latest
+    strategy:
+      # A single Node version failing must not cancel the evidence from the other.
+      fail-fast: false
+      matrix:
+        # 22 is the maintainer's local version, 24 is what upstream's CI runs.
+        node: [22, 24]
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
