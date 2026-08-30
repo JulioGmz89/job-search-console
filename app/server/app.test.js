@@ -91,3 +91,15 @@ test('GET /api/reports/:id/pdf 404s rather than serving an escaping path', async
   assert.equal((await get('/api/reports/9/pdf')).statusCode, 404, 'path escapes output/');
   assert.equal((await get('/api/reports/3/pdf')).statusCode, 404, 'no PDF at all');
 });
+
+test('the SPA shell is served for client routes but /api stays JSON', async () => {
+  const ui = buildApp({ root: WORKSPACE });
+
+  const shell = await ui.inject({ method: 'GET', url: '/' });
+  assert.equal(shell.statusCode, 200);
+  assert.match(shell.headers['content-type'], /text\/html/);
+
+  const missing = await ui.inject({ method: 'GET', url: '/api/nope' });
+  assert.equal(missing.statusCode, 404);
+  assert.equal(missing.json().error, 'Not found');
+});

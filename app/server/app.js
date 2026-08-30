@@ -8,13 +8,18 @@
  * this file only shapes responses and turns "not found" into a 404.
  */
 
-import { createReadStream } from 'node:fs';
+import { createReadStream, existsSync } from 'node:fs';
 import { stat } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
+import fastifyStatic from '@fastify/static';
 import Fastify from 'fastify';
 
 import { readPipeline, SCORE_BANDS } from './services/pipeline.js';
 import { listReports, readReport, resolveReportPdf } from './services/reports.js';
+
+const uiDist = join(dirname(fileURLToPath(import.meta.url)), '..', 'ui', 'dist');
 
 /**
  * Build the Fastify instance.
@@ -26,8 +31,22 @@ import { listReports, readReport, resolveReportPdf } from './services/reports.js
  *   data directory; omit to use upstream's resolution chain.
  * @returns {import('fastify').FastifyInstance}
  */
-export function buildApp({ root, logger = false } = {}) {
+export function buildApp({ root, logger = false, serveUi = true } = {}) {
   const app = Fastify({ logger });
+
+  // The built SPA is served by this same process, so M1's acceptance criterion
+  // ("browse the pipeline without touching a terminal") is one command on one
+  // port. In dev, Vite serves the app instead and proxies /api back here — so a
+  // missing dist/ is normal, not an error.
+  if (serveUi && existsSync(uiDist)) {
+    app.register(fastifyStatic, { root: uiDist });
+    // Client-side routes must fall through to index.html, but a mistyped /api
+    // path has to stay a JSON 404 rather than silently returning the SPA shell.
+    app.setNotFoundHandler((request, reply) => {
+      if (request.url.startsWith('/api/')) return reply.code(404).send({ error: 'Not found' });
+      return reply.sendFile('index.html');
+    });
+  }
 
   /**
    * Join the tracker to the reports once per request.
