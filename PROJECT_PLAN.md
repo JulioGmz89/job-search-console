@@ -61,7 +61,8 @@ Our backend generalizes that pattern.
 - `cv.md` — the user's resume (markdown)
 - `config/profile.yml` — user profile
 - `portals.yml` — scanner configuration (companies + search queries)
-- `data/` incl. `pipeline.md` — the application tracker (markdown tables)
+- `data/` incl. `applications.md` — the application tracker (markdown tables).
+  `data/pipeline.md` is a separate file: the inbox of pending job URLs.
 - `reports/` — A–H evaluation reports (markdown)
 - `output/` — generated PDFs
 
@@ -102,7 +103,7 @@ job-search-console/
 ├── app/
 │   ├── server/                # Node backend (Fastify or Express), binds 127.0.0.1 only
 │   │   ├── services/          # SEAM: wraps upstream .mjs + parses data files
-│   │   │   ├── pipeline.js    #   parse/write pipeline.md & tracker data
+│   │   │   ├── pipeline.js    #   parse/write data/applications.md (the tracker)
 │   │   │   ├── reports.js     #   parse reports/, resolve output/ PDFs
 │   │   │   ├── scanner.js     #   invoke scan.mjs (incl. --verify), portals.yml CRUD
 │   │   │   └── profile.js     #   cv.md + profile.yml read/write
@@ -218,7 +219,7 @@ Each milestone ships something usable. Do not start N+1 before N works end-to-en
 - **M0 — Fork hygiene:** fork, rename repo to `job-search-console`, new README
   crediting upstream, add `upstream` remote, CI lint/test skeleton, this
   document committed.
-- **M1 — Read-only dashboard:** `app/server` parses `pipeline.md` + `reports/`
+- **M1 — Read-only dashboard:** `app/server` parses `data/applications.md` + `reports/`
   into JSON endpoints; UI shows pipeline table, rendered reports, PDF preview.
   *No agents, no queue.* This forces the data-contract parsing everything else
   builds on. Acceptance: point it at a populated career-ops directory and browse
