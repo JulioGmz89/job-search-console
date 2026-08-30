@@ -1,0 +1,55 @@
+# Portal Scanner Configuration — test fixture
+# Deliberately over-commented: these comments are the assertion. Every write the
+# console makes has to leave all of them exactly where they are.
+
+# -- Location filter --
+location_filter:
+  # always_allow is checked BEFORE block, so a multi-region role still passes.
+  always_allow:
+    - "Mexico"
+    - "LATAM"
+  block:
+    - "United States"
+
+title_filter:
+  positive:
+    - engineer
+  negative:
+    - intern
+
+tracked_companies:
+
+  # -- Group one: ATS-backed --
+
+  - name: Acme
+    careers_url: https://job-boards.greenhouse.io/acme
+    api: https://boards-api.greenhouse.io/v1/boards/acme/jobs
+    provider: greenhouse
+    notes: "Quoted note with an apostrophe: Acme's board."
+    enabled: true
+
+  - name: Globex
+    careers_url: https://jobs.lever.co/globex
+    enabled: false
+
+  # -- Group two: websearch lane --
+  # This heading must survive a delete of the entry above it.
+
+  - name: Initech
+    scan_method: websearch
+    scan_query: '"Initech" (jobs OR careers)'
+    notes: No quotes on this one.
+    enabled: true
+
+  - name: Umbrella
+    careers_url: https://boards.greenhouse.io/umbrella
+    provider: greenhouse
+    max_pages: 3
+    enabled: true
+
+job_boards:
+
+  # A board the scanner cannot auto-detect — it needs the explicit provider.
+  - name: RemoteOK
+    provider: remoteok
+    enabled: true
