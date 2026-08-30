@@ -63,6 +63,11 @@ config/benchmarks.yml
 # project, and must survive the sync that overwrites update-system.mjs (#2421).
 config/local-paths.txt
 portals.yml
+portals.yml.bak
+# ...but the console's test fixtures are code, not user config. The pattern
+# above is unanchored, so it swallows them at any depth and CI then runs
+# against files that were never committed.
+!app/server/services/__fixtures__/**/portals.yml
 modes/_profile.md
 modes/_custom.md
 modes/_brief.md
