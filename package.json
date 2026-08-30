@@ -1,7 +1,7 @@
 {
-  "name": "career-ops",
+  "name": "job-search-console",
   "version": "1.30.0",
-  "description": "AI-powered job search pipeline — works with any AI coding CLI (Claude Code, Codex, OpenCode, Antigravity, Grok, Qwen, Kimi, Copilot)",
+  "description": "Local web console for the whole job search — discovery, AI evaluation, tailored CVs, and skills gap analysis. Built on career-ops.",
   "private": true,
   "engines": {
     "node": ">=18"
@@ -86,11 +86,11 @@
     "grok",
     "ai-agent-skill"
   ],
-  "author": "Santiago Fernández de Valderrama <hi@santifer.io> (https://santifer.io)",
-  "homepage": "https://santifer.io",
+  "author": "JulioGmz89",
+  "homepage": "https://github.com/JulioGmz89/job-search-console",
   "repository": {
     "type": "git",
-    "url": "https://github.com/santifer/career-ops"
+    "url": "https://github.com/JulioGmz89/job-search-console"
   },
   "license": "MIT",
   "dependencies": {
