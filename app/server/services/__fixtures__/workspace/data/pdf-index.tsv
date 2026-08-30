@@ -1,0 +1,4 @@
+# report	pdf	html	format	date — written by generate-pdf.mjs, do not edit
+001	output/cv-fixture-acme-2026-01-05.pdf	output/cv-fixture-acme.html	a4	2026-01-05
+006	output/cv-fixture-soylent-2026-01-09.pdf	output/cv-fixture-soylent.html	letter	2026-01-09
+009	output/../../../escape-attempt.pdf	output/escape.html	a4	2026-01-12
