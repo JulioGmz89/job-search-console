@@ -75,6 +75,30 @@ Two deliberate exceptions worth knowing about:
   are disabled at the GitHub level rather than deleted, so no workflow file conflicts on
   merge.
 
+## Known upstream test divergences
+
+`node test-all.mjs --quick` is upstream's repo-integrity suite. It runs here, and most of
+it is worth keeping — but a handful of its checks assert things that are true of
+career-ops and deliberately not true of this fork. Don't "fix" these; they are the fork
+working as intended.
+
+| Check | Why it fails here |
+|---|---|
+| `README is missing required Codex usage guidance` | It requires README.md to document `codex exec` and CODEX.md. v1 supports Claude Code headless only ([PROJECT_PLAN.md §3](PROJECT_PLAN.md)); documenting Codex would advertise support we don't have. Multi-CLI is a post-v1 goal — revisit this check then |
+| `SYSTEM_PATHS coverage gap` | Requires every tracked file to be registered in `update-system.mjs`, which is upstream's manifest for shipping *upstream's* files to users. `PROJECT_PLAN.md` and `app/**` are ours and must not be in it. Registering them would also make a high-churn merge hotspot worse |
+
+Everything else in the suite should stay green. **Before you push, compare against a
+baseline rather than reading the failure count cold** — several checks (the
+`CLAUDE.md`/`AGENTS.md` wrapper assertions, the skill-router routing rule, and the `web/`
+unit suites) were already red at the fork point and have nothing to do with your change:
+
+```sh
+git worktree add /tmp/baseline main
+cd /tmp/baseline && node test-all.mjs --quick   # note the failure list
+```
+
+Your branch should add no failures to that list.
+
 ## Non-negotiable constraints
 
 From [PROJECT_PLAN.md §9](PROJECT_PLAN.md). A PR that violates any of these will be

@@ -28,7 +28,8 @@ Upstream's original README is preserved here at
 1. **Profile** — upload and edit your resume (`cv.md`) and configure job board sources.
 2. **Discovery** — run automated job discovery across multiple platforms.
 3. **Evaluation** — trigger AI evaluations and tailored CV/PDF generation from the UI,
-   with live progress; no terminal commands.
+   with live progress; no terminal commands. Results are the structured A–H report
+   career-ops produces, rendered in the browser next to the generated PDF.
 4. **Skills Gap Analysis** *(new in this fork)* — aggregate every posting you've scanned
    to report which skills are most in demand, which you fully have, which you partially
    have, and which you lack entirely — weighted toward the jobs you actually scored well
@@ -56,16 +57,13 @@ setup, and you can always drop back into a terminal in the same directory.
 
 ## Principles
 
-- **Human-in-the-loop.** The system drafts and evaluates; *you* apply. It never submits
-  an application, sends an email, or clicks anything on your behalf. Auto-apply is
-  permanently out of scope.
-- **Local-only.** The server binds `127.0.0.1`. No hosted service, no accounts.
-- **No telemetry.** Nothing is collected. The only outbound traffic is to the AI provider
-  you configure and the job boards being scanned.
-- **Your data is yours.** Your CV and personal files never leave your machine except to
-  the AI provider you chose.
-- **Respects third-party terms.** Upstream's rate-limiting and scanning behavior is kept
-  as-is.
+| | |
+|---|---|
+| **Human-in-the-loop** <!-- hitl: absolute guarantee. Do not soften this row with a manner adverb, an emphatic reflexive, or a conditional clause; the prohibition is absolute and has no exceptions. --> | The console drafts and evaluates; **you** apply. It never submits an application, sends an email, or clicks anything on your behalf. Auto-apply is permanently out of scope. |
+| **Local-only** | The server binds `127.0.0.1`. No hosted service, no accounts. |
+| **No telemetry** | Nothing is collected. The only outbound traffic goes to the AI provider you configure and the job boards being scanned. |
+| **Your data is yours** | Your CV and personal files never leave your machine except to the AI provider you chose. |
+| **Respects third-party terms** | Upstream's rate-limiting and scanning behavior is kept as-is. |
 
 ## Roadmap
 
