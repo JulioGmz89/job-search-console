@@ -87,15 +87,20 @@ export function buildApp({ root, logger = false, serveUi = true } = {}) {
   // ("browse the pipeline without touching a terminal") is one command on one
   // port. In dev, Vite serves the app instead and proxies /api back here — so a
   // missing dist/ is normal, not an error.
-  if (serveUi && existsSync(uiDist)) {
-    app.register(fastifyStatic, { root: uiDist });
-    // Client-side routes must fall through to index.html, but a mistyped /api
-    // path has to stay a JSON 404 rather than silently returning the SPA shell.
-    app.setNotFoundHandler((request, reply) => {
-      if (request.url.startsWith('/api/')) return reply.code(404).send({ error: 'Not found' });
-      return reply.sendFile('index.html');
-    });
-  }
+  const spaBuilt = serveUi && existsSync(uiDist);
+  if (spaBuilt) app.register(fastifyStatic, { root: uiDist });
+
+  // Registered whichever mode we are in. An unknown /api path must be a JSON 404
+  // in every configuration, not just the one where the SPA happens to be built —
+  // otherwise a dev-mode client parsing Fastify's default 404 finds no `error`
+  // key and reports the wrong thing. Only the SPA fallback is conditional.
+  app.setNotFoundHandler((request, reply) => {
+    if (!spaBuilt || request.url.startsWith('/api/')) {
+      return reply.code(404).send({ error: 'Not found' });
+    }
+    // Client-side routes fall through to the shell so a deep link still loads.
+    return reply.sendFile('index.html');
+  });
 
   /**
    * Join the tracker to the reports once per request.

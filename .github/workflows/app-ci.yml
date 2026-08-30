@@ -44,7 +44,18 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: npm
-          cache-dependency-path: app/package-lock.json
+          cache-dependency-path: |
+            app/package-lock.json
+            app/ui/package-lock.json
       - run: npm ci
       - run: npm run lint
+      # ui/ is a separate package with its own lockfile, so the install above
+      # (which is scoped to app/) does not reach it.
+      - run: npm --prefix ui ci
+      # Build the UI before testing, for two reasons: app.test.js asserts the
+      # SPA shell is served, which only happens when ui/dist exists (a fresh
+      # clone has none, so that test failed here from M1 onward); and without
+      # this step nothing in CI ever compiles the components, so a broken one
+      # reaches main unnoticed.
+      - run: npm run build
       - run: npm test

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -92,16 +93,30 @@ test('GET /api/reports/:id/pdf 404s rather than serving an escaping path', async
   assert.equal((await get('/api/reports/3/pdf')).statusCode, 404, 'no PDF at all');
 });
 
-test('the SPA shell is served for client routes but /api stays JSON', async () => {
-  const ui = buildApp({ root: WORKSPACE });
-
-  const shell = await ui.inject({ method: 'GET', url: '/' });
-  assert.equal(shell.statusCode, 200);
-  assert.match(shell.headers['content-type'], /text\/html/);
-
-  const missing = await ui.inject({ method: 'GET', url: '/api/nope' });
+test('an unknown /api path is a JSON 404 whether or not the UI is built', async () => {
+  // This half must hold in both configurations. It previously did not: the
+  // handler was registered only when ui/dist existed, so with no build an
+  // unknown /api path fell through to Fastify's default 404, whose body has no
+  // `error` key — the very field ui/src/api.js unwraps. That is the dev-server
+  // configuration, so the unhandled mode was the one used while developing.
+  const missing = await buildApp({ root: WORKSPACE }).inject({ method: 'GET', url: '/api/nope' });
   assert.equal(missing.statusCode, 404);
   assert.equal(missing.json().error, 'Not found');
+});
+
+test('a client route falls through to the SPA shell once the UI is built', async (t) => {
+  // ui/dist is gitignored, so it is absent on a fresh clone and present on a
+  // developer's machine. Asserting unconditionally made this test pass locally
+  // and fail in CI from M1 onward; skipping when there is nothing to serve keeps
+  // `npm test` honest on a bare checkout, and CI now builds the UI first so this
+  // path is still covered there.
+  if (!existsSync(join(here, '..', 'ui', 'dist', 'index.html'))) {
+    return t.skip('ui/dist not built — run `npm run build` to cover the SPA fallback');
+  }
+
+  const shell = await buildApp({ root: WORKSPACE }).inject({ method: 'GET', url: '/deep/link' });
+  assert.equal(shell.statusCode, 200);
+  assert.match(shell.headers['content-type'], /text\/html/);
 });
 
 // ── M2: writes, runs and streaming ───────────────────────────────────
