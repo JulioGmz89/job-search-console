@@ -124,3 +124,83 @@ export function loadStates() {
   }
   return { states, byAlias };
 }
+
+/**
+ * Absolute path to `portals.yml`, the scanner's configuration.
+ *
+ * Upstream honours `CAREER_OPS_PORTALS` in scan.mjs, fix-slugs.mjs and
+ * validate-portals.mjs alike, so the console has to as well: if the UI edited
+ * one file while the scan it launches read another, every change would look
+ * silently ignored.
+ *
+ * An explicit `root` still wins, matching resolveDataRoot's contract — tests
+ * point at a fixture directory without mutating process.env, which would leak
+ * across the test files `node --test` runs in parallel.
+ *
+ * @param {string} [root] - Data root; omit to use upstream resolution.
+ * @returns {string} Absolute path to portals.yml.
+ */
+export function portalsPath(root) {
+  if (!root && process.env.CAREER_OPS_PORTALS) return resolve(process.env.CAREER_OPS_PORTALS);
+  return join(resolveDataRoot(root), 'portals.yml');
+}
+
+/** @param {string} [root] @returns {string} Absolute path to `data/pipeline.md`, the URL inbox. */
+export function inboxPath(root) {
+  if (!root && process.env.CAREER_OPS_PIPELINE) return resolve(process.env.CAREER_OPS_PIPELINE);
+  return join(resolveDataRoot(root), 'data', 'pipeline.md');
+}
+
+/**
+ * The two scan bookkeeping files, which are anchored differently from every
+ * other data file.
+ *
+ * `scan.mjs` builds most of its paths from `getCareerOpsRoot()`, but these two
+ * are bare relative constants — `const SCAN_RUNS_PATH = 'data/scan-runs.tsv'`
+ * and `const PORTAL_HEALTH_PATH = 'data/portal-health.tsv'` (scan.mjs:2037,
+ * 2110). A relative path resolves against the process's working directory, so
+ * they land wherever the scan was *launched from*, not under the data root.
+ *
+ * The console launches scans with `cwd: repoRoot` (queue/runner.js), so that is
+ * where they are, and that is where these read from. Resolving them under the
+ * data root instead would look right and work fine in the usual setup where the
+ * two are the same directory — and then silently report "never scanned" for
+ * every source the moment anyone points CAREER_OPS_ROOT somewhere else.
+ *
+ * An explicit `root` still wins, so tests can supply fixtures.
+ */
+function scanBookkeepingDir(root) {
+  return root ? resolveDataRoot(root) : repoRoot;
+}
+
+/** @param {string} [root] @returns {string} Absolute path to `data/scan-runs.tsv`. */
+export function scanRunsPath(root) {
+  return join(scanBookkeepingDir(root), 'data', 'scan-runs.tsv');
+}
+
+/** @param {string} [root] @returns {string} Absolute path to `data/portal-health.tsv`. */
+export function portalHealthPath(root) {
+  return join(scanBookkeepingDir(root), 'data', 'portal-health.tsv');
+}
+
+/**
+ * The provider ids upstream can actually resolve, derived from `providers/`.
+ *
+ * validate-portals.mjs derives its own list the same way (every `*.mjs` not
+ * prefixed with `_`), so a provider the user picks in the UI is one upstream
+ * will accept. Providers live in the system layer next to the code, so this
+ * reads from the repo root rather than the data root.
+ *
+ * @returns {string[]} Sorted provider ids.
+ */
+export function listProviderIds() {
+  const { readdirSync } = require('node:fs');
+  try {
+    return readdirSync(join(repoRoot, 'providers'))
+      .filter((f) => f.endsWith('.mjs') && !f.startsWith('_'))
+      .map((f) => f.slice(0, -4))
+      .sort();
+  } catch {
+    return [];
+  }
+}

@@ -11,8 +11,13 @@
  * header-aware `tracker-parse.mjs`, which is the module several upstream
  * readers already share for exactly this reason.
  *
- * Read-only, per M1. Nothing here writes. `rawLine` is preserved on every row
- * because M2's inline status edits will need to locate the exact source line.
+ * Read-only. Nothing here writes, and M2's inline status edits did not change
+ * that: they go through upstream's `set-status.mjs` (see services/status.js),
+ * which already owns the lock, the state validation and the transition ledger.
+ * `rawLine`/`sourceLine` were preserved here against a hand-editing write-back
+ * that deliberately never happened; they stay because they cost nothing and
+ * locating a row's source line is genuinely useful, but nothing depends on them
+ * and `app.js` still strips `rawLine` before it can cross the wire.
  */
 
 import { readFileSync } from 'node:fs';

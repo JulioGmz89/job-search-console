@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { fetchPipeline, fetchReport } from './api.js';
+import { fetchPipeline, fetchReport, fetchRuns } from './api.js';
+import MaintenanceBar from './components/MaintenanceBar.jsx';
 import PipelineTable from './components/PipelineTable.jsx';
 import ReportDetail from './components/ReportDetail.jsx';
+import SourcesPage from './components/SourcesPage.jsx';
 
 /** Sort comparator. Nulls always sort last, whichever direction is active. */
 function compare(a, b, key, dir) {
@@ -18,8 +20,32 @@ function compare(a, b, key, dir) {
   return dir === 'asc' ? result : -result;
 }
 
+const PAGES = [
+  { id: 'pipeline', label: 'Pipeline' },
+  { id: 'sources', label: 'Sources' },
+];
+
+/**
+ * Hash routing, in fifteen lines.
+ *
+ * Two pages do not justify a router dependency, and PROJECT_PLAN.md §11 leaves
+ * the UI stack open — pulling one in now would quietly settle that question.
+ */
+function useHashPage() {
+  const read = () => window.location.hash.replace(/^#\/?/, '') || 'pipeline';
+  const [page, setPage] = useState(read);
+  useEffect(() => {
+    const onChange = () => setPage(read());
+    window.addEventListener('hashchange', onChange);
+    return () => window.removeEventListener('hashchange', onChange);
+  }, []);
+  return [PAGES.some((p) => p.id === page) ? page : 'pipeline', (next) => { window.location.hash = `#/${next}`; }];
+}
+
 export default function App() {
+  const [page, goTo] = useHashPage();
   const [data, setData] = useState(null);
+  const [kinds, setKinds] = useState([]);
   const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [bandFilter, setBandFilter] = useState('all');
@@ -29,8 +55,13 @@ export default function App() {
   const [report, setReport] = useState(null);
   const [reportError, setReportError] = useState(null);
 
-  useEffect(() => {
+  const reload = useCallback(() => {
     fetchPipeline().then(setData).catch((e) => setError(e.message));
+  }, []);
+
+  useEffect(reload, [reload]);
+  useEffect(() => {
+    fetchRuns().then((runs) => setKinds(runs.kinds)).catch(() => {});
   }, []);
 
   const openRow = useCallback((row) => {
@@ -54,6 +85,33 @@ export default function App() {
       .sort((a, b) => compare(a, b, sort.key, sort.dir));
   }, [data, statusFilter, bandFilter, query, sort]);
 
+  const nav = (
+    <nav className="tabs nav">
+      {PAGES.map((entry) => (
+        <button
+          key={entry.id}
+          className="chip"
+          aria-pressed={page === entry.id}
+          onClick={() => goTo(entry.id)}
+        >
+          {entry.label}
+        </button>
+      ))}
+    </nav>
+  );
+
+  if (page === 'sources') {
+    return (
+      <div className="app">
+        <header className="masthead">
+          <h1>Job Search Console</h1>
+          {nav}
+        </header>
+        <SourcesPage />
+      </div>
+    );
+  }
+
   if (error) return <div className="app"><div className="notice warn">Could not reach the server: {error}</div></div>;
   if (!data) return <div className="app"><p className="empty">Loading…</p></div>;
 
@@ -73,6 +131,7 @@ export default function App() {
     <div className="app">
       <header className="masthead">
         <h1>Job Search Console</h1>
+        {nav}
         <span className="counts">
           {data.rows.length} applications · {data.rows.filter((r) => r.pdf).length} PDFs
         </span>
@@ -132,13 +191,22 @@ export default function App() {
 
       <PipelineTable
         rows={rows}
+        statuses={data.statuses}
         sort={sort}
         onSortChange={setSort}
         selectedId={selected}
         onSelect={openRow}
+        onStatusChanged={reload}
       />
 
       <ReportDetail report={report} error={reportError} />
+
+      {kinds.length > 0 ? (
+        <MaintenanceBar
+          kinds={kinds.filter((kind) => kind.kind !== 'scan')}
+          onFinish={reload}
+        />
+      ) : null}
     </div>
   );
 }

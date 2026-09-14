@@ -1,0 +1,4 @@
+timestamp	company	status
+2026-08-28T09:14:48.839Z	Acme	reachable
+2026-08-28T09:14:48.839Z	Globex	empty
+2026-08-29T09:20:11.000Z	Acme	slug_gone

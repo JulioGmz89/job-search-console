@@ -171,3 +171,337 @@ td.company { font-weight: 600; white-space: nowrap; }
 .empty { padding: 44px 20px; text-align: center; color: var(--muted); }
 .muted { color: var(--muted); }
 .notes { font-size: 12.5px; color: var(--muted); max-width: 460px; }
+
+/* ── M2: navigation, sources, runs ─────────────────────────────────── */
+
+.masthead .nav {
+  margin: 0;
+  border: 0;
+  gap: 6px;
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 24px 0 8px;
+}
+
+.section-head h2 {
+  font-size: 15px;
+  margin: 0;
+}
+
+.chip.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+label.inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.warn-text {
+  color: var(--skip);
+}
+
+/* Not display:flex — a flex <td> drops out of the table's column layout and
+   overflows the last column. */
+.row-actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.row-actions .chip + .chip {
+  margin-left: 6px;
+}
+
+/* The status column is the one editable cell in the table. */
+.status-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-cell select {
+  font: inherit;
+  padding: 2px 4px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+  max-width: 130px;
+}
+
+.status-cell select:hover:not(:disabled),
+.status-cell select:focus {
+  border-color: var(--border);
+}
+
+.status-error {
+  color: var(--skip);
+  font-weight: 600;
+  cursor: help;
+}
+
+/* ── run panel ─────────────────────────────────────────────────────── */
+
+.run-panel {
+  margin: 12px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 12px;
+}
+
+.run-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.badge.dry {
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.badge.run-running { background: var(--accent-soft); color: var(--accent); }
+.badge.run-succeeded { background: var(--strong-soft); color: var(--strong); }
+.badge.run-failed,
+.badge.run-cancelled { background: var(--skip-soft); color: var(--skip); }
+
+.run-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.run-progress progress {
+  width: 220px;
+}
+
+.run-log {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.5;
+  max-height: 320px;
+  overflow: auto;
+  margin: 0;
+  padding: 10px;
+  background: var(--surface-2);
+  border-radius: 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.run-log .err {
+  color: var(--skip);
+}
+
+.run-confirm {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--warn-soft);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.run-confirm p {
+  margin: 0;
+  flex: 1 1 260px;
+  font-size: 13px;
+}
+
+.maintenance {
+  margin-top: 32px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+/* ── sources page ──────────────────────────────────────────────────── */
+
+.scan-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 12px;
+  margin-top: 16px;
+}
+
+.scan-box .toolbar {
+  border: 0;
+  padding: 0;
+  margin: 0 0 8px;
+}
+
+.scan-box input[type="number"] {
+  width: 110px;
+}
+
+.inbox-summary {
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+.inbox-list {
+  max-height: 260px;
+  overflow: auto;
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.inbox-list li {
+  margin-bottom: 4px;
+}
+
+.inbox-list li.err a {
+  color: var(--skip);
+}
+
+.entry-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.entry-form h3,
+.entry-form .wide,
+.entry-form .entry-actions {
+  grid-column: 1 / -1;
+}
+
+.entry-form h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.entry-form label:not(.inline) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.entry-form input:not([type="checkbox"]),
+.entry-form select {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.entry-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.filters {
+  margin-top: 32px;
+}
+
+.filters pre {
+  font-family: var(--mono);
+  font-size: 12px;
+  max-height: 320px;
+  overflow: auto;
+  background: var(--surface-2);
+  padding: 10px;
+  border-radius: 6px;
+}
+
+/* A check that exits non-zero because it found something is informative,
+   not broken — see RunPanel's outcome(). */
+.badge.run-findings { background: var(--review-soft); color: var(--review); }
+
+/* ── in-app help ───────────────────────────────────────────────────── */
+
+.help {
+  margin: 14px 0;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.help.compact {
+  margin: 0 0 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  background: var(--surface-2);
+}
+
+.help summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.help summary:hover { color: var(--text); }
+
+.help h4 {
+  margin: 14px 0 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.help dl { margin: 8px 0; }
+.help dl > div { margin-bottom: 8px; }
+.help dt { font-weight: 600; }
+.help dd { margin: 2px 0 0; color: var(--text); }
+.help p { margin: 8px 0; }
+
+/* Field-level hints in the entry form. */
+.entry-form .intro {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.entry-form .field-label { color: var(--muted); }
+
+.hint {
+  display: block;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+label.inline .hint { margin-left: 4px; display: inline; }
+
+/* The checkbox row spans the form, so its label and hint sit on one line. */
+.entry-form label.inline { grid-column: 1 / -1; flex-wrap: wrap; }
