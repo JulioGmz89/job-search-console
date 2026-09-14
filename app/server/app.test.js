@@ -212,6 +212,12 @@ test('GET /api/runs lists the run vocabulary without any argv builders', async (
   assert.equal(body.kinds.find((k) => k.kind === 'dedup').confirmRequired, true);
   // The wire vocabulary carries no way to influence what actually gets run.
   for (const kind of body.kinds) assert.equal(kind.args, undefined);
+  // Every maintenance kind explains itself; the UI's help panel renders this
+  // rather than restating it, so the spec that runs a script is the one place
+  // that describes it.
+  for (const kind of body.kinds.filter((k) => k.kind !== 'scan')) {
+    assert.ok(kind.help && kind.help.length > 100, `${kind.kind} has a help paragraph`);
+  }
 });
 
 test('the client cannot name a command, only a kind', async () => {

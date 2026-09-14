@@ -26,7 +26,10 @@ import { parseProgress, scanArgs } from '../services/scanner.js';
  * @typedef {object} RunKind
  * @property {string} script - Filename at the repository root.
  * @property {string} label - What the UI calls this run.
- * @property {string} description - What it does, shown before it is started.
+ * @property {string} description - One line, for the button's tooltip.
+ * @property {string} [help] - A paragraph for the UI's help panel: what it changes,
+ *   when to use it, and how to read its result. The UI never hardcodes this text;
+ *   the spec that runs the script is the one place that describes it.
  * @property {boolean} writes - True when a real run modifies user files.
  * @property {boolean} confirmRequired - True when a real run needs a prior dry run.
  * @property {boolean} [reportsFindings] - True when a non-zero exit means the check
@@ -51,6 +54,8 @@ export const RUN_KINDS = Object.freeze({
     script: 'dedup-tracker.mjs',
     label: 'Dedup tracker',
     description: 'Merge duplicate rows in applications.md, keeping the best score and furthest status.',
+    help:
+      'The same job can be evaluated twice — found again under a different URL, re-listed by an agency, or pasted after it was already scanned — leaving two rows for one application. Dedup groups rows by company and a fuzzy role match and merges each group into one, keeping the higher score, the most advanced status (Applied beats Evaluated) and every note. Rewrites data/applications.md and saves the previous version as applications.md.bak.',
     writes: true,
     confirmRequired: true,
     supportsDryRun: true,
@@ -60,6 +65,8 @@ export const RUN_KINDS = Object.freeze({
     script: 'reconcile-pipeline.mjs',
     label: 'Reconcile inbox',
     description: 'Move already-evaluated URLs out of the inbox’s Pending section.',
+    help:
+      'Evaluated URLs are supposed to move from the inbox’s Pending section to Processed, and the two drift when an evaluation runs but the inbox is not updated. Reconcile moves them so the inbox count reflects what is actually still waiting. Rewrites data/pipeline.md.',
     writes: true,
     confirmRequired: true,
     supportsDryRun: true,
@@ -69,6 +76,8 @@ export const RUN_KINDS = Object.freeze({
     script: 'verify-pipeline.mjs',
     label: 'Check integrity',
     description: 'Run every tracker integrity check. Reads only.',
+    help:
+      'Thirteen consistency checks over the tracker: every status is a canonical one, no duplicate company+role, every report link points at a file that exists, scores are well-formed, no row number is reused, and more. Reports what it finds and changes nothing — “Found problems” means the tracker needs a fix by hand, not that the check broke.',
     writes: false,
     confirmRequired: false,
     supportsDryRun: false,
@@ -80,6 +89,8 @@ export const RUN_KINDS = Object.freeze({
     script: 'validate-portals.mjs',
     label: 'Validate sources',
     description: 'Check portals.yml against the scanner’s schema. Reads only.',
+    help:
+      'Checks portals.yml against the scanner’s schema: unknown provider ids, entries without a name, malformed URLs, duplicate names. The console already runs this before saving any edit made here; run it by hand after editing the file directly. Changes nothing.',
     writes: false,
     confirmRequired: false,
     supportsDryRun: false,
@@ -91,6 +102,8 @@ export const RUN_KINDS = Object.freeze({
     script: 'verify-portals.mjs',
     label: 'Probe sources',
     description: 'Ask every tracked company’s ATS whether its board still exists. Reads only, but hits the network.',
+    help:
+      'Asks every provider-backed company’s job board whether it still exists, and suggests the corrected board when a company has moved ATS. Sources that use websearch have no board to ask and are reported as skipped — that is expected, not a failure. Hits the network; changes nothing.',
     writes: false,
     confirmRequired: false,
     supportsDryRun: false,
@@ -116,6 +129,7 @@ export function describeKinds() {
     kind,
     label: def.label,
     description: def.description,
+    help: def.help ?? null,
     writes: def.writes,
     confirmRequired: def.confirmRequired,
     supportsDryRun: def.supportsDryRun,

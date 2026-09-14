@@ -438,3 +438,70 @@ label.inline {
 /* A check that exits non-zero because it found something is informative,
    not broken — see RunPanel's outcome(). */
 .badge.run-findings { background: var(--review-soft); color: var(--review); }
+
+/* ── in-app help ───────────────────────────────────────────────────── */
+
+.help {
+  margin: 14px 0;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.help.compact {
+  margin: 0 0 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  background: var(--surface-2);
+}
+
+.help summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.help summary:hover { color: var(--text); }
+
+.help h4 {
+  margin: 14px 0 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.help dl { margin: 8px 0; }
+.help dl > div { margin-bottom: 8px; }
+.help dt { font-weight: 600; }
+.help dd { margin: 2px 0 0; color: var(--text); }
+.help p { margin: 8px 0; }
+
+/* Field-level hints in the entry form. */
+.entry-form .intro {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.entry-form .field-label { color: var(--muted); }
+
+.hint {
+  display: block;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+label.inline .hint { margin-left: 4px; display: inline; }
+
+/* The checkbox row spans the form, so its label and hint sit on one line. */
+.entry-form label.inline { grid-column: 1 / -1; flex-wrap: wrap; }

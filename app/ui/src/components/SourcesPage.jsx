@@ -5,7 +5,7 @@ import { useRun } from '../useRun.js';
 import PortalEntryForm from './PortalEntryForm.jsx';
 import RunPanel from './RunPanel.jsx';
 
-/** How `portal-health.tsv` verdicts read to a human. */
+/** How `portal-health.tsv` verdicts read to a human, and what to do about each. */
 const HEALTH_LABEL = {
   reachable: 'reachable',
   empty: 'live but empty',
@@ -15,6 +15,15 @@ const HEALTH_LABEL = {
   server: 'server error',
   unknown: 'unknown',
 };
+
+const HEALTH_MEANING = [
+  ['reachable', 'The board answered and listed postings on the last scan.'],
+  ['live but empty', 'The board answered but had zero openings. Normal for small companies; nothing to fix.'],
+  ['board not found', 'The address is wrong or the company moved to another ATS. Run Probe sources — it suggests the corrected board.'],
+  ['network error / server error', 'The board could not be reached that time. Usually transient; if it persists, the URL may be dead.'],
+  ['needs auth', 'The board wants a login. The scanner cannot read it; consider websearch for this one.'],
+  ['never scanned', 'Either a websearch source (scans never fetch those) or one added since the last scan.'],
+];
 
 /** A source's effective provider, as the scanner will resolve it. */
 function providerOf(entry) {
@@ -131,6 +140,44 @@ export default function SourcesPage() {
           />
         </div>
 
+        <details className="help compact">
+          <summary>What the scan options do</summary>
+          <dl>
+            <div>
+              <dt>Scan now</dt>
+              <dd>
+                Fetches every enabled source, applies your filters from <code>portals.yml</code> (title,
+                location, salary…), drops anything already seen, and appends what is left to the inbox as
+                URLs waiting to be evaluated. Nothing is applied to or sent anywhere.
+              </dd>
+            </div>
+            <div>
+              <dt>Preview only</dt>
+              <dd>Runs the whole scan and shows what it would add, but writes nothing. Safe to run any time.</dd>
+            </div>
+            <div>
+              <dt>Verify each posting is live</dt>
+              <dd>
+                Opens every <em>new</em> posting in a real browser and drops the ones that have expired or
+                lost their apply button. Much slower — seconds per posting — and the only phase with a
+                real progress bar, because it is the only phase the scanner counts.
+              </dd>
+            </div>
+            <div>
+              <dt>Only this company</dt>
+              <dd>Scan a single source, matched by name (case-insensitive, partial match works).</dd>
+            </div>
+            <div>
+              <dt>Last N days</dt>
+              <dd>Ignore postings the employer published more than N days ago.</dd>
+            </div>
+          </dl>
+          <p className="muted">
+            The scanner reports nothing while it is fetching — every source is queried at once and the
+            summary arrives all together — so a quiet log with a running clock is normal, not stuck.
+          </p>
+        </details>
+
         <RunPanel
           run={scan.run}
           lines={scan.lines}
@@ -170,6 +217,53 @@ export default function SourcesPage() {
           </div>
         ) : null}
       </section>
+
+      <details className="help">
+        <summary>How sources work</summary>
+        <p>
+          Every scan reads each enabled source below and drops new postings into the inbox. A source is
+          read in one of three ways, and the <strong>Provider</strong> column tells you which:
+        </p>
+        <dl>
+          <div>
+            <dt>auto-detected</dt>
+            <dd>
+              The careers URL is on a job-board system the scanner recognises (Greenhouse, Lever, Ashby,
+              Workday, SmartRecruiters and about twenty more). Fetched for free on every scan. This is
+              what you want for most companies.
+            </dd>
+          </div>
+          <div>
+            <dt>a provider name</dt>
+            <dd>
+              The provider was chosen by hand — needed for aggregator boards with no per-company page,
+              or when a custom domain hides which system is behind it.
+            </dd>
+          </div>
+          <div>
+            <dt>web search</dt>
+            <dd>
+              No provider can reach this company. <strong>Scans never fetch it</strong>; it is listed
+              under “Agent/WebSearch handoff” in the scan log for the AI agent (a later milestone). If a
+              company shows up here but does have a careers page on a known system, editing the source
+              to add that URL turns it into a real one.
+            </dd>
+          </div>
+        </dl>
+        <h4>The Last seen column</h4>
+        <dl>
+          {HEALTH_MEANING.map(([label, meaning]) => (
+            <div key={label}><dt>{label}</dt><dd>{meaning}</dd></div>
+          ))}
+        </dl>
+        <p className="muted">
+          Everything you change here is written straight into <code>portals.yml</code>, editing only the
+          lines involved — your comments and the rest of the file are left exactly as they were, and a
+          copy of the previous version is kept as <code>portals.yml.bak</code>. If the file changes on
+          disk while this page is open, saving is refused until you reload, so nothing is ever
+          overwritten.
+        </p>
+      </details>
 
       {sections.map(({ kind, title, entries }) => (
         <section key={kind}>
