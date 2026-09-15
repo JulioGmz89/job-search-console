@@ -204,7 +204,8 @@ test('a non-object body is a 400, not a crash', async () => {
 test('GET /api/runs lists the run vocabulary without any argv builders', async () => {
   const body = (await get('/api/runs')).json();
 
-  assert.equal(body.active, null);
+  assert.deepEqual(body.active, []);
+  assert.deepEqual(body.queued, []);
   assert.deepEqual(body.recent, []);
   const scan = body.kinds.find((k) => k.kind === 'scan');
   assert.equal(scan.label, 'Scan portals');
