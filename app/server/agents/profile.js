@@ -53,6 +53,7 @@ export function readProfile({ root }) {
     candidateName: null,
     candidateSlug: null,
     location: null,
+    country: null,
   };
   if (!existsSync(path)) return base;
 
@@ -91,5 +92,6 @@ export function readProfile({ root }) {
     candidateName: typeof name === 'string' ? name : null,
     candidateSlug: typeof name === 'string' ? kebab(name) || null : null,
     location: typeof location === 'string' ? location : null,
+    country: typeof doc.location?.country === 'string' ? doc.location.country : null,
   };
 }

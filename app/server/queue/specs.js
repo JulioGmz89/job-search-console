@@ -184,15 +184,30 @@ export const RUN_KINDS = Object.freeze({
     internal: true,
     args: () => [],
   },
+  'mark-pdf-ready': {
+    script: 'mark-pdf-ready.mjs',
+    label: 'Mark PDF ready',
+    description: 'Flip the tracker row’s PDF column to ✅ after a render.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    exclusive: true,
+    internal: true,
+    args: ({ reportNum }) => {
+      if (!/^\d{1,6}$/.test(String(reportNum ?? ''))) throw new TypeError('reportNum must be a report number');
+      return [String(reportNum)];
+    },
+  },
 });
 
 /** A rejected run request. */
 export class SpecError extends Error {
-  constructor(message, { code, status = 400 } = {}) {
+  constructor(message, { code, status = 400, detail } = {}) {
     super(message);
     this.name = 'SpecError';
     this.code = code;
     this.status = status;
+    this.detail = detail;
   }
 }
 
@@ -280,6 +295,6 @@ export function buildSpec(kind, options = {}, ctx = {}) {
 }
 
 /** Build a server-queued post-step. Not reachable from a request. */
-export function internalSpec(kind, ctx = {}) {
-  return buildSpec(kind, {}, { ...ctx, internal: true });
+export function internalSpec(kind, ctx = {}, options = {}) {
+  return buildSpec(kind, options, { ...ctx, internal: true });
 }

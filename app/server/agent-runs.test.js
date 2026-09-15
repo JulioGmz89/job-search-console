@@ -224,3 +224,89 @@ test('requests that cannot work are refused before anything is queued', async ()
     rmSync(noCv, { recursive: true, force: true });
   }
 });
+
+// ── pdf, cover, and the auto-PDF chain ─────────────────────────────
+
+test('a high score queues the PDF, which renders and flips the tracker flag', async () => {
+  scenario('evaluate-ok', { FAKE_CLAUDE_SCORE: '4.4' });
+  const url = 'https://jobs.example.com/ada/6';
+  const { run } = (await post('/api/inbox/urls', { url, evaluate: true })).json();
+  const done = await settled(run.id);
+  assert.equal(done.status, 'succeeded', text(done));
+  assert.match(text(done), /Score 4.4 ≥ 3.5: queuing the tailored PDF/);
+  const num = done.meta.reportNum;
+
+  // The PDF run is queued behind the exclusive merge; by the time it starts the
+  // fake CLI must play the pdf scenario.
+  scenario('pdf-ok');
+  await drained({ timeoutMs: 60_000 });
+  const { recent } = (await get('/api/runs')).json();
+  const pdf = recent.find((r) => r.kind === 'pdf' && r.meta.reportNum === num);
+  assert.ok(pdf, 'a pdf run was chained');
+  assert.equal(pdf.status, 'succeeded', pdf.error);
+  assert.equal(pdf.parentId, run.id);
+  assert.match(pdf.meta.template, /standard/);
+
+  const marked = recent.find((r) => r.kind === 'mark-pdf-ready' && r.parentId === pdf.id);
+  assert.equal(marked?.status, 'succeeded', marked?.error);
+  const row = tracker().split(/\r?\n/).find((l) => l.includes('Fake Co') && l.includes(`[${num}]`));
+  assert.match(row, /✅/, 'mark-pdf-ready.mjs flipped the PDF column');
+
+  const res = await get(`/api/reports/${Number(num)}/pdf`);
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.headers['content-type'], 'application/pdf');
+});
+
+test('a PDF run whose agent renders nothing fails, and refuses an unknown report', async () => {
+  scenario('evaluate-no-report');
+  const some = (await get('/api/reports')).json().reports[0].id;
+  const { id } = (await post('/api/runs', { kind: 'pdf', options: { reportId: some } })).json();
+  const run = await settled(id);
+  assert.equal(run.status, 'failed');
+  assert.match(run.error, /no PDF was recorded|still points at the previous PDF/);
+
+  const missing = await post('/api/runs', { kind: 'pdf', options: { reportId: 999 } });
+  assert.equal(missing.statusCode, 404);
+  assert.equal(missing.json().code, 'report-missing');
+  const bad = await post('/api/runs', { kind: 'pdf', options: { reportId: some, format: 'legal' } });
+  assert.equal(bad.statusCode, 400);
+  await drained();
+});
+
+test('a cover letter needs all four answers, renders to a fixed path, and never touches pdf-index', async () => {
+  const some = (await get('/api/reports')).json().reports.find((r) => r.id === 1).id;
+  const incomplete = await post('/api/runs', { kind: 'cover', options: { reportId: some, answers: { why: 'x', problem: 'y', approach: '' , tone: 'direct' } } });
+  assert.equal(incomplete.statusCode, 400);
+  assert.equal(incomplete.json().code, 'answers-invalid');
+  assert.equal(incomplete.json().detail.key, 'approach');
+  const badTone = await post('/api/runs', { kind: 'cover', options: { reportId: some, answers: { why: 'x', problem: 'y', approach: 'z', tone: 'sassy' } } });
+  assert.equal(badTone.statusCode, 400);
+
+  const indexBefore = readFileSync(join(root, 'data', 'pdf-index.tsv'), 'utf-8');
+  scenario('cover-ok');
+  const started = await post('/api/runs', {
+    kind: 'cover',
+    options: { reportId: some, answers: { why: 'The scale', problem: 'Slow deploys', approach: 'Ship a pipeline first', tone: 'Mirror' } },
+  });
+  assert.equal(started.statusCode, 202, started.body);
+  const run = await settled(started.json().id);
+  assert.equal(run.status, 'succeeded', text(run));
+  assert.equal(run.meta.coverPath, 'output/cover-acme-001.pdf');
+  assert.match(text(run), /Tone: mirror/);
+  assert.ok(existsSync(join(root, 'output', 'cover-acme-001.pdf')));
+  assert.equal(readFileSync(join(root, 'data', 'pdf-index.tsv'), 'utf-8'), indexBefore, 'the CV index is untouched');
+
+  const report = (await get('/api/reports/1')).json();
+  assert.equal(report.cover.path, 'output/cover-acme-001.pdf');
+  const res = await get('/api/reports/1/cover');
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.headers['content-type'], 'application/pdf');
+  assert.equal((await get('/api/reports/2/cover')).statusCode, 404);
+
+  // The prompt carried the answers, the report path and the fixed output path.
+  const prompt = readFileSync(run.meta.promptPath, 'utf-8');
+  assert.match(prompt, /- \*\*A\. Why this role \/ company\?\*\*\n {2}> The scale/);
+  assert.match(prompt, /reports\/001-acme-2026-01-05\.md/);
+  assert.match(prompt, /no\*\* `--report` flag/);
+  await drained();
+});

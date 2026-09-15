@@ -31,6 +31,8 @@ import { resolveClaudeCommand } from './agents/claude-bin.js';
 import { readProfile } from './agents/profile.js';
 import { createRunner } from './queue/runner.js';
 import { buildSpec, describeKinds, RUN_KINDS } from './queue/specs.js';
+import { resolveReportCover } from './services/covers.js';
+import { listCvTemplates, listWritingSamples, readStyle, readVoice, writeStyle, writeVoice } from './services/cvstyle.js';
 import { appendInboxUrl, readInbox } from './services/inbox.js';
 import { repoRoot, resolveDataRoot } from './services/paths.js';
 import { readPipeline, SCORE_BANDS } from './services/pipeline.js';
@@ -214,8 +216,10 @@ export function buildApp({ root, logger = false, serveUi = true, agent } = {}) {
     // The row carries tracker-only facts (status, applied date in notes) that
     // the report file itself does not know about.
     const row = readPipeline({ root }).rows.find((r) => r.reportId === report.id) ?? null;
+    const cover = resolveReportCover(report.id, { root });
     return {
       ...report,
+      cover: cover ? { path: cover.path, date: cover.date } : null,
       tracker: row
         ? { id: row.id, status: row.status, statusId: row.statusId, date: row.date, notes: row.notes }
         : null,
@@ -236,6 +240,48 @@ export function buildApp({ root, logger = false, serveUi = true, agent } = {}) {
       .header('Content-Disposition', `inline; filename="${pdf.fileName.replace(/["\r\n]/g, '')}"`)
       .send(createReadStream(pdf.absolutePath));
   });
+
+  /** The cover letter PDF, tracked by the console rather than pdf-index.tsv (see services/covers.js). */
+  app.get('/api/reports/:id/cover', async (request, reply) => {
+    const cover = resolveReportCover(request.params.id, { root });
+    if (!cover) return reply.code(404).send({ error: 'No cover letter for this report' });
+
+    const { size } = await stat(cover.absolutePath);
+    return reply
+      .header('Content-Type', 'application/pdf')
+      .header('Content-Length', size)
+      .header('Content-Disposition', `inline; filename="${cover.fileName.replace(/["\r\n]/g, '')}"`)
+      .send(createReadStream(cover.absolutePath));
+  });
+
+  // ── CV Studio: style tokens, voice rules, templates, samples ───────
+
+  app.get('/api/cv/style', async () => readStyle({ root }));
+
+  app.put('/api/cv/style', async (request, reply) => {
+    try {
+      const input = body(request);
+      const saved = writeStyle({ root, style: input.style ?? input });
+      return { ok: true, ...saved, ...readStyle({ root }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.get('/api/cv/voice', async () => readVoice({ root }));
+
+  app.put('/api/cv/voice', async (request, reply) => {
+    try {
+      const input = body(request);
+      return { ok: true, ...writeVoice({ root, text: input.text }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.get('/api/cv/templates', async () => listCvTemplates({ root }));
+
+  app.get('/api/cv/writing-samples', async () => listWritingSamples({ root }));
 
   // ── inline status changes ──────────────────────────────────────────
 

@@ -252,6 +252,17 @@ test('an exclusive run waits for silence and blocks everything behind it', async
   assert.ok(after.startedAt >= merged.endedAt);
 });
 
+test('nothing starts beside a running exclusive run, even if enqueued later', async () => {
+  const r = createRunner({ repoRoot: BIN, maxAgents: 2 });
+  const merge = r.start(spec(['--hang'], { exclusive: true, label: 'merge' }));
+  assert.equal(merge.status, 'running');
+  const agent = r.start(spec(['--lines', '1'], { lane: 'agent' }));
+  assert.equal(agent.status, 'queued');
+  r.cancel(merge.id);
+  await settled(r, merge.id);
+  assert.equal((await settled(r, agent.id)).status, 'succeeded');
+});
+
 test('a run whose dependency failed is cancelled, and `next` chains follow-ups', async () => {
   const r = runner();
   const parent = r.start(spec(['--exit', '1']));

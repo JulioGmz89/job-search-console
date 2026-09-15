@@ -477,6 +477,9 @@ export function createRunner({ repoRoot, root, spawnFn = spawn, maxAgents = maxA
   /** Start whatever the lanes have room for, in arrival order. */
   function schedule() {
     if (closing) return;
+    // An exclusive run that is already running owns every lane until it ends —
+    // including against runs enqueued after it started.
+    if ([...running].some((id) => runs.get(id)?.exclusive)) return;
     for (const id of [...queue]) {
       const run = runs.get(id);
       if (!run || run.status !== 'queued') continue;
