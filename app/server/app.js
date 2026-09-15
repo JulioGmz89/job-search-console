@@ -40,6 +40,7 @@ import { createEntry, deleteEntry, readPortals, updateEntry } from './services/p
 import { listReports, readReport, resolveReportPdf } from './services/reports.js';
 import { readLastScanRun, readPortalHealth } from './services/scanner.js';
 import { setStatus } from './services/status.js';
+import { createWatcher } from './watch.js';
 
 const uiDist = join(dirname(fileURLToPath(import.meta.url)), '..', 'ui', 'dist');
 
@@ -78,13 +79,14 @@ function body(request) {
  * Exported unstarted so tests can drive it with `app.inject()` — no socket, no
  * port collisions when suites run in parallel.
  *
- * @param {{root?: string, logger?: boolean|object, serveUi?: boolean, agent?: object}} [options] -
+ * @param {{root?: string, logger?: boolean|object, serveUi?: boolean, agent?: object, watch?: boolean}} [options] -
  *   `root` pins the data directory; omit to use upstream's resolution chain.
  *   `agent` overrides how the Claude Code CLI is spawned (tests point it at a
- *   fake); omit to look it up on PATH.
+ *   fake); omit to look it up on PATH. `watch: false` skips the file watcher
+ *   (tests that do not need it).
  * @returns {import('fastify').FastifyInstance}
  */
-export function buildApp({ root, logger = false, serveUi = true, agent } = {}) {
+export function buildApp({ root, logger = false, serveUi = true, agent, watch = true } = {}) {
   const app = Fastify({ logger });
 
   // One runner per app instance, not a module singleton: each test file builds
@@ -92,6 +94,38 @@ export function buildApp({ root, logger = false, serveUi = true, agent } = {}) {
   // be a flake generator.
   const runner = createRunner({ repoRoot, root });
   app.addHook('onClose', async () => runner.close());
+
+  // The server-wide event feed: file changes under the data root and run
+  // transitions from the queue, fanned out to every open `/api/events` socket.
+  const subscribers = new Set();
+  const broadcast = (event) => {
+    for (const send of subscribers) {
+      try {
+        send(event);
+      } catch {
+        // A dead socket is cleaned up by its own close handler.
+      }
+    }
+  };
+  const unsubscribeRuns = runner.subscribeAll(broadcast);
+  const watcher = watch
+    ? createWatcher({
+        root: resolveDataRoot(root),
+        onChange: ({ paths, at }) => broadcast({ type: 'changed', paths, at }),
+        log: (message) => app.log.warn(message),
+      })
+    : null;
+  /** Open `/api/events` responses, ended on shutdown so nothing waits on a dead server. */
+  const eventSockets = new Set();
+  app.addHook('onClose', async () => {
+    unsubscribeRuns();
+    watcher?.close();
+    subscribers.clear();
+    for (const raw of eventSockets) {
+      if (!raw.writableEnded) raw.end();
+    }
+    eventSockets.clear();
+  });
 
   // Resolved once: the CLI does not move while the server runs, and an agent
   // run refused because the CLI is missing should say so at request time.
@@ -485,6 +519,45 @@ export function buildApp({ root, logger = false, serveUi = true, agent } = {}) {
       unsubscribe();
     });
     reply.raw.on('finish', () => clearInterval(heartbeat));
+
+    reply.hijack();
+    return reply;
+  });
+
+  /**
+   * Everything the UI needs to stay current without polling: `changed` when a
+   * file under reports/, output/ or data/ was written (by a run here, an
+   * upstream script, or a Claude Code session in the same directory), and
+   * `run` on every queue transition.
+   */
+  app.get('/api/events', (request, reply) => {
+    reply.raw.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no',
+    });
+
+    const send = (event) => {
+      if (reply.raw.writableEnded) return;
+      reply.raw.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
+    };
+    subscribers.add(send);
+    eventSockets.add(reply.raw);
+    // The current queue, so a client that connects late does not wait for the
+    // next transition to learn what is running.
+    send({ type: 'hello', runs: runner.list(), watching: watcher?.watching() ?? [], at: Date.now() });
+
+    const heartbeat = setInterval(() => {
+      if (!reply.raw.writableEnded) reply.raw.write(': ping\n\n');
+    }, 15_000);
+    const gone = () => {
+      clearInterval(heartbeat);
+      subscribers.delete(send);
+      eventSockets.delete(reply.raw);
+    };
+    request.raw.on('close', gone);
+    reply.raw.on('finish', gone);
 
     reply.hijack();
     return reply;
