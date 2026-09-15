@@ -373,7 +373,9 @@ export function createRunner({ repoRoot, root, spawnFn = spawn, maxAgents = maxA
       child = spawnFn(command.file, command.args ?? [], {
         cwd: command.cwd ?? repoRoot,
         env: { ...childEnv(), ...(command.env ?? {}) },
-        shell: false,
+        // A shell only on the documented fallback (agents/claude-bin.js): a
+        // Windows .cmd shim with no script to unwrap to. Everything else is exact argv.
+        shell: command.shell === true,
         windowsHide: true,
         stdio: ['ignore', 'pipe', 'pipe'],
       });
