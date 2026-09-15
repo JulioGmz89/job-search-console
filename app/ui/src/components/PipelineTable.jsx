@@ -10,6 +10,7 @@
  * StatusCell for why it stops its own clicks from opening the row.
  */
 
+import RowActions from './RowActions.jsx';
 import StatusCell from './StatusCell.jsx';
 
 const COLUMNS = [
@@ -22,12 +23,13 @@ const COLUMNS = [
   { key: 'decision', label: 'Decision', sortable: true },
   { key: 'comp', label: 'Comp' },
   { key: 'pdf', label: 'PDF', className: 'num' },
+  { key: 'actions', label: '', className: 'row-actions' },
 ];
 
 /** Score formatting: the API sends a JS number, so 4.0 arrives as 4. */
 const formatScore = (score) => (typeof score === 'number' ? score.toFixed(1) : '—');
 
-export default function PipelineTable({ rows, statuses, sort, onSortChange, selectedId, onSelect, onStatusChanged }) {
+export default function PipelineTable({ rows, statuses, sort, onSortChange, selectedId, onSelect, onStatusChanged, onRunStarted, onCoverRequested }) {
   const toggleSort = (key) => {
     // Numbers and dates are most useful highest-first; text A–Z.
     const numeric = key === 'score' || key === 'id' || key === 'date';
@@ -81,6 +83,9 @@ export default function PipelineTable({ rows, statuses, sort, onSortChange, sele
               <td className="notes">{row.report?.advertisedComp ?? <span className="muted">not stated</span>}</td>
               <td className="num">
                 <span className={`dot ${row.pdf ? 'yes' : ''}`}>{row.pdf ? '●' : '○'}</span>
+              </td>
+              <td className="row-actions">
+                <RowActions row={row} compact onStarted={onRunStarted} onCoverRequested={() => onCoverRequested?.(row)} />
               </td>
             </tr>
           ))}

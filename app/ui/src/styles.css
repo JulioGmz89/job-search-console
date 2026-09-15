@@ -505,3 +505,116 @@ label.inline .hint { margin-left: 4px; display: inline; }
 
 /* The checkbox row spans the form, so its label and hint sit on one line. */
 .entry-form label.inline { grid-column: 1 / -1; flex-wrap: wrap; }
+
+/* ── M3: agent runs, Runs page, CV Studio ──────────────────────────── */
+
+.add-job {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 12px;
+}
+
+.add-job .toolbar { border: 0; padding: 0; margin: 0 0 8px; }
+
+.add-job .url-input {
+  flex: 1 1 320px;
+  font: inherit;
+  font-size: 13.5px;
+  padding: 6px 10px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.run-detail { font-size: 12.5px; margin: -4px 0 8px; }
+
+.badge.run-queued { background: var(--surface-2); color: var(--muted); border-style: dashed; }
+
+.detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.related-runs { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.related-runs .badge { cursor: pointer; font: inherit; font-size: 11.5px; }
+
+th.row-actions { text-align: right; }
+td.row-actions .chip { padding: 2px 8px; font-size: 11.5px; }
+
+.toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  font-size: 13px;
+  z-index: 10;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  padding: 20px;
+}
+
+.dialog {
+  width: min(720px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.cover-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+}
+
+.cover-dialog h3 { margin: 0; font-size: 15px; }
+.cover-dialog .intro { margin: 0; font-size: 13px; color: var(--muted); }
+.cover-dialog label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+.cover-dialog textarea,
+.cover-dialog select,
+.voice-text {
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+}
+.voice-text { font-family: var(--mono); font-size: 12.5px; width: 100%; }
+
+.runs-page section { margin-top: 12px; }
+.runs-table td.company { white-space: normal; }
+
+.cv-studio .color-row { display: flex; gap: 8px; align-items: center; }
+.cv-studio .color-row input[type="text"] { flex: 1; }
+.cv-studio .color-row input[type="color"] { width: 42px; height: 32px; padding: 2px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); }
+.cv-studio .entry-form textarea { grid-column: 1 / -1; }
+.cv-studio h4 { margin: 12px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+.section-order ol { margin: 6px 0; padding-left: 20px; }
+.section-order li { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.section-order li span { min-width: 120px; }
+.section-order .chip { padding: 1px 7px; font-size: 11px; }

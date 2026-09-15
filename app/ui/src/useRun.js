@@ -35,6 +35,9 @@ export function useRun({ onFinish } = {}) {
     const source = new EventSource(runEventsUrl(id));
     sourceRef.current = source;
 
+    // A run waiting for a lane, then taking one: the record changes, the log does not.
+    source.addEventListener('queued', (event) => setRun(JSON.parse(event.data).run));
+    source.addEventListener('started', (event) => setRun(JSON.parse(event.data).run));
     source.addEventListener('line', (event) => {
       const { line } = JSON.parse(event.data);
       setLines((current) => [...current, line]);
@@ -80,6 +83,22 @@ export function useRun({ onFinish } = {}) {
     }
   }, [connect]);
 
+  /**
+   * Attach to a run that already exists — one chained by the server, or one
+   * picked from the Runs page. The replayed log makes it indistinguishable from
+   * having started it here.
+   *
+   * @param {object|string} target - A run record, or an id.
+   */
+  const follow = useCallback(async (target) => {
+    setError(null);
+    setLines([]);
+    setProgress(null);
+    const id = typeof target === 'string' ? target : target.id;
+    setRun(typeof target === 'string' ? { id, status: 'queued', label: '…', queuedAt: Date.now() } : target);
+    connect(id);
+  }, [connect]);
+
   const cancel = useCallback(async () => {
     if (!run) return;
     try {
@@ -97,5 +116,5 @@ export function useRun({ onFinish } = {}) {
     setError(null);
   }, [disconnect]);
 
-  return { run, lines, progress, error, starting, start, cancel, reset };
+  return { run, lines, progress, error, starting, start, follow, cancel, reset };
 }

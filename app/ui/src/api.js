@@ -63,3 +63,21 @@ export const startRun = (kind, options = {}, confirmToken) =>
   request('POST', '/api/runs', { kind, options, ...(confirmToken ? { confirmToken } : {}) });
 export const cancelRun = (id) => request('POST', `/api/runs/${id}/cancel`);
 export const runEventsUrl = (id) => `/api/runs/${id}/events`;
+
+// ── M3: agent runs, the inbox write, CV Studio, the event feed ───────
+
+export const addInboxUrl = (body) => request('POST', '/api/inbox/urls', body);
+export const fetchAgentStatus = () => get('/api/agent/status');
+export const startEvaluate = (options) => startRun('evaluate', options);
+export const startPdf = (reportId, options = {}) => startRun('pdf', { reportId, ...options });
+export const startCover = (reportId, answers) => startRun('cover', { reportId, answers });
+
+export const fetchCvStyle = () => get('/api/cv/style');
+export const saveCvStyle = (style) => request('PUT', '/api/cv/style', { style });
+export const fetchVoice = () => get('/api/cv/voice');
+export const saveVoice = (text) => request('PUT', '/api/cv/voice', { text });
+export const fetchCvTemplates = () => get('/api/cv/templates');
+export const fetchWritingSamples = () => get('/api/cv/writing-samples');
+
+export const coverUrl = (id) => `/api/reports/${id}/cover`;
+export const serverEventsUrl = () => '/api/events';

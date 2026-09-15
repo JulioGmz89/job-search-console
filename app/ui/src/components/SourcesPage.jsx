@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { createPortalEntry, deletePortalEntry, fetchInbox, fetchPortals, updatePortalEntry } from '../api.js';
+import { createPortalEntry, deletePortalEntry, fetchInbox, fetchPortals, startEvaluate, updatePortalEntry } from '../api.js';
+import { useRuns } from '../runs.jsx';
 import { useRun } from '../useRun.js';
 import PortalEntryForm from './PortalEntryForm.jsx';
 import RunPanel from './RunPanel.jsx';
@@ -33,7 +34,9 @@ function providerOf(entry) {
   return '—';
 }
 
-export default function SourcesPage() {
+export default function SourcesPage({ onRunStarted }) {
+  const { agentReady, agentReason, list: allRuns } = useRuns();
+  const [evaluating, setEvaluating] = useState(null);
   const [portals, setPortals] = useState(null);
   const [inbox, setInbox] = useState(null);
   const [error, setError] = useState(null);
@@ -200,17 +203,38 @@ export default function SourcesPage() {
               <details>
                 <summary>Show the inbox</summary>
                 <ul className="inbox-list">
-                  {inbox.pending.map((item, i) => (
-                    <li key={i} className={item.error ? 'err' : undefined}>
-                      <a href={item.url} target="_blank" rel="noopener noreferrer">
-                        {item.title ?? item.url}
-                      </a>
-                      {item.company ? <span className="muted"> · {item.company}</span> : null}
-                      {item.location ? <span className="muted"> · {item.location}</span> : null}
-                      {item.posted ? <span className="muted"> · posted {item.posted}</span> : null}
-                      {item.error ? <span className="muted"> · {item.error}</span> : null}
-                    </li>
-                  ))}
+                  {inbox.pending.map((item, i) => {
+                    const inFlight = allRuns.find((r) => r.kind === 'evaluate' && r.meta?.url === item.url && (r.status === 'queued' || r.status === 'running'));
+                    return (
+                      <li key={i} className={item.error ? 'err' : undefined}>
+                        <a href={item.url} target="_blank" rel="noopener noreferrer">
+                          {item.title ?? item.url}
+                        </a>
+                        {item.company ? <span className="muted"> · {item.company}</span> : null}
+                        {item.location ? <span className="muted"> · {item.location}</span> : null}
+                        {item.posted ? <span className="muted"> · posted {item.posted}</span> : null}
+                        {item.error ? <span className="muted"> · {item.error}</span> : null}
+                        {' '}
+                        <button
+                          className="chip"
+                          disabled={!agentReady || Boolean(inFlight) || evaluating === item.url}
+                          title={agentReady ? (inFlight ? `Already ${inFlight.status}` : 'Evaluate this posting with Claude') : agentReason}
+                          onClick={async () => {
+                            setEvaluating(item.url);
+                            try {
+                              onRunStarted?.(await startEvaluate({ url: item.url }));
+                            } catch (failure) {
+                              setError(failure.message);
+                            } finally {
+                              setEvaluating(null);
+                            }
+                          }}
+                        >
+                          {inFlight ? inFlight.status : 'Evaluate'}
+                        </button>
+                      </li>
+                    );
+                  })}
                 </ul>
               </details>
             ) : null}
