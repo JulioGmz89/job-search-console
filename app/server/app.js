@@ -13,6 +13,10 @@
  *   - The client never names a command. It names a run *kind* from
  *     `queue/specs.js`, which rebuilds every argument from constants.
  *   - Anything that rewrites the tracker needs a successful dry run first.
+ *
+ * M3 adds the agent runs (evaluate, pdf, cover) behind the same `POST /api/runs`
+ * — a kind plus a narrow option set — and one more write: a pasted URL into
+ * the inbox, under upstream's own lock.
  */
 
 import { createReadStream, existsSync } from 'node:fs';
@@ -23,10 +27,12 @@ import { fileURLToPath } from 'node:url';
 import fastifyStatic from '@fastify/static';
 import Fastify from 'fastify';
 
+import { resolveClaudeCommand } from './agents/claude-bin.js';
+import { readProfile } from './agents/profile.js';
 import { createRunner } from './queue/runner.js';
 import { buildSpec, describeKinds, RUN_KINDS } from './queue/specs.js';
-import { readInbox } from './services/inbox.js';
-import { repoRoot } from './services/paths.js';
+import { appendInboxUrl, readInbox } from './services/inbox.js';
+import { repoRoot, resolveDataRoot } from './services/paths.js';
 import { readPipeline, SCORE_BANDS } from './services/pipeline.js';
 import { createEntry, deleteEntry, readPortals, updateEntry } from './services/portals.js';
 import { listReports, readReport, resolveReportPdf } from './services/reports.js';
@@ -70,11 +76,13 @@ function body(request) {
  * Exported unstarted so tests can drive it with `app.inject()` — no socket, no
  * port collisions when suites run in parallel.
  *
- * @param {{root?: string, logger?: boolean|object}} [options] - `root` pins the
- *   data directory; omit to use upstream's resolution chain.
+ * @param {{root?: string, logger?: boolean|object, serveUi?: boolean, agent?: object}} [options] -
+ *   `root` pins the data directory; omit to use upstream's resolution chain.
+ *   `agent` overrides how the Claude Code CLI is spawned (tests point it at a
+ *   fake); omit to look it up on PATH.
  * @returns {import('fastify').FastifyInstance}
  */
-export function buildApp({ root, logger = false, serveUi = true } = {}) {
+export function buildApp({ root, logger = false, serveUi = true, agent } = {}) {
   const app = Fastify({ logger });
 
   // One runner per app instance, not a module singleton: each test file builds
@@ -82,6 +90,11 @@ export function buildApp({ root, logger = false, serveUi = true } = {}) {
   // be a flake generator.
   const runner = createRunner({ repoRoot, root });
   app.addHook('onClose', async () => runner.close());
+
+  // Resolved once: the CLI does not move while the server runs, and an agent
+  // run refused because the CLI is missing should say so at request time.
+  const claude = agent ?? resolveClaudeCommand();
+  const specContext = { root, repoRoot, agent: claude };
 
   // The built SPA is served by this same process, so M1's acceptance criterion
   // ("browse the pipeline without touching a terminal") is one command on one
@@ -249,6 +262,55 @@ export function buildApp({ root, logger = false, serveUi = true } = {}) {
     return { ...inbox, lastScan: readLastScanRun({ root }) };
   });
 
+  /**
+   * Paste a URL. With `evaluate: true` the evaluation is queued in the same
+   * request, which is the milestone's headline path: one paste, one click.
+   * A URL that is already in the inbox is not an error — the run still starts.
+   */
+  app.post('/api/inbox/urls', async (request, reply) => {
+    try {
+      const input = body(request);
+      const added = await appendInboxUrl({
+        root,
+        url: input.url,
+        company: input.company,
+        title: input.title,
+        note: input.note,
+      });
+      let run = null;
+      if (input.evaluate === true) {
+        const spec = buildSpec('evaluate', { url: input.url, autoPdf: input.autoPdf !== false }, specContext);
+        run = runner.start(spec);
+      }
+      return reply.code(201).send({ ok: true, ...added, run });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  // ── the agent ──────────────────────────────────────────────────────
+
+  /** Whether agent runs can work at all, for the UI to enable its buttons honestly. */
+  app.get('/api/agent/status', async () => {
+    const dataRoot = resolveDataRoot(root);
+    const profile = readProfile({ root: dataRoot });
+    return {
+      bin: { display: claude.display, source: claude.source, found: claude.found, shell: claude.shell },
+      maxAgents: Number.parseInt(process.env.JSC_MAX_AGENTS ?? '', 10) || 2,
+      profile: {
+        exists: profile.exists,
+        error: profile.error,
+        spendTier: profile.spendTier,
+        autoPdfThreshold: profile.autoPdfThreshold,
+        language: profile.language,
+        hasStyle: profile.hasStyle,
+        hasCvSections: profile.hasCvSections,
+      },
+      cvPresent: existsSync(join(dataRoot, 'cv.md')),
+      voiceDnaPresent: existsSync(join(dataRoot, 'voice-dna.md')),
+    };
+  });
+
   // ── portals ────────────────────────────────────────────────────────
 
   app.get('/api/portals', async () => ({
@@ -313,7 +375,7 @@ export function buildApp({ root, logger = false, serveUi = true } = {}) {
   app.post('/api/runs', async (request, reply) => {
     try {
       const input = body(request);
-      const spec = buildSpec(input.kind, input.options ?? {});
+      const spec = buildSpec(input.kind, input.options ?? {}, specContext);
       // Burn the confirmation before spawning: if the token is bad, nothing has
       // run, and a valid token can never authorise a second write.
       if (spec.confirmRequired) runner.consumeConfirmation(input.confirmToken, spec.kind);

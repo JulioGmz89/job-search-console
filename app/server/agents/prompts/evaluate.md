@@ -27,7 +27,7 @@ At most 5 WebSearch calls for Blocks D and G, as the mode says. No subagents: th
 
 - The report number is **`{{REPORT_NUM}}`**. It was reserved before you started. Do **not** run `node reserve-report-num.mjs`, do not compute `max + 1`, and do not release anything — the console handles both.
 - Write the report to exactly `reports/{{REPORT_NUM}}-{company-slug}-{{DATE}}.md` with the header and sections the mode specifies (Machine Summary YAML included). The console verifies that file exists when you finish.
-- Do not generate a CV PDF, HTML or cover-letter PDF in this run, even for a high score. Leave the header line as `**PDF:** ❌`.
+- Do not generate a CV PDF, HTML or cover-letter PDF in this run, even for a high score. Write the header line as `**PDF:** not generated — use the console's Generate PDF button` (localized to `language.output`; keep the words "not generated", upstream's tooling keys on them).
 
 ### Tracker
 
