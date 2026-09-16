@@ -7,16 +7,20 @@
  * (the application tracker). Inheriting that collision into the console would
  * make every later reference ambiguous, so the seam renames it once, here.
  *
- * Read-only. `scan.mjs` appends to this file under an advisory lock
- * (`pipeline-lock.mjs`); nothing in the console writes it, so nothing here takes
- * that lock. Anything that does write it in a later milestone must.
+ * Mostly read-only. `scan.mjs` appends to this file under an advisory lock
+ * (`pipeline-lock.mjs`); the console's single write — `appendInboxUrl`, for a
+ * URL pasted into the UI — takes the same lock. Marking a URL as processed is
+ * left to upstream's `reconcile-pipeline.mjs`, driven from `batch-state.tsv`.
  *
  * Format is documented in `modes/pipeline.md` and produced by
  * `scan.mjs:formatPipelineOffer`.
  */
 
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 
+import { LockTimeoutError, withPipelineLock } from '../../../pipeline-lock.mjs';
+import { normalizeUrl } from '../../../url-key.mjs';
 import { inboxPath } from './paths.js';
 
 /** Section headers. Upstream writes either language and readers must accept both. */
@@ -29,8 +33,11 @@ const ROW_RE = /^- \[([ xX!])\]\s*(.*)$/;
 /** Labeled trailing segments, which ride after the positional cells in a stable order. */
 const LABEL_RE = /^(posted|trust|note):\s*(.*)$/;
 
-/** `#143` leading a processed row. */
-const REPORT_NUM_RE = /^#(\d+)$/;
+/**
+ * `#143` leading a processed row — or `[143](../reports/143-….md)`, the form
+ * `reconcile-pipeline.mjs` writes when it moves a row after a batch.
+ */
+const REPORT_NUM_RE = /^(?:#(\d+)|\[(\d+)\]\([^)]*\))$/;
 
 /** A score cell on a processed row, e.g. `3.4/5`. */
 const SCORE_RE = /^(\d+(?:\.\d+)?)\/5$/;
@@ -118,7 +125,7 @@ function parseProcessed(body, line) {
   const cells = [...positional];
 
   const numbered = REPORT_NUM_RE.exec(cells[0] ?? '');
-  const reportId = numbered ? Number(numbered[1]) : null;
+  const reportId = numbered ? Number(numbered[1] ?? numbered[2]) : null;
   if (numbered) cells.shift();
 
   const scoreIndex = cells.findIndex((cell) => SCORE_RE.test(cell));
@@ -208,4 +215,123 @@ export function readInbox({ root } = {}) {
   });
 
   return { path, pending, processed, issues };
+}
+
+// ── the one write: appending a pasted URL ─────────────────────────────
+
+/** A refused inbox write. */
+export class InboxError extends Error {
+  constructor(message, { code, status = 400 } = {}) {
+    super(message);
+    this.name = 'InboxError';
+    this.code = code;
+    this.status = status;
+  }
+}
+
+/** The same escaping `scan.mjs:sanitizeMarkdownField` applies before it writes a cell. */
+function sanitizeField(value) {
+  return String(value ?? '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/[[\]]/g, '\\$&')
+    .replace(/\|/g, '/');
+}
+
+/** Validate a pasted URL the way a careful person would: absolute, http(s), no junk. */
+export function validateInboxUrl(raw) {
+  const text = typeof raw === 'string' ? raw.trim() : '';
+  if (!text) throw new InboxError('Paste a job URL', { code: 'url-invalid' });
+  if (text.length > 2048) throw new InboxError('That URL is too long', { code: 'url-invalid' });
+  if (/[\s|]/.test(text)) throw new InboxError('A URL cannot contain spaces or "|"', { code: 'url-invalid' });
+  let url;
+  try {
+    url = new URL(text);
+  } catch {
+    throw new InboxError('That is not an absolute URL (start with https://)', { code: 'url-invalid' });
+  }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new InboxError('Only http(s) job URLs can be evaluated', { code: 'url-invalid' });
+  }
+  return url.toString();
+}
+
+/**
+ * Append a URL to the inbox's Pending section.
+ *
+ * The only write the console makes to `data/pipeline.md`, taken under the same
+ * advisory lock `scan.mjs` uses (`pipeline-lock.mjs`) so a scan running at the
+ * same moment cannot lose the line or clobber ours. Duplicates are detected
+ * with upstream's own URL key (`url-key.mjs`), against both sections: a URL
+ * that was already evaluated is not "new" just because its tracking params
+ * differ. A missing file is created with the two sections the readers expect.
+ *
+ * @param {{root?: string, url: string, company?: string, title?: string, location?: string, note?: string}} input
+ * @returns {Promise<{added: boolean, line: string|null, existing: {section: 'pending'|'processed', line: number}|null, path: string}>}
+ * @throws {InboxError}
+ */
+export async function appendInboxUrl({ root, url, company, title, location, note } = {}) {
+  const clean = validateInboxUrl(url);
+  const path = inboxPath(root);
+
+  const key = normalizeUrl(clean);
+
+  const cells = [clean, sanitizeField(company), sanitizeField(title)];
+  if (location) cells.push(sanitizeField(location));
+  // Positional cells stop at the last non-empty one; a bare URL is a valid row.
+  while (cells.length > 1 && cells.at(-1) === '') cells.pop();
+  let line = `- [ ] ${cells.join(' | ')}`;
+  if (note) line += ` | note: ${sanitizeField(note)}`;
+
+  const work = () => {
+    const current = readInbox({ root });
+    const twin =
+      current.pending.find((row) => normalizeUrl(row.url) === key) ??
+      current.processed.find((row) => normalizeUrl(row.url) === key);
+    if (twin) {
+      const section = current.pending.includes(twin) ? 'pending' : 'processed';
+      return { added: false, line: null, existing: { section, line: twin.line }, path };
+    }
+
+    let text;
+    try {
+      text = readFileSync(path, 'utf-8');
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+      text = '# Pipeline — Pending URLs\n\nPaste job URLs below as `- [ ] {url}` then run `/career-ops pipeline`.\n\n## Pending\n\n## Processed\n';
+    }
+    const eol = text.includes('\r\n') ? '\r\n' : '\n';
+    const lines = text.split(/\r?\n/);
+
+    // Insert at the end of the Pending section: after its last row, before the
+    // blank line that precedes the next heading.
+    const pendingAt = lines.findIndex((l) => PENDING_MARKERS.includes(l.trim()));
+    if (pendingAt === -1) {
+      throw new InboxError('The inbox has no "## Pending" section — fix data/pipeline.md by hand', {
+        code: 'inbox-malformed',
+        status: 409,
+      });
+    }
+    let end = pendingAt + 1;
+    while (end < lines.length && !lines[end].trim().startsWith('## ')) end += 1;
+    let insertAt = end;
+    while (insertAt > pendingAt + 1 && lines[insertAt - 1].trim() === '') insertAt -= 1;
+    lines.splice(insertAt, 0, line);
+
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, lines.join(eol), 'utf-8');
+    return { added: true, line, existing: null, path };
+  };
+
+  try {
+    return await withPipelineLock(path, work);
+  } catch (error) {
+    if (error instanceof LockTimeoutError) {
+      throw new InboxError('The inbox is locked by another process (a scan?) — try again in a moment', {
+        code: 'inbox-locked',
+        status: 503,
+      });
+    }
+    throw error;
+  }
 }

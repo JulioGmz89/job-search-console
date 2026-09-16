@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -84,19 +85,33 @@ test('a subscriber that arrives late still sees the whole log', async () => {
   assert.equal(events.at(-1).run.status, 'succeeded');
 });
 
-test('only one run at a time', async () => {
+test('script-lane runs are serialized: the second waits, then runs', async () => {
   const r = runner();
   const first = r.start(spec(['--hang']));
-
-  assert.throws(() => r.start(spec()), (error) => error instanceof RunBusyError && error.status === 409);
+  const second = r.start(spec(['--lines', '1']));
+  assert.equal(second.status, 'queued');
+  assert.deepEqual(r.list().queued.map((run) => run.id), [second.id]);
 
   r.cancel(first.id);
   await settled(r, first.id);
 
-  // The slot frees up once it finishes.
-  const second = r.start(spec(['--lines', '1']));
-  assert.equal(r.get(second.id).status, 'running');
-  await settled(r, second.id);
+  // The slot frees up once the first finishes and the queued run takes it.
+  const run = await settled(r, second.id);
+  assert.equal(run.status, 'succeeded');
+  assert.ok(run.startedAt >= r.get(first.id).endedAt);
+});
+
+test('the same work is refused while it is queued or running', async () => {
+  const r = runner();
+  const first = r.start(spec(['--hang'], { dedupeKey: 'evaluate:https://x' }));
+  assert.throws(
+    () => r.start(spec([], { dedupeKey: 'evaluate:https://x' })),
+    (error) => error instanceof RunBusyError && error.status === 409 && error.activeId === first.id,
+  );
+  // Different work is not "busy", it just queues.
+  assert.equal(r.start(spec([], { dedupeKey: 'evaluate:https://y' })).status, 'queued');
+  r.cancel(first.id);
+  await settled(r, first.id);
 });
 
 test('cancelling ends the run as cancelled', async () => {
@@ -107,7 +122,18 @@ test('cancelling ends the run as cancelled', async () => {
   const run = await settled(r, id);
 
   assert.equal(run.status, 'cancelled');
-  assert.equal(r.list().active, null);
+  assert.deepEqual(r.list().active, []);
+});
+
+test('a queued run can be cancelled before it starts', async () => {
+  const r = runner();
+  const first = r.start(spec(['--hang']));
+  const second = r.start(spec());
+  const cancelled = r.cancel(second.id);
+  assert.equal(cancelled.status, 'cancelled');
+  assert.equal(r.get(second.id).startedAt, null);
+  r.cancel(first.id);
+  await settled(r, first.id);
 });
 
 test('a missing script fails the run instead of crashing the server', async () => {
@@ -166,21 +192,174 @@ test('a failed dry run authorises nothing', async () => {
   assert.throws(() => r.consumeConfirmation(id, 'dedup'), (e) => e.code === 'confirm-unsuccessful');
 });
 
-test('list separates the active run from finished ones', async () => {
+test('list separates queued, active and finished runs', async () => {
   const r = runner();
   const { id } = r.start(spec(['--hang']));
+  const waiting = r.start(spec());
 
   let listed = r.list();
-  assert.equal(listed.active.id, id);
+  assert.deepEqual(listed.active.map((run) => run.id), [id]);
+  assert.deepEqual(listed.queued.map((run) => run.id), [waiting.id]);
   assert.deepEqual(listed.recent, []);
   // The listing is a summary; the log itself is fetched per run.
-  assert.equal(listed.active.lines, undefined);
-  assert.equal(typeof listed.active.lineCount, 'number');
+  assert.equal(listed.active[0].lines, undefined);
+  assert.equal(typeof listed.active[0].lineCount, 'number');
 
   r.cancel(id);
   await settled(r, id);
+  await settled(r, waiting.id);
 
   listed = r.list();
-  assert.equal(listed.active, null);
-  assert.deepEqual(listed.recent.map((run) => run.id), [id]);
+  assert.deepEqual(listed.active, []);
+  assert.deepEqual(listed.queued, []);
+  assert.deepEqual(listed.recent.map((run) => run.id).sort(), [id, waiting.id].sort());
+});
+
+test('agent-lane runs overlap up to the limit', async () => {
+  const r = createRunner({ repoRoot: BIN, maxAgents: 2 });
+  const a = r.start(spec(['--hang'], { lane: 'agent' }));
+  const b = r.start(spec(['--hang'], { lane: 'agent' }));
+  const c = r.start(spec(['--lines', '1'], { lane: 'agent' }));
+  assert.equal(a.status, 'running');
+  assert.equal(b.status, 'running');
+  assert.equal(c.status, 'queued');
+  // The script lane is independent: it still has its own slot.
+  const s = r.start(spec(['--lines', '1']));
+  assert.equal(s.status, 'running');
+  await settled(r, s.id);
+
+  r.cancel(a.id);
+  await settled(r, a.id);
+  assert.equal((await settled(r, c.id)).status, 'succeeded');
+  r.cancel(b.id);
+  await settled(r, b.id);
+});
+
+test('an exclusive run waits for silence and blocks everything behind it', async () => {
+  const r = createRunner({ repoRoot: BIN, maxAgents: 2 });
+  const agent = r.start(spec(['--hang'], { lane: 'agent' }));
+  const merge = r.start(spec(['--lines', '1'], { exclusive: true, label: 'merge' }));
+  const later = r.start(spec(['--lines', '1'], { lane: 'agent' }));
+  assert.equal(merge.status, 'queued');
+  // Room in the agent lane, but the exclusive run at the head is draining it.
+  assert.equal(later.status, 'queued');
+
+  r.cancel(agent.id);
+  await settled(r, agent.id);
+  const merged = await settled(r, merge.id);
+  assert.equal(merged.status, 'succeeded');
+  const after = await settled(r, later.id);
+  assert.ok(after.startedAt >= merged.endedAt);
+});
+
+test('nothing starts beside a running exclusive run, even if enqueued later', async () => {
+  const r = createRunner({ repoRoot: BIN, maxAgents: 2 });
+  const merge = r.start(spec(['--hang'], { exclusive: true, label: 'merge' }));
+  assert.equal(merge.status, 'running');
+  const agent = r.start(spec(['--lines', '1'], { lane: 'agent' }));
+  assert.equal(agent.status, 'queued');
+  r.cancel(merge.id);
+  await settled(r, merge.id);
+  assert.equal((await settled(r, agent.id)).status, 'succeeded');
+});
+
+test('a run whose dependency failed is cancelled, and `next` chains follow-ups', async () => {
+  const r = runner();
+  const parent = r.start(spec(['--exit', '1']));
+  const child = r.start(spec([], { dependsOn: [parent.id] }));
+  await settled(r, parent.id);
+  const run = await settled(r, child.id);
+  assert.equal(run.status, 'cancelled');
+  assert.match(run.error, /failed/);
+
+  const chained = [];
+  const unsubscribe = r.subscribeAll((event) => chained.push(event.run));
+  const root = r.start(spec(['--lines', '1'], {
+    hooks: {
+      after: () => ({ next: [spec(['--lines', '2'], { label: 'follow-up' })] }),
+    },
+  }));
+  await settled(r, root.id);
+  const followUp = chained.find((run) => run.label === 'follow-up');
+  assert.ok(followUp);
+  assert.equal(followUp.parentId, root.id);
+  await settled(r, followUp.id);
+  unsubscribe();
+  assert.equal(r.get(followUp.id).status, 'succeeded');
+});
+
+test('`before` prepares the command and a failure there never spawns', async () => {
+  let spawned = 0;
+  const r = createRunner({
+    repoRoot: BIN,
+    spawnFn: (...args) => {
+      spawned += 1;
+      return spawn(...args);
+    },
+  });
+  const afterSeen = [];
+  const ok = r.start(spec([], {
+    script: undefined,
+    hooks: {
+      before: async () => ({
+        command: { file: process.execPath, args: [join(BIN, 'emit.js'), '--lines', '1'] },
+        meta: { prepared: true },
+        lines: ['preparing…'],
+      }),
+      after: (run, { provisional }) => {
+        afterSeen.push(provisional.status);
+        return { result: { checked: true } };
+      },
+    },
+  }));
+  const done = await settled(r, ok.id);
+  assert.equal(done.status, 'succeeded');
+  assert.equal(done.meta.prepared, true);
+  assert.deepEqual(done.result, { checked: true });
+  assert.equal(done.lines[0].text, 'preparing…');
+
+  const bad = r.start(spec([], {
+    hooks: {
+      before: async () => {
+        throw new Error('no number free');
+      },
+      after: (run, { provisional }) => {
+        afterSeen.push(provisional.status);
+      },
+    },
+  }));
+  const failed = await settled(r, bad.id);
+  assert.equal(failed.status, 'failed');
+  assert.match(failed.error, /no number free/);
+  assert.equal(spawned, 1);
+  assert.deepEqual(afterSeen, ['succeeded', 'failed']);
+});
+
+test('`after` can turn an exit 0 into a failure', async () => {
+  const r = runner();
+  const { id } = r.start(spec(['--lines', '1'], {
+    hooks: { after: () => ({ status: 'failed', error: 'no report was written' }) },
+  }));
+  const run = await settled(r, id);
+  assert.equal(run.status, 'failed');
+  assert.equal(run.exitCode, 0);
+  assert.equal(run.error, 'no report was written');
+});
+
+test('a run past its timeout is killed and fails', async () => {
+  const r = runner();
+  const { id } = r.start(spec(['--hang'], { timeoutMs: 200 }));
+  const run = await settled(r, id);
+  assert.equal(run.status, 'failed');
+  assert.match(run.error, /timed out after/);
+});
+
+test('close cancels the queue and stops what is running', async () => {
+  const r = runner();
+  const active = r.start(spec(['--hang']));
+  const waiting = r.start(spec());
+  await r.close();
+  assert.equal(r.get(waiting.id).status, 'cancelled');
+  assert.equal(r.get(active.id).status, 'cancelled');
+  assert.throws(() => r.start(spec()), (e) => e.code === 'closing');
 });

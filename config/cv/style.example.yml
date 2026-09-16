@@ -1,0 +1,37 @@
+# Job Search Console — CV style tokens (PROJECT_PLAN.md §7a).
+#
+# Copy to config/cv/style.yml (gitignored) or edit from the CV Studio page.
+# Applied by app/cv/render-cv.js whenever a PDF is generated from the console;
+# every key is optional and a missing key means "the template's own default".
+#
+# Note: upstream's renderer applies config/profile.yml's `style:` block and
+# `cv.sections` AFTER these, so a value set there overrides the same value here.
+
+# Any CSS colour. Used for the name bar, section titles and highlights.
+# accent_color: "#1f4e79"
+
+# Body font stack. Fonts must exist on this machine, or be one of the two
+# bundled in fonts/ ("DM Sans", "Space Grotesk"), which are embedded automatically.
+# font_family: "DM Sans, Arial, sans-serif"
+
+# Optional separate stack for the name and section titles.
+# heading_font_family: "Space Grotesk, sans-serif"
+
+# Base body size (pt, px, em or rem).
+# font_size: "10.5pt"
+
+# Page margin (in, cm, mm, pt or px; up to four values).
+# margin: "0.6in"
+
+# compact | normal | relaxed — line height and the gap between blocks.
+# density: normal
+
+# Which template renders the CV: an upstream name (standard, modern, compact,
+# executive, jake, leadership, zh-minimal) or the basename of a file you drop
+# into config/cv/templates/ (see the README there).
+# template: standard
+
+# Order for the named sections; the ones you leave out keep the template's
+# place. Name at least two. Keys: summary, competencies, experience, projects,
+# education, certifications, awards, skills, interests.
+# sections: [summary, skills, experience, projects, education]

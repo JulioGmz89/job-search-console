@@ -1,10 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { fetchPipeline, fetchReport, fetchRuns } from './api.js';
+import { fetchPipeline, fetchReport, startCover } from './api.js';
+import AddJobBox from './components/AddJobBox.jsx';
+import CoverLetterDialog from './components/CoverLetterDialog.jsx';
+import CvStudioPage from './components/CvStudioPage.jsx';
 import MaintenanceBar from './components/MaintenanceBar.jsx';
 import PipelineTable from './components/PipelineTable.jsx';
 import ReportDetail from './components/ReportDetail.jsx';
+import RunsPage from './components/RunsPage.jsx';
 import SourcesPage from './components/SourcesPage.jsx';
+import { RunsProvider, useRuns } from './runs.jsx';
 
 /** Sort comparator. Nulls always sort last, whichever direction is active. */
 function compare(a, b, key, dir) {
@@ -23,29 +28,38 @@ function compare(a, b, key, dir) {
 const PAGES = [
   { id: 'pipeline', label: 'Pipeline' },
   { id: 'sources', label: 'Sources' },
+  { id: 'runs', label: 'Runs' },
+  { id: 'cv', label: 'CV Studio' },
 ];
 
 /**
- * Hash routing, in fifteen lines.
+ * Hash routing, in twenty lines.
  *
- * Two pages do not justify a router dependency, and PROJECT_PLAN.md §11 leaves
- * the UI stack open — pulling one in now would quietly settle that question.
+ * Four pages still do not justify a router dependency, and PROJECT_PLAN.md §11
+ * leaves the UI stack open — pulling one in now would quietly settle that
+ * question. `#/runs/<id>` deep-links to one run's log.
  */
 function useHashPage() {
-  const read = () => window.location.hash.replace(/^#\/?/, '') || 'pipeline';
-  const [page, setPage] = useState(read);
+  const read = () => {
+    const [page = 'pipeline', arg = null] = window.location.hash.replace(/^#\/?/, '').split('/');
+    return { page: PAGES.some((p) => p.id === page) ? page : 'pipeline', arg };
+  };
+  const [route, setRoute] = useState(read);
   useEffect(() => {
-    const onChange = () => setPage(read());
+    const onChange = () => setRoute(read());
     window.addEventListener('hashchange', onChange);
     return () => window.removeEventListener('hashchange', onChange);
   }, []);
-  return [PAGES.some((p) => p.id === page) ? page : 'pipeline', (next) => { window.location.hash = `#/${next}`; }];
+  return [route, (next, arg) => { window.location.hash = arg ? `#/${next}/${arg}` : `#/${next}`; }];
 }
 
-export default function App() {
-  const [page, goTo] = useHashPage();
+/** Files whose change means the pipeline table or an open report is stale. */
+const REFRESH_ON = [/^data\/applications\.md$/, /^reports\//, /^output\//, /^data\/pdf-index\.tsv$/, /^data\/jsc\/covers\.json$/];
+
+function Shell({ reloadRef }) {
+  const [route, goTo] = useHashPage();
+  const { kinds } = useRuns();
   const [data, setData] = useState(null);
-  const [kinds, setKinds] = useState([]);
   const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [bandFilter, setBandFilter] = useState('all');
@@ -54,26 +68,63 @@ export default function App() {
   const [selected, setSelected] = useState(null);
   const [report, setReport] = useState(null);
   const [reportError, setReportError] = useState(null);
+  const [coverFor, setCoverFor] = useState(null);
+  const [coverBusy, setCoverBusy] = useState(false);
+  const [toast, setToast] = useState(null);
+  const reportIdRef = useRef(null);
 
   const reload = useCallback(() => {
     fetchPipeline().then(setData).catch((e) => setError(e.message));
+    // The open report may have gained a PDF or a cover letter.
+    if (reportIdRef.current) fetchReport(reportIdRef.current).then(setReport).catch(() => {});
   }, []);
 
   useEffect(reload, [reload]);
   useEffect(() => {
-    fetchRuns().then((runs) => setKinds(runs.kinds)).catch(() => {});
-  }, []);
+    reloadRef.current = reload;
+  }, [reload, reloadRef]);
 
   const openRow = useCallback((row) => {
     setSelected(row.id);
     setReport(null);
     setReportError(null);
+    reportIdRef.current = null;
     if (!row.hasReport) {
       setReportError(`Row ${row.id} references report ${row.reportId}, which is not on disk.`);
       return;
     }
+    reportIdRef.current = row.reportId;
     fetchReport(row.reportId).then(setReport).catch((e) => setReportError(e.message));
   }, []);
+
+  // A run was started from a row or a report: say so, and offer its log.
+  const onRunStarted = useCallback((run) => {
+    if (!run) return;
+    setToast({ id: run.id, text: `${run.label} ${run.status === 'queued' ? 'queued' : 'started'}` });
+    setTimeout(() => setToast((t) => (t?.id === run.id ? null : t)), 6000);
+  }, []);
+
+  const requestCover = useCallback(async (target) => {
+    // From a row we only have the id; the dialog wants the report for its hints.
+    const id = target?.machine ? target.id : target?.reportId;
+    if (!id) return;
+    const full = target?.machine ? target : await fetchReport(id).catch(() => ({ id }));
+    setCoverFor(full);
+  }, []);
+
+  const submitCover = useCallback(async (answers) => {
+    setCoverBusy(true);
+    try {
+      const run = await startCover(coverFor.id, answers);
+      setCoverFor(null);
+      onRunStarted(run);
+      goTo('runs', run.id);
+    } catch (failure) {
+      setToast({ id: 'cover-error', text: failure.message });
+    } finally {
+      setCoverBusy(false);
+    }
+  }, [coverFor, onRunStarted, goTo]);
 
   const rows = useMemo(() => {
     if (!data) return [];
@@ -91,7 +142,7 @@ export default function App() {
         <button
           key={entry.id}
           className="chip"
-          aria-pressed={page === entry.id}
+          aria-pressed={route.page === entry.id}
           onClick={() => goTo(entry.id)}
         >
           {entry.label}
@@ -100,14 +151,54 @@ export default function App() {
     </nav>
   );
 
-  if (page === 'sources') {
+  const masthead = (extra) => (
+    <header className="masthead">
+      <h1>Job Search Console</h1>
+      {nav}
+      {extra}
+    </header>
+  );
+
+  const toastEl = toast ? (
+    <div className="toast" role="status">
+      {toast.text}
+      {toast.id && toast.id !== 'cover-error' ? <button className="chip" onClick={() => { goTo('runs', toast.id); setToast(null); }}>Open log</button> : null}
+      <button className="chip" onClick={() => setToast(null)}>×</button>
+    </div>
+  ) : null;
+
+  const coverDialog = coverFor ? (
+    <div className="dialog-backdrop" onClick={() => !coverBusy && setCoverFor(null)}>
+      <div className="dialog" onClick={(e) => e.stopPropagation()}>
+        <CoverLetterDialog report={coverFor} busy={coverBusy} onSubmit={submitCover} onCancel={() => setCoverFor(null)} />
+      </div>
+    </div>
+  ) : null;
+
+  if (route.page === 'sources') {
     return (
       <div className="app">
-        <header className="masthead">
-          <h1>Job Search Console</h1>
-          {nav}
-        </header>
-        <SourcesPage />
+        {masthead()}
+        <SourcesPage onRunStarted={(run) => { onRunStarted(run); }} />
+        {toastEl}
+      </div>
+    );
+  }
+
+  if (route.page === 'runs') {
+    return (
+      <div className="app">
+        {masthead()}
+        <RunsPage openId={route.arg} onOpen={(id) => goTo('runs', id)} />
+      </div>
+    );
+  }
+
+  if (route.page === 'cv') {
+    return (
+      <div className="app">
+        {masthead()}
+        <CvStudioPage />
       </div>
     );
   }
@@ -129,13 +220,13 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="masthead">
-        <h1>Job Search Console</h1>
-        {nav}
+      {masthead(
         <span className="counts">
           {data.rows.length} applications · {data.rows.filter((r) => r.pdf).length} PDFs
-        </span>
-      </header>
+        </span>,
+      )}
+
+      <AddJobBox onChanged={reload} />
 
       {data.issues.length > 0 ? (
         <details className="notice warn">
@@ -197,16 +288,41 @@ export default function App() {
         selectedId={selected}
         onSelect={openRow}
         onStatusChanged={reload}
+        onRunStarted={onRunStarted}
+        onCoverRequested={requestCover}
       />
 
-      <ReportDetail report={report} error={reportError} />
+      <ReportDetail
+        report={report}
+        error={reportError}
+        onRunStarted={onRunStarted}
+        onCoverRequested={requestCover}
+        onOpenRun={(id) => goTo('runs', id)}
+      />
 
       {kinds.length > 0 ? (
         <MaintenanceBar
-          kinds={kinds.filter((kind) => kind.kind !== 'scan')}
+          kinds={kinds.filter((kind) => kind.kind !== 'scan' && kind.lane !== 'agent')}
           onFinish={reload}
         />
       ) : null}
+
+      {toastEl}
+      {coverDialog}
     </div>
+  );
+}
+
+export default function App() {
+  // The pipeline refetches itself when a report, PDF or the tracker changes on
+  // disk — whoever wrote it. A ref so the provider's handler never goes stale.
+  const reloadRef = useRef(null);
+  const onChanged = useCallback((event) => {
+    if (event.paths.some((path) => REFRESH_ON.some((re) => re.test(path)))) reloadRef.current?.();
+  }, []);
+  return (
+    <RunsProvider onChanged={onChanged}>
+      <Shell reloadRef={reloadRef} />
+    </RunsProvider>
   );
 }

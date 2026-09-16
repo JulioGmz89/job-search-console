@@ -4,12 +4,32 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 
 import { repoRoot } from '../services/paths.js';
-import { buildSpec, describeKinds, RUN_KINDS, SpecError } from './specs.js';
+import { buildSpec, describeKinds, internalSpec, RUN_KINDS, SpecError } from './specs.js';
 
-test('every kind names a script that exists upstream', () => {
+test('every script kind names a script that exists upstream', () => {
   for (const [kind, def] of Object.entries(RUN_KINDS)) {
+    if (def.build) {
+      // Agent kinds have no script; the whole spec comes from agent-specs.js.
+      assert.equal(def.script, undefined, `${kind} must not also name a script`);
+      continue;
+    }
     assert.ok(existsSync(join(repoRoot, def.script)), `${kind} points at a missing ${def.script}`);
   }
+});
+
+test('internal post-steps are pinned to no arguments and hidden from requests', () => {
+  for (const kind of ['merge-tracker', 'reconcile-auto']) {
+    assert.throws(() => buildSpec(kind), (e) => e.code === 'kind-unknown');
+    const spec = internalSpec(kind);
+    assert.deepEqual(spec.args, []);
+    assert.equal(spec.exclusive, true);
+    assert.equal(spec.lane, 'script');
+  }
+  // merge-tracker hands over to reconcile-auto, and only on success.
+  const merge = internalSpec('merge-tracker');
+  const chained = merge.hooks.after({}, { provisional: { status: 'succeeded' } });
+  assert.deepEqual(chained.next.map((s) => s.kind), ['reconcile-auto']);
+  assert.deepEqual(merge.hooks.after({}, { provisional: { status: 'failed' } }), {});
 });
 
 test('the argv of every spec is pinned', () => {
@@ -74,7 +94,9 @@ test('options the client invents cannot reach argv', () => {
 
 test('describeKinds is the UI vocabulary and carries no argv builders', () => {
   const kinds = describeKinds();
-  assert.deepEqual(kinds.map((k) => k.kind).sort(), Object.keys(RUN_KINDS).sort());
+  const visible = Object.entries(RUN_KINDS).filter(([, def]) => !def.internal).map(([kind]) => kind);
+  assert.deepEqual(kinds.map((k) => k.kind).sort(), visible.sort());
+  assert.ok(!kinds.some((k) => k.kind === 'merge-tracker'));
   for (const kind of kinds) {
     assert.equal(typeof kind.label, 'string');
     assert.equal(kind.args, undefined);

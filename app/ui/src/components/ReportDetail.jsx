@@ -10,7 +10,10 @@
 
 import { useEffect, useState } from 'react';
 
-import { pdfUrl } from '../api.js';
+import { coverUrl, pdfUrl } from '../api.js';
+import { runsForReport, useRuns } from '../runs.jsx';
+import { outcome } from './RunPanel.jsx';
+import RowActions from './RowActions.jsx';
 
 const FACTS = [
   ['final_decision', 'Decision'],
@@ -28,8 +31,9 @@ const LISTS = [
   ['discard_reasons', 'Discard reasons'],
 ];
 
-export default function ReportDetail({ report, error }) {
+export default function ReportDetail({ report, error, onRunStarted, onCoverRequested, onOpenRun }) {
   const [tab, setTab] = useState('report');
+  const { list } = useRuns();
 
   // A newly opened report should never inherit the previous one's tab — landing
   // on an empty PDF pane reads as a broken preview.
@@ -40,6 +44,9 @@ export default function ReportDetail({ report, error }) {
 
   const machine = report.machine ?? {};
   const hasPdf = report.pdf?.exists === true;
+  const hasCover = Boolean(report.cover);
+  // What the console has done, or is doing, for this report.
+  const related = runsForReport(list, report.id).slice(0, 6);
 
   return (
     <div className="detail">
@@ -49,6 +56,18 @@ export default function ReportDetail({ report, error }) {
           {report.tracker?.status ? <span className="badge">{report.tracker.status}</span> : null}
           {report.header?.date ? <> · {report.header.date}</> : null}
           {report.url ? <> · <a href={report.url} target="_blank" rel="noopener noreferrer">{report.url}</a></> : null}
+        </div>
+        <div className="detail-actions">
+          <RowActions report={report} onStarted={onRunStarted} onCoverRequested={() => onCoverRequested?.(report)} />
+          {related.length ? (
+            <span className="related-runs">
+              {related.map((run) => (
+                <button key={run.id} className={`badge ${outcome(run).className}`} onClick={() => onOpenRun?.(run.id)} title={`${run.label} — ${outcome(run).label}. Open its log.`}>
+                  {run.label}: {outcome(run).label}
+                </button>
+              ))}
+            </span>
+          ) : null}
         </div>
       </div>
 
@@ -63,10 +82,21 @@ export default function ReportDetail({ report, error }) {
         >
           PDF{hasPdf ? '' : ' —'}
         </button>
+        <button
+          role="tab"
+          aria-selected={tab === 'cover'}
+          onClick={() => setTab('cover')}
+          disabled={!hasCover}
+          title={hasCover ? `Rendered ${report.cover.date}` : 'No cover letter generated for this report'}
+        >
+          Cover letter{hasCover ? '' : ' —'}
+        </button>
       </div>
 
       {tab === 'pdf' && hasPdf ? (
         <iframe className="pdf-frame" src={pdfUrl(report.id)} title={`CV for report ${report.id}`} />
+      ) : tab === 'cover' && hasCover ? (
+        <iframe className="pdf-frame" src={coverUrl(report.id)} title={`Cover letter for report ${report.id}`} />
       ) : (
         <>
           {report.machine ? (

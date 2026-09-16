@@ -13,14 +13,22 @@
  *   can only run after a successful dry run of the same kind (see
  *   `runner.consumeConfirmation`), so nothing rewrites `applications.md` before
  *   the user has read what it would do.
- * - Only scripts that validate their own flags are listed. `merge-tracker.mjs`
- *   and `normalize-statuses.mjs` read flags with a bare `process.argv.includes`,
- *   so a mistyped `--dry-run` there runs live and writes; they are deliberately
- *   absent, and `queue/specs.test.js` pins the exact argv of everything that is
- *   here so a typo cannot reach one of them by accident.
+ * - Only scripts that validate their own flags are exposed to the browser.
+ *   `merge-tracker.mjs` reads flags with a bare `process.argv.includes`, so a
+ *   mistyped `--dry-run` there runs live and writes; it is listed only as an
+ *   `internal` kind that the server itself queues after an evaluation, with an
+ *   argv pinned to `[]`, and `buildSpec()` refuses it from a request.
+ *   `queue/specs.test.js` pins the exact argv of everything here so a typo
+ *   cannot reach one of them by accident.
+ *
+ * M3 adds two more shapes to the table:
+ * - Agent kinds (`evaluate`, `pdf`, `cover`) have no `script`; a `build`
+ *   function in `agent-specs.js` produces the whole spec, hooks included.
+ * - `lane` and `exclusive` tell the queue how a kind may overlap with others.
  */
 
 import { parseProgress, scanArgs } from '../services/scanner.js';
+import { buildCoverSpec, buildEvaluateSpec, buildPdfSpec } from './agent-specs.js';
 
 /**
  * @typedef {object} RunKind
@@ -35,6 +43,10 @@ import { parseProgress, scanArgs } from '../services/scanner.js';
  * @property {boolean} [reportsFindings] - True when a non-zero exit means the check
  *   found problems rather than that the check itself broke.
  * @property {boolean} supportsDryRun
+ * @property {'script'|'agent'} [lane] - Queue lane; `script` (serialized) unless set.
+ * @property {boolean} [exclusive] - Runs only when nothing else does.
+ * @property {boolean} [internal] - Queued by the server after another run; never from a request.
+ * @property {Function} [build] - Agent kinds: `(options, ctx) => spec`, replacing `script`/`args`.
  */
 export const RUN_KINDS = Object.freeze({
   scan: {
@@ -111,30 +123,109 @@ export const RUN_KINDS = Object.freeze({
     reportsFindings: true,
     args: () => [],
   },
+
+  // ── agent kinds (headless Claude Code sessions) ─────────────────────
+  evaluate: {
+    label: 'Evaluate posting',
+    description: 'Run the A–G evaluation on a job URL and add it to the tracker.',
+    help:
+      'Starts a headless Claude Code session that reads your cv.md and profile, fetches the posting, writes the full A–G report to reports/, and adds a tracker row — the same thing `/career-ops oferta` does in a terminal, without the terminal. The report number is reserved before the session starts and released when it ends. After a successful report the console merges the tracker row and moves the URL out of the inbox by running upstream’s own scripts, and queues a tailored PDF when the score reaches your profile’s auto_pdf_score_threshold. Nothing is ever submitted anywhere.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    lane: 'agent',
+    build: buildEvaluateSpec,
+  },
+  pdf: {
+    label: 'Generate PDF',
+    description: 'Tailor the CV to an evaluated posting and render it as a PDF.',
+    help:
+      'Starts a headless Claude Code session that follows `modes/pdf.md`: it reads the report and your cv.md, tailors the content (keywords injected, nothing invented — the fact gate runs before rendering), builds the HTML with the template chosen in CV Studio, and renders the PDF through upstream’s renderer with your style tokens applied. The result appears in the report’s PDF tab and in data/pdf-index.tsv.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    lane: 'agent',
+    build: buildPdfSpec,
+  },
+  cover: {
+    label: 'Cover letter',
+    description: 'Draft a cover letter from the report and your answers, and render it as a PDF.',
+    help:
+      'Starts a headless Claude Code session that follows `modes/cover.md` in slug mode, starting from the report’s Cover Letter Draft. The four questions the mode always asks (why this role, what problem you would solve, how you would approach it, tone) are answered by you in the form before the run, so the session never has to guess. The PDF lands in output/ and is linked from the report.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    lane: 'agent',
+    build: buildCoverSpec,
+  },
+
+  // ── internal post-steps (queued by the server, never by a request) ──
+  'merge-tracker': {
+    script: 'merge-tracker.mjs',
+    label: 'Merge tracker additions',
+    description: 'Fold batch/tracker-additions/*.tsv into applications.md.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    exclusive: true,
+    internal: true,
+    args: () => [],
+    // The tracker is updated; now the inbox can learn the URL was processed.
+    after: () => ({ next: ['reconcile-auto'] }),
+  },
+  'reconcile-auto': {
+    script: 'reconcile-pipeline.mjs',
+    label: 'Reconcile inbox',
+    description: 'Move evaluated URLs out of the inbox’s Pending section.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    exclusive: true,
+    internal: true,
+    args: () => [],
+  },
+  'mark-pdf-ready': {
+    script: 'mark-pdf-ready.mjs',
+    label: 'Mark PDF ready',
+    description: 'Flip the tracker row’s PDF column to ✅ after a render.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    exclusive: true,
+    internal: true,
+    args: ({ reportNum }) => {
+      if (!/^\d{1,6}$/.test(String(reportNum ?? ''))) throw new TypeError('reportNum must be a report number');
+      return [String(reportNum)];
+    },
+  },
 });
 
 /** A rejected run request. */
 export class SpecError extends Error {
-  constructor(message, { code, status = 400 } = {}) {
+  constructor(message, { code, status = 400, detail } = {}) {
     super(message);
     this.name = 'SpecError';
     this.code = code;
     this.status = status;
+    this.detail = detail;
   }
 }
 
 /** The kinds the UI lists, without the argv builders. */
 export function describeKinds() {
-  return Object.entries(RUN_KINDS).map(([kind, def]) => ({
-    kind,
-    label: def.label,
-    description: def.description,
-    help: def.help ?? null,
-    writes: def.writes,
-    confirmRequired: def.confirmRequired,
-    supportsDryRun: def.supportsDryRun,
-    reportsFindings: def.reportsFindings === true,
-  }));
+  return Object.entries(RUN_KINDS)
+    .filter(([, def]) => def.internal !== true)
+    .map(([kind, def]) => ({
+      kind,
+      label: def.label,
+      description: def.description,
+      help: def.help ?? null,
+      writes: def.writes,
+      confirmRequired: def.confirmRequired,
+      supportsDryRun: def.supportsDryRun,
+      reportsFindings: def.reportsFindings === true,
+      lane: def.lane ?? 'script',
+    }));
 }
 
 /**
@@ -142,16 +233,23 @@ export function describeKinds() {
  *
  * @param {string} kind - A key of RUN_KINDS.
  * @param {object} [options] - Kind-specific options; `dryRun` is understood by all.
- * @returns {{kind: string, script: string, label: string, args: string[], dryRun: boolean,
- *            writes: boolean, confirmRequired: boolean, parseProgress?: Function}}
+ * @param {{root?: string, repoRoot?: string, agent?: object, internal?: boolean}} [ctx] -
+ *   What agent kinds need to build themselves; `internal: true` is the server
+ *   vouching that this is a post-step, not a request from the browser.
+ * @returns {{kind: string, script?: string, label: string, args: string[], dryRun: boolean,
+ *            writes: boolean, confirmRequired: boolean, lane: string, exclusive: boolean,
+ *            parseProgress?: Function, hooks?: object}}
  * @throws {SpecError}
  */
-export function buildSpec(kind, options = {}) {
+export function buildSpec(kind, options = {}, ctx = {}) {
   const def = RUN_KINDS[kind];
-  if (!def) throw new SpecError(`Unknown run "${kind}"`, { code: 'kind-unknown' });
+  // An internal kind is "unknown" to a request: the browser gets no hint that
+  // merge-tracker exists, let alone a way to run it.
+  if (!def || (def.internal && ctx.internal !== true)) throw new SpecError(`Unknown run "${kind}"`, { code: 'kind-unknown' });
   if (options === null || typeof options !== 'object' || Array.isArray(options)) {
     throw new SpecError('Run options must be an object', { code: 'options-invalid' });
   }
+  if (def.build) return def.build(options, ctx);
 
   const dryRun = options.dryRun === true;
   if (dryRun && !def.supportsDryRun) {
@@ -177,6 +275,26 @@ export function buildSpec(kind, options = {}) {
     writes: def.writes && !dryRun,
     confirmRequired: def.confirmRequired && !dryRun,
     reportsFindings: def.reportsFindings === true,
+    lane: def.lane ?? 'script',
+    exclusive: def.exclusive === true,
     parseProgress: def.parseProgress,
+    ...(def.after
+      ? {
+          hooks: {
+            after: (run, hookCtx) => {
+              if (hookCtx.provisional.status !== 'succeeded') return {};
+              const outcome = def.after(run, hookCtx);
+              // Post-steps name the next kind; the spec is built here so the
+              // table stays declarative.
+              return { ...outcome, next: (outcome.next ?? []).map((k) => internalSpec(k, ctx)) };
+            },
+          },
+        }
+      : {}),
   };
+}
+
+/** Build a server-queued post-step. Not reachable from a request. */
+export function internalSpec(kind, ctx = {}, options = {}) {
+  return buildSpec(kind, options, { ...ctx, internal: true });
 }

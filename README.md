@@ -4,8 +4,10 @@
 generate tailored CVs, and see which skills you actually need to learn next. Everything
 runs on your machine.
 
-> **Status: in development.** M0 (fork hygiene) is the current milestone. There is
-> nothing to install yet — see the [roadmap](#roadmap).
+> **Status: in development.** M0–M3 are done: you can browse your pipeline, scan
+> sources, and — from M3 — paste a job URL and get an evaluation report and a
+> tailored CV PDF without typing a command. Skills Gap (M4) is next. See the
+> [roadmap](#roadmap).
 
 ---
 
@@ -69,10 +71,10 @@ setup, and you can always drop back into a terminal in the same directory.
 
 | Milestone | What ships |
 |---|---|
-| **M0** | Fork hygiene: own name and README, upstream credit, CI skeleton |
-| **M1** | Read-only dashboard: browse your pipeline, reports, and PDFs in a browser |
-| **M2** | Deterministic actions: portals CRUD, "Scan now", status changes written back |
-| **M3** | Agent orchestration: evaluate / generate PDF / cover letter, with live logs |
+| **M0** ✅ | Fork hygiene: own name and README, upstream credit, CI skeleton |
+| **M1** ✅ | Read-only dashboard: browse your pipeline, reports, and PDFs in a browser |
+| **M2** ✅ | Deterministic actions: portals CRUD, "Scan now", status changes written back |
+| **M3** ✅ | Agent orchestration: evaluate / generate PDF / cover letter with live logs, a run queue, live refresh, and CV Studio phase A (style tokens + voice rules) |
 | **M4** | Skills Gap: extraction, aggregation, and "what should I learn next?" |
 | **M5** | CV Studio: structured CV data, themes, live preview, ATS guardrail |
 | **M6** | Polish and release: onboarding, docs, v1.0 |
@@ -85,8 +87,28 @@ setup, and you can always drop back into a terminal in the same directory.
 
 ## Getting started
 
-Not yet installable — the web console arrives with M1. Until then, the career-ops engine
-in this repository works exactly as upstream documents it.
+```sh
+npm install                 # upstream's engine (installs Chromium for PDF rendering)
+cp config/profile.example.yml config/profile.yml   # then edit it, and add your cv.md
+cd app && npm install && npm start                 # builds the UI, serves http://127.0.0.1:4317
+```
+
+Open the console, paste a job URL into the box at the top of the Pipeline page and click
+**Evaluate now**. A headless Claude Code session evaluates the posting (the same
+`/career-ops oferta` mode upstream runs in a terminal), the report and tracker row appear
+in the table by themselves, and — when the score reaches your profile's
+`auto_pdf_score_threshold` — a tailored PDF follows. Every row has **Evaluate**, **PDF**
+and **Cover letter** buttons; the **Runs** page shows what is queued, running and done,
+with live logs; **CV Studio** sets the look of every PDF (`config/cv/style.yml`) and the
+voice of every letter (`voice-dna.md`).
+
+The console only ever *drafts and evaluates*; it never submits an application or sends a
+message. See [app/README.md](app/README.md) for how the runs work, the environment
+variables, and where the console keeps its own files.
+
+The career-ops engine in this repository also still works exactly as upstream documents
+it — a `claude` session in the same directory and the console read and write the same
+files.
 
 ## Contributing
 

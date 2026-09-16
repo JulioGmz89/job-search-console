@@ -4,14 +4,16 @@ import { useEffect, useRef, useState } from 'react';
  * Live output for one run, plus the confirm step for anything that rewrites the
  * tracker.
  *
- * The progress indicator is deliberately honest about what `scan.mjs` reports.
- * Its fetch sweep runs every provider concurrently and prints nothing until it
- * is done, so there is no percentage to show — an elapsed clock and the live log
- * are the real information. Only the `--verify` phase is counted, and only then
- * does a determinate bar appear.
+ * The progress indicator is deliberately honest about what each run reports.
+ * `scan.mjs`'s fetch sweep runs every provider concurrently and prints nothing
+ * until it is done, so there is no percentage to show — an elapsed clock and
+ * the live log are the real information. Only the `--verify` phase is counted,
+ * and only then does a determinate bar appear. An agent run streams what
+ * Claude is doing (tool calls, text) as it happens.
  */
 
-const STATUS_LABEL = {
+export const STATUS_LABEL = {
+  queued: 'Queued',
   running: 'Running',
   succeeded: 'Finished',
   failed: 'Failed',
@@ -25,26 +27,40 @@ const STATUS_LABEL = {
  * returns 1 for "one error in the tracker". Calling that "Failed" says the tool
  * broke, when in fact it worked and is telling you something.
  */
-function outcome(run) {
+export function outcome(run) {
   if (run.status === 'failed' && run.reportsFindings) {
     return { label: 'Found problems', className: 'run-findings' };
   }
   return { label: STATUS_LABEL[run.status] ?? run.status, className: `run-${run.status}` };
 }
 
-/** mm:ss since a run started. */
-function useElapsed(run) {
+/** mm:ss since a run started (or how long it has been waiting). */
+export function useElapsed(run) {
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
-    if (!run || run.status !== 'running') return undefined;
+    if (!run || (run.status !== 'running' && run.status !== 'queued')) return undefined;
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
   }, [run]);
 
   if (!run) return null;
-  const ms = (run.status === 'running' ? now : run.endedAt) - run.startedAt;
-  const seconds = Math.max(0, Math.floor(ms / 1000));
+  const from = run.startedAt ?? run.queuedAt;
+  const to = run.status === 'running' || run.status === 'queued' ? now : run.endedAt;
+  if (!from || !to) return null;
+  const seconds = Math.max(0, Math.floor((to - from) / 1000));
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+}
+
+/** The one-line summary of what a run was about, from its metadata. */
+export function describeRun(run) {
+  const m = run.meta ?? {};
+  const parts = [];
+  if (m.company) parts.push(m.company);
+  if (m.reportNum) parts.push(`report ${m.reportNum}`);
+  else if (m.url) parts.push(m.url);
+  if (m.template) parts.push(`${m.template} template`);
+  if (m.tone) parts.push(`${m.tone} tone`);
+  return parts.join(' · ');
 }
 
 export default function RunPanel({ run, lines, progress, error, onCancel, onConfirm, onDismiss, confirmLabel }) {
@@ -65,8 +81,11 @@ export default function RunPanel({ run, lines, progress, error, onCancel, onConf
   }
   if (!run) return null;
 
+  const queued = run.status === 'queued';
   const running = run.status === 'running';
+  const agent = run.lane === 'agent';
   const result = outcome(run);
+  const detail = describeRun(run);
   // A successful dry run is what authorises the real thing.
   const awaitingConfirm = onConfirm && run.dryRun && run.status === 'succeeded';
 
@@ -81,9 +100,18 @@ export default function RunPanel({ run, lines, progress, error, onCancel, onConf
           <span className="muted">exit {run.exitCode}</span>
         ) : null}
         <span className="spacer" />
-        {running ? <button className="chip" onClick={onCancel}>Cancel</button> : null}
-        {!running && onDismiss ? <button className="chip" onClick={onDismiss}>Close</button> : null}
+        {queued || running ? <button className="chip" onClick={onCancel}>Cancel</button> : null}
+        {!queued && !running && onDismiss ? <button className="chip" onClick={onDismiss}>Close</button> : null}
       </div>
+
+      {detail ? <div className="muted run-detail">{detail}</div> : null}
+
+      {queued ? (
+        <div className="run-progress">
+          <progress />
+          <span className="muted">Waiting for a free slot — another run is using the lane it needs</span>
+        </div>
+      ) : null}
 
       {running ? (
         progress?.phase === 'verify' && progress.total ? (
@@ -96,14 +124,16 @@ export default function RunPanel({ run, lines, progress, error, onCancel, onConf
             <progress />
             <span className="muted">
               {/* Say why it looks stuck, because it will look stuck. */}
-              Fetching from every source at once — the scanner reports nothing until the sweep finishes
+              {agent
+                ? 'Claude is working — tool calls and text appear below as they stream; a full evaluation takes several minutes'
+                : 'Fetching from every source at once — the scanner reports nothing until the sweep finishes'}
             </span>
           </div>
         )
       ) : null}
 
       <pre className="run-log" ref={logRef}>
-        {lines.length === 0 && running ? <span className="muted">Waiting for output…</span> : null}
+        {lines.length === 0 && (running || queued) ? <span className="muted">Waiting for output…</span> : null}
         {lines.map((line, i) => (
           <div key={i} className={line.stream === 'stderr' ? 'err' : undefined}>{line.text}</div>
         ))}
@@ -111,6 +141,10 @@ export default function RunPanel({ run, lines, progress, error, onCancel, onConf
 
       {run.truncated ? (
         <p className="muted">Output was long and has been truncated.</p>
+      ) : null}
+
+      {run.status === 'failed' && run.error && !run.reportsFindings ? (
+        <div className="notice warn">{run.error}</div>
       ) : null}
 
       {error ? <div className="notice warn">{error.message}</div> : null}

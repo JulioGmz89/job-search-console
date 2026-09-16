@@ -13,6 +13,10 @@
  *   - The client never names a command. It names a run *kind* from
  *     `queue/specs.js`, which rebuilds every argument from constants.
  *   - Anything that rewrites the tracker needs a successful dry run first.
+ *
+ * M3 adds the agent runs (evaluate, pdf, cover) behind the same `POST /api/runs`
+ * — a kind plus a narrow option set — and one more write: a pasted URL into
+ * the inbox, under upstream's own lock.
  */
 
 import { createReadStream, existsSync } from 'node:fs';
@@ -23,15 +27,20 @@ import { fileURLToPath } from 'node:url';
 import fastifyStatic from '@fastify/static';
 import Fastify from 'fastify';
 
+import { resolveClaudeCommand } from './agents/claude-bin.js';
+import { readProfile } from './agents/profile.js';
 import { createRunner } from './queue/runner.js';
 import { buildSpec, describeKinds, RUN_KINDS } from './queue/specs.js';
-import { readInbox } from './services/inbox.js';
-import { repoRoot } from './services/paths.js';
+import { resolveReportCover } from './services/covers.js';
+import { listCvTemplates, listWritingSamples, readStyle, readVoice, writeStyle, writeVoice } from './services/cvstyle.js';
+import { appendInboxUrl, readInbox } from './services/inbox.js';
+import { repoRoot, resolveDataRoot } from './services/paths.js';
 import { readPipeline, SCORE_BANDS } from './services/pipeline.js';
 import { createEntry, deleteEntry, readPortals, updateEntry } from './services/portals.js';
 import { listReports, readReport, resolveReportPdf } from './services/reports.js';
 import { readLastScanRun, readPortalHealth } from './services/scanner.js';
 import { setStatus } from './services/status.js';
+import { createWatcher } from './watch.js';
 
 const uiDist = join(dirname(fileURLToPath(import.meta.url)), '..', 'ui', 'dist');
 
@@ -70,11 +79,14 @@ function body(request) {
  * Exported unstarted so tests can drive it with `app.inject()` — no socket, no
  * port collisions when suites run in parallel.
  *
- * @param {{root?: string, logger?: boolean|object}} [options] - `root` pins the
- *   data directory; omit to use upstream's resolution chain.
+ * @param {{root?: string, logger?: boolean|object, serveUi?: boolean, agent?: object, watch?: boolean}} [options] -
+ *   `root` pins the data directory; omit to use upstream's resolution chain.
+ *   `agent` overrides how the Claude Code CLI is spawned (tests point it at a
+ *   fake); omit to look it up on PATH. `watch: false` skips the file watcher
+ *   (tests that do not need it).
  * @returns {import('fastify').FastifyInstance}
  */
-export function buildApp({ root, logger = false, serveUi = true } = {}) {
+export function buildApp({ root, logger = false, serveUi = true, agent, watch = true } = {}) {
   const app = Fastify({ logger });
 
   // One runner per app instance, not a module singleton: each test file builds
@@ -82,6 +94,43 @@ export function buildApp({ root, logger = false, serveUi = true } = {}) {
   // be a flake generator.
   const runner = createRunner({ repoRoot, root });
   app.addHook('onClose', async () => runner.close());
+
+  // The server-wide event feed: file changes under the data root and run
+  // transitions from the queue, fanned out to every open `/api/events` socket.
+  const subscribers = new Set();
+  const broadcast = (event) => {
+    for (const send of subscribers) {
+      try {
+        send(event);
+      } catch {
+        // A dead socket is cleaned up by its own close handler.
+      }
+    }
+  };
+  const unsubscribeRuns = runner.subscribeAll(broadcast);
+  const watcher = watch
+    ? createWatcher({
+        root: resolveDataRoot(root),
+        onChange: ({ paths, at }) => broadcast({ type: 'changed', paths, at }),
+        log: (message) => app.log.warn(message),
+      })
+    : null;
+  /** Open `/api/events` responses, ended on shutdown so nothing waits on a dead server. */
+  const eventSockets = new Set();
+  app.addHook('onClose', async () => {
+    unsubscribeRuns();
+    watcher?.close();
+    subscribers.clear();
+    for (const raw of eventSockets) {
+      if (!raw.writableEnded) raw.end();
+    }
+    eventSockets.clear();
+  });
+
+  // Resolved once: the CLI does not move while the server runs, and an agent
+  // run refused because the CLI is missing should say so at request time.
+  const claude = agent ?? resolveClaudeCommand();
+  const specContext = { root, repoRoot, agent: claude };
 
   // The built SPA is served by this same process, so M1's acceptance criterion
   // ("browse the pipeline without touching a terminal") is one command on one
@@ -201,8 +250,10 @@ export function buildApp({ root, logger = false, serveUi = true } = {}) {
     // The row carries tracker-only facts (status, applied date in notes) that
     // the report file itself does not know about.
     const row = readPipeline({ root }).rows.find((r) => r.reportId === report.id) ?? null;
+    const cover = resolveReportCover(report.id, { root });
     return {
       ...report,
+      cover: cover ? { path: cover.path, date: cover.date } : null,
       tracker: row
         ? { id: row.id, status: row.status, statusId: row.statusId, date: row.date, notes: row.notes }
         : null,
@@ -223,6 +274,48 @@ export function buildApp({ root, logger = false, serveUi = true } = {}) {
       .header('Content-Disposition', `inline; filename="${pdf.fileName.replace(/["\r\n]/g, '')}"`)
       .send(createReadStream(pdf.absolutePath));
   });
+
+  /** The cover letter PDF, tracked by the console rather than pdf-index.tsv (see services/covers.js). */
+  app.get('/api/reports/:id/cover', async (request, reply) => {
+    const cover = resolveReportCover(request.params.id, { root });
+    if (!cover) return reply.code(404).send({ error: 'No cover letter for this report' });
+
+    const { size } = await stat(cover.absolutePath);
+    return reply
+      .header('Content-Type', 'application/pdf')
+      .header('Content-Length', size)
+      .header('Content-Disposition', `inline; filename="${cover.fileName.replace(/["\r\n]/g, '')}"`)
+      .send(createReadStream(cover.absolutePath));
+  });
+
+  // ── CV Studio: style tokens, voice rules, templates, samples ───────
+
+  app.get('/api/cv/style', async () => readStyle({ root }));
+
+  app.put('/api/cv/style', async (request, reply) => {
+    try {
+      const input = body(request);
+      const saved = writeStyle({ root, style: input.style ?? input });
+      return { ok: true, ...saved, ...readStyle({ root }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.get('/api/cv/voice', async () => readVoice({ root }));
+
+  app.put('/api/cv/voice', async (request, reply) => {
+    try {
+      const input = body(request);
+      return { ok: true, ...writeVoice({ root, text: input.text }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.get('/api/cv/templates', async () => listCvTemplates({ root }));
+
+  app.get('/api/cv/writing-samples', async () => listWritingSamples({ root }));
 
   // ── inline status changes ──────────────────────────────────────────
 
@@ -247,6 +340,55 @@ export function buildApp({ root, logger = false, serveUi = true } = {}) {
   app.get('/api/inbox', async () => {
     const inbox = readInbox({ root });
     return { ...inbox, lastScan: readLastScanRun({ root }) };
+  });
+
+  /**
+   * Paste a URL. With `evaluate: true` the evaluation is queued in the same
+   * request, which is the milestone's headline path: one paste, one click.
+   * A URL that is already in the inbox is not an error — the run still starts.
+   */
+  app.post('/api/inbox/urls', async (request, reply) => {
+    try {
+      const input = body(request);
+      const added = await appendInboxUrl({
+        root,
+        url: input.url,
+        company: input.company,
+        title: input.title,
+        note: input.note,
+      });
+      let run = null;
+      if (input.evaluate === true) {
+        const spec = buildSpec('evaluate', { url: input.url, autoPdf: input.autoPdf !== false }, specContext);
+        run = runner.start(spec);
+      }
+      return reply.code(201).send({ ok: true, ...added, run });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  // ── the agent ──────────────────────────────────────────────────────
+
+  /** Whether agent runs can work at all, for the UI to enable its buttons honestly. */
+  app.get('/api/agent/status', async () => {
+    const dataRoot = resolveDataRoot(root);
+    const profile = readProfile({ root: dataRoot });
+    return {
+      bin: { display: claude.display, source: claude.source, found: claude.found, shell: claude.shell },
+      maxAgents: Number.parseInt(process.env.JSC_MAX_AGENTS ?? '', 10) || 2,
+      profile: {
+        exists: profile.exists,
+        error: profile.error,
+        spendTier: profile.spendTier,
+        autoPdfThreshold: profile.autoPdfThreshold,
+        language: profile.language,
+        hasStyle: profile.hasStyle,
+        hasCvSections: profile.hasCvSections,
+      },
+      cvPresent: existsSync(join(dataRoot, 'cv.md')),
+      voiceDnaPresent: existsSync(join(dataRoot, 'voice-dna.md')),
+    };
   });
 
   // ── portals ────────────────────────────────────────────────────────
@@ -313,7 +455,7 @@ export function buildApp({ root, logger = false, serveUi = true } = {}) {
   app.post('/api/runs', async (request, reply) => {
     try {
       const input = body(request);
-      const spec = buildSpec(input.kind, input.options ?? {});
+      const spec = buildSpec(input.kind, input.options ?? {}, specContext);
       // Burn the confirmation before spawning: if the token is bad, nothing has
       // run, and a valid token can never authorise a second write.
       if (spec.confirmRequired) runner.consumeConfirmation(input.confirmToken, spec.kind);
@@ -377,6 +519,45 @@ export function buildApp({ root, logger = false, serveUi = true } = {}) {
       unsubscribe();
     });
     reply.raw.on('finish', () => clearInterval(heartbeat));
+
+    reply.hijack();
+    return reply;
+  });
+
+  /**
+   * Everything the UI needs to stay current without polling: `changed` when a
+   * file under reports/, output/ or data/ was written (by a run here, an
+   * upstream script, or a Claude Code session in the same directory), and
+   * `run` on every queue transition.
+   */
+  app.get('/api/events', (request, reply) => {
+    reply.raw.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no',
+    });
+
+    const send = (event) => {
+      if (reply.raw.writableEnded) return;
+      reply.raw.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);
+    };
+    subscribers.add(send);
+    eventSockets.add(reply.raw);
+    // The current queue, so a client that connects late does not wait for the
+    // next transition to learn what is running.
+    send({ type: 'hello', runs: runner.list(), watching: watcher?.watching() ?? [], at: Date.now() });
+
+    const heartbeat = setInterval(() => {
+      if (!reply.raw.writableEnded) reply.raw.write(': ping\n\n');
+    }, 15_000);
+    const gone = () => {
+      clearInterval(heartbeat);
+      subscribers.delete(send);
+      eventSockets.delete(reply.raw);
+    };
+    request.raw.on('close', gone);
+    reply.raw.on('finish', gone);
 
     reply.hijack();
     return reply;
