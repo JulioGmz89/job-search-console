@@ -32,10 +32,15 @@ printf 'candidate:\n  name: "Ada Lovelace"\nspend_tier: standard\ncv:\n  auto_pd
 
 cd app && npm run build && \
 CAREER_OPS_ROOT="$W" \
-JSC_CLAUDE_BIN="$PWD/server/services/__fixtures__/bin/fake-claude.js" \
+JSC_CLAUDE_BIN="$(pwd -W)/server/services/__fixtures__/bin/fake-claude.js" \
 FAKE_CLAUDE_SCENARIO=evaluate-ok FAKE_CLAUDE_SCORE=4.2 \
 node server/index.js
 ```
+
+`JSC_CLAUDE_BIN` must be a path Node's native `fs` can resolve. In Git Bash on Windows,
+`$PWD` is a POSIX-style path (`/c/Users/...`) that `node.exe` cannot look up — use
+`$(pwd -W)` (Windows-style, `C:/Users/...`) instead. In PowerShell, `"$PWD\server\..."`
+is already correct as-is.
 
 Then open <http://127.0.0.1:4317>:
 
