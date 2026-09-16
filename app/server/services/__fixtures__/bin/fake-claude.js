@@ -10,14 +10,15 @@
  * Environment:
  *   FAKE_CLAUDE_SCENARIO  evaluate-ok (default) | evaluate-no-report | evaluate-is-error |
  *                         evaluate-wrong-number | evaluate-blacklisted | hang |
- *                         pdf-ok | cover-ok
+ *                         pdf-ok | cover-ok | skills-ok | skills-partial |
+ *                         skills-no-output | skills-cv-ok
  *   FAKE_CLAUDE_SCORE     score for evaluate-ok (default 4.1)
  *   FAKE_CLAUDE_ARGV      when set, the argv is written to this file for inspection
  *   CAREER_OPS_ROOT       the data root (set by the runner's confineTo)
  */
 
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, isAbsolute, join } from 'node:path';
 
 const args = process.argv.slice(2);
 const flag = (name) => {
@@ -52,6 +53,9 @@ const finish = ({ isError = false, text = '', subtype = isError ? 'error_during_
     result: text,
     usage: { input_tokens: 100, output_tokens: 50, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 },
   });
+
+/** A path the overlay printed: relative to the cwd (the repo) when inside it, absolute otherwise. */
+const resolveFromCwd = (p) => (isAbsolute(p) ? p : join(process.cwd(), p));
 
 const write = (relative, text) => {
   const path = join(root, relative);
@@ -114,6 +118,19 @@ const writeReport = (num, score) => {
   return file;
 };
 
+/** The skills-cv session: a fixed list with a duplicate and an alias, for the validator to fold. */
+const writeCvSkills = () => {
+  const output = resolveFromCwd(grab(/\*\*Output file:\*\* `([^`]+)`/));
+  writeFileSync(output, JSON.stringify({ skills: [
+    { skill: 'Python', category: 'language', depth: 'expert' },
+    { skill: 'Postgres', category: 'data', depth: 'solid' },
+    { skill: 'Terraform', category: 'cloud-infra', depth: 'basic' },
+    { skill: 'Terraform', category: 'cloud-infra', depth: 'expert' },
+  ] }));
+  tool('Write', { file_path: output });
+  finish({ text: 'done' });
+};
+
 switch (scenario) {
   case 'evaluate-ok': {
     const score = process.env.FAKE_CLAUDE_SCORE ?? '4.1';
@@ -162,6 +179,45 @@ switch (scenario) {
     finish({ text: `Cover letter at ${cover}` });
     break;
   }
+  case 'skills-ok':
+  case 'skills-partial': {
+    // One scenario serves both session kinds the Skills page queues together.
+    if (/^# CV skill extraction/m.test(systemPrompt)) {
+      writeCvSkills();
+      break;
+    }
+    // The overlay names both files (relative to the cwd when inside the repo,
+    // absolute otherwise); the input lists the postings. Each posting gets
+    // Kubernetes twice under two spellings, Go when its text mentions it, and
+    // two unusable entries — so the tests can see canonicalization, dedupe
+    // and validation happen, not just a file appear.
+    const input = resolveFromCwd(grab(/\*\*Input file:\*\* `([^`]+)`/));
+    const output = resolveFromCwd(grab(/\*\*Output file:\*\* `([^`]+)`/));
+    const postings = JSON.parse(readFileSync(input, 'utf-8'));
+    tool('Read', { file_path: input });
+    const items = postings.map((p) => ({
+      id: p.id,
+      skills: [
+        { skill: 'k8s', category: 'cloud-infra', level: 'required' },
+        { skill: 'Kubernetes', category: 'cloud-infra', level: 'nice-to-have' },
+        ...(/\bGo\b/.test(p.text) ? [{ skill: 'Go', category: 'language', level: 'nice-to-have' }] : []),
+        { skill: 'Fake Skill', category: 'not-a-category', level: 'sometimes' },
+        { skill: '', category: 'other', level: 'required' },
+      ],
+    }));
+    if (scenario === 'skills-partial') items.pop();
+    writeFileSync(output, JSON.stringify(items));
+    tool('Write', { file_path: output });
+    finish({ text: 'done' });
+    break;
+  }
+  case 'skills-no-output':
+    say('I read the postings but wrote nothing.\n');
+    finish({ text: 'done' });
+    break;
+  case 'skills-cv-ok':
+    writeCvSkills();
+    break;
   default:
     process.stderr.write(`fake-claude: unknown scenario ${scenario}\n`);
     process.exit(2);

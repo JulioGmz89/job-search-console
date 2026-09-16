@@ -33,7 +33,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 const iso = (ms) => new Date(ms ?? Date.now()).toISOString();
 
 /** Refuse at request time — before anything is queued — when the run cannot possibly work. */
-function requireAgent(agent) {
+export function requireAgent(agent) {
   if (!agent?.found) {
     throw new SpecError(
       `Claude Code CLI not found (looked for "${agent?.display ?? 'claude'}") — install it or set JSC_CLAUDE_BIN`,
@@ -42,7 +42,7 @@ function requireAgent(agent) {
   }
 }
 
-function requireCv(root) {
+export function requireCv(root) {
   if (!existsSync(join(resolveDataRoot(root), 'cv.md'))) {
     throw new SpecError('No cv.md in the data directory — add your CV before evaluating', { code: 'cv-missing' });
   }
@@ -52,7 +52,7 @@ function requireCv(root) {
  * The per-run wiring shared by every agent kind: a stream-json parser, a
  * mirror of the raw stream to `data/jsc/logs/<run>.jsonl`, and the model.
  */
-function agentPlumbing({ root, model }) {
+export function agentPlumbing({ root, model }) {
   const dataRoot = resolveDataRoot(root);
   const parser = createStreamParser();
   const profile = readProfile({ root: dataRoot });
@@ -88,7 +88,7 @@ function agentPlumbing({ root, model }) {
 }
 
 /** `run.result` when the CLI reported a failure of its own. */
-const agentError = (run) => (run.result?.isError ? run.result.error ?? 'Claude reported an error' : null);
+export const agentError = (run) => (run.result?.isError ? run.result.error ?? 'Claude reported an error' : null);
 
 // ── evaluate ─────────────────────────────────────────────────────────
 
@@ -241,7 +241,7 @@ export function buildEvaluateSpec({ url, autoPdf = true, model = null } = {}, { 
 // ── pdf, cover ───────────────────────────────────────────────────────
 
 /** A path for the prompt: relative to the repository when it sits inside it, else absolute. */
-function promptPath(repoRoot, path) {
+export function promptPath(repoRoot, path) {
   const rel = relative(repoRoot, path);
   return rel && !rel.startsWith('..') && !isAbsolute(rel) ? rel.replace(/\\/g, '/') : path;
 }

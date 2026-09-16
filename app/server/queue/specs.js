@@ -29,6 +29,7 @@
 
 import { parseProgress, scanArgs } from '../services/scanner.js';
 import { parseFetchProgress } from '../skills/cli.js';
+import { buildSkillsCvSpec, buildSkillsExtractSpec } from '../skills/extract-spec.js';
 import { buildCoverSpec, buildEvaluateSpec, buildPdfSpec } from './agent-specs.js';
 
 /** Argv for the skills fetch worker (`skills/cli.js`): only flags it validates itself. */
@@ -60,6 +61,7 @@ function skillsFetchArgs(options = {}) {
  * @property {boolean} [exclusive] - Runs only when nothing else does.
  * @property {boolean} [internal] - Queued by the server after another run; never from a request.
  * @property {Function} [build] - Agent kinds: `(options, ctx) => spec`, replacing `script`/`args`.
+ * @property {string} [page] - The UI page that owns this kind's button; unset means the Maintenance bar.
  */
 export const RUN_KINDS = Object.freeze({
   scan: {
@@ -150,6 +152,7 @@ export const RUN_KINDS = Object.freeze({
     writes: true,
     confirmRequired: false,
     supportsDryRun: false,
+    page: 'skills',
     args: (options) => skillsFetchArgs(options),
     parseProgress: parseFetchProgress,
   },
@@ -187,6 +190,31 @@ export const RUN_KINDS = Object.freeze({
     supportsDryRun: false,
     lane: 'agent',
     build: buildCoverSpec,
+  },
+
+  'skills-extract': {
+    label: 'Extract skills',
+    description: 'Read a batch of cached postings in a Claude session and record the skills each one asks for.',
+    help:
+      'Starts a headless Claude Code session over up to ten postings whose text the console has already fetched. The session may only read the batch file and write one JSON file; the console validates that file, folds spellings onto canonical names, and caches the result by the text’s hash — a posting is never sent twice. Until this runs, a posting’s skills come from the rules-based pass, which knows the common vocabulary but not required vs nice-to-have as well. Queued from the Skills page, one run per batch.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    lane: 'agent',
+    page: 'skills',
+    build: buildSkillsExtractSpec,
+  },
+  'skills-cv': {
+    label: 'Extract CV skills',
+    description: 'Read cv.md in a Claude session and record each skill it evidences, with a depth.',
+    help:
+      'Starts a headless Claude Code session over cv.md and profile.yml that lists every skill they evidence with a depth (expert, solid, basic). The Skills page uses it to tell “have” from “deepen”. Cached against cv.md’s content, so it re-runs only after the CV changes; until then, or when it has never run, the rules-based pass reads the CV instead.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    lane: 'agent',
+    page: 'skills',
+    build: buildSkillsCvSpec,
   },
 
   // ── internal post-steps (queued by the server, never by a request) ──
@@ -266,6 +294,7 @@ export function describeKinds() {
       supportsDryRun: def.supportsDryRun,
       reportsFindings: def.reportsFindings === true,
       lane: def.lane ?? 'script',
+      page: def.page ?? null,
     }));
 }
 
