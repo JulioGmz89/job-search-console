@@ -28,7 +28,20 @@
  */
 
 import { parseProgress, scanArgs } from '../services/scanner.js';
+import { parseFetchProgress } from '../skills/cli.js';
 import { buildCoverSpec, buildEvaluateSpec, buildPdfSpec } from './agent-specs.js';
+
+/** Argv for the skills fetch worker (`skills/cli.js`): only flags it validates itself. */
+function skillsFetchArgs(options = {}) {
+  const args = ['fetch'];
+  if (options.retryFailed === true) args.push('--retry-failed');
+  if (options.limit !== undefined && options.limit !== null && options.limit !== '') {
+    const limit = Number(options.limit);
+    if (!Number.isInteger(limit) || limit < 1) throw new TypeError('limit must be a positive whole number');
+    args.push('--limit', String(limit));
+  }
+  return args;
+}
 
 /**
  * @typedef {object} RunKind
@@ -61,6 +74,9 @@ export const RUN_KINDS = Object.freeze({
     supportsDryRun: true,
     args: (options) => scanArgs(options),
     parseProgress,
+    // New postings mean new text to read for the skills analysis (M4). Only a
+    // real scan chains it: a dry run added nothing to the inbox.
+    after: (run) => (run.dryRun ? {} : { next: ['skills-fetch-auto'] }),
   },
   dedup: {
     script: 'dedup-tracker.mjs',
@@ -124,6 +140,20 @@ export const RUN_KINDS = Object.freeze({
     args: () => [],
   },
 
+  // ── the skills layer (M4) ───────────────────────────────────────────
+  'skills-fetch': {
+    script: 'app/server/skills/cli.js',
+    label: 'Fetch posting text',
+    description: 'Read the text of every scanned posting that has not been read yet, for the skills analysis.',
+    help:
+      'The scanner only records that a posting exists; the Skills page needs what it says. This reads each posting once — through the board’s public API when it is a Greenhouse, Lever, Ashby, Workday or LinkedIn posting, otherwise through upstream’s headless browser reader — and caches the text under data/skills/. Postings already read are skipped; a failed read is retried after a week (a removed posting after a month), or now with “retry failed”. Runs on its own after every real scan. Network only; writes nothing upstream reads.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    args: (options) => skillsFetchArgs(options),
+    parseProgress: parseFetchProgress,
+  },
+
   // ── agent kinds (headless Claude Code sessions) ─────────────────────
   evaluate: {
     label: 'Evaluate posting',
@@ -183,6 +213,17 @@ export const RUN_KINDS = Object.freeze({
     exclusive: true,
     internal: true,
     args: () => [],
+  },
+  'skills-fetch-auto': {
+    script: 'app/server/skills/cli.js',
+    label: 'Fetch posting text',
+    description: 'Read the text of newly scanned postings for the skills analysis.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    internal: true,
+    args: () => ['fetch'],
+    parseProgress: parseFetchProgress,
   },
   'mark-pdf-ready': {
     script: 'mark-pdf-ready.mjs',

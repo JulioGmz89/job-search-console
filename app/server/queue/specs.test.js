@@ -54,6 +54,21 @@ test('the argv of every spec is pinned', () => {
   assert.deepEqual(argv('verify-pipeline', {}), ['verify-pipeline.mjs']);
   assert.deepEqual(argv('validate-portals', {}), ['validate-portals.mjs']);
   assert.deepEqual(argv('verify-portals', {}), ['verify-portals.mjs']);
+  assert.deepEqual(argv('skills-fetch', {}), ['app/server/skills/cli.js', 'fetch']);
+  assert.deepEqual(argv('skills-fetch', { retryFailed: true, limit: 25 }), ['app/server/skills/cli.js', 'fetch', '--retry-failed', '--limit', '25']);
+  assert.throws(() => buildSpec('skills-fetch', { limit: 0 }), (e) => e.code === 'options-invalid');
+  assert.deepEqual([internalSpec('skills-fetch-auto').script, ...internalSpec('skills-fetch-auto').args], ['app/server/skills/cli.js', 'fetch']);
+});
+
+test('a real scan chains the skills fetch; a dry run does not', () => {
+  const real = buildSpec('scan', {});
+  const chained = real.hooks.after({ dryRun: false }, { provisional: { status: 'succeeded' } });
+  assert.deepEqual(chained.next.map((s) => s.kind), ['skills-fetch-auto']);
+  assert.equal(chained.next[0].lane, 'script');
+  assert.deepEqual(real.hooks.after({ dryRun: false }, { provisional: { status: 'failed' } }), {});
+  const dry = buildSpec('scan', { dryRun: true });
+  assert.deepEqual(dry.hooks.after({ dryRun: true }, { provisional: { status: 'succeeded' } }).next, []);
+  assert.throws(() => buildSpec('skills-fetch-auto'), (e) => e.code === 'kind-unknown');
 });
 
 test('scripts that rewrite the tracker are the ones that need confirming', () => {
