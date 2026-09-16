@@ -18,8 +18,9 @@
 import { pathToFileURL } from 'node:url';
 
 import { repoRoot as defaultRepoRoot, resolveDataRoot } from '../services/paths.js';
+import { readPortals } from '../services/portals.js';
 import { readCorpus } from './corpus.js';
-import { fetchPostingText } from './fetch.js';
+import { fetchPostingText, greenhouseBoards } from './fetch.js';
 import { readPostings, writePosting } from './store.js';
 
 /** A failed fetch is retried on its own after this long; a `gone` posting after a month. */
@@ -85,6 +86,13 @@ export async function runFetch({ root, repoRoot = defaultRepoRoot, argv = [], lo
   }
 
   const boardCache = new Map();
+  // Greenhouse boards from portals.yml, for postings embedded in company sites.
+  let boards = [];
+  try {
+    boards = greenhouseBoards(readPortals({ root }).companies);
+  } catch {
+    // No portals.yml is fine; those postings just take the browser rung.
+  }
   let index = 0;
   let fetched = 0;
   let failed = 0;
@@ -97,7 +105,7 @@ export async function runFetch({ root, repoRoot = defaultRepoRoot, argv = [], lo
       next += 1;
       let line;
       try {
-        const result = await fetchPostingText(posting, { root, repoRoot, fetchFn, spawnFn, boardCache, browser: options.browser });
+        const result = await fetchPostingText(posting, { root, repoRoot, fetchFn, spawnFn, boardCache, browser: options.browser, boards });
         writePosting({ root, url: posting.url, source: result.source, title: result.title ?? posting.title, text: result.text });
         fetched += 1;
         line = `ok ${result.source} ${kchars(result.text.length)} chars`;

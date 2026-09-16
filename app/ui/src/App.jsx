@@ -90,18 +90,6 @@ function Shell({ reloadRef, skillsReloadRef }) {
     reloadRef.current = reload;
   }, [reload, reloadRef]);
 
-  // A deep link to a report (`#/pipeline/<reportId>`): open its row once the table is loaded.
-  const openedLinkRef = useRef(null);
-  useEffect(() => {
-    if (route.page !== 'pipeline' || !route.arg || !data) return;
-    if (openedLinkRef.current === route.arg) return;
-    const row = data.rows.find((r) => String(r.reportId) === String(route.arg));
-    if (!row) return;
-    openedLinkRef.current = route.arg;
-    openRow(row);
-    setTimeout(() => document.querySelector('.detail')?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 50);
-  }, [route, data, openRow]);
-
   const openRow = useCallback((row) => {
     setSelected(row.id);
     setReport(null);
@@ -114,6 +102,18 @@ function Shell({ reloadRef, skillsReloadRef }) {
     reportIdRef.current = row.reportId;
     fetchReport(row.reportId).then(setReport).catch((e) => setReportError(e.message));
   }, []);
+
+  // A deep link to a report (`#/pipeline/<reportId>`): open its row once the table is loaded.
+  const openedLinkRef = useRef(null);
+  useEffect(() => {
+    if (route.page !== 'pipeline' || !route.arg || !data) return;
+    if (openedLinkRef.current === route.arg) return;
+    const row = data.rows.find((r) => String(r.reportId) === String(route.arg));
+    if (!row) return;
+    openedLinkRef.current = route.arg;
+    openRow(row);
+    setTimeout(() => document.querySelector('.detail')?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 50);
+  }, [route, data, openRow]);
 
   // A run was started from a row or a report: say so, and offer its log.
   const onRunStarted = useCallback((run) => {

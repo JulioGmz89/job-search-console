@@ -14,6 +14,8 @@ Read the input file with the Read tool. It is a JSON object `{ "cv", "profile" }
 - Every hard skill the CV or profile actually evidences: languages, frameworks, databases, cloud, tooling, practices, architectures, certifications, product domains, spoken languages.
 - Use the common canonical name, not the CV's spelling: `JavaScript`, `TypeScript`, `Node.js`, `Kubernetes`, `PostgreSQL`, `.NET`, `C#`, `CI/CD`, `REST APIs`, `AWS`, `GCP`, `Machine Learning`, `LLMs`.
 - Do not list a skill the CV does not mention. Do not infer a skill from a job title alone.
+- A course or certificate title is not a skill: list the skill it evidences (a "Kubernetes Fundamentals" course → `Kubernetes`, basic), never the title. Soft traits ("leadership", "communication") are not skills either.
+- Prefer the shortest common name: `Fintech` rather than "Financial Services / Fintech", `HTML` and `CSS` as two entries rather than "HTML/CSS".
 - `depth` is your reading of the evidence:
   - `"expert"` — years of work with it, ownership, leading with it, or several roles using it;
   - `"solid"` — used in real work at least once with some detail, or named in a skills section with supporting experience;

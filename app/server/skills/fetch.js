@@ -130,8 +130,8 @@ export function textFromCapture({ root, reportId }) {
  *   null when the URL is not a known ATS posting or the payload had no description.
  * @throws {FetchError} on a definitive failure (404, unparsable body, timeout).
  */
-export async function textFromApi(url, { fetchFn = fetch, boardCache = new Map(), timeoutMs = API_TIMEOUT_MS } = {}) {
-  const resolved = resolveAtsApi(url);
+export async function textFromApi(url, { fetchFn = fetch, boardCache = new Map(), timeoutMs = API_TIMEOUT_MS, boards = [], company = null } = {}) {
+  const resolved = resolveAtsApi(url) ?? resolveEmbeddedGreenhouse(url, boards, company);
   if (!resolved) return null;
   const { ats, apiUrl, parts, accept } = resolved;
 
@@ -170,9 +170,69 @@ export async function textFromApi(url, { fetchFn = fetch, boardCache = new Map()
   }
 
   const mapped = textFromAts(ats, body, parts, url);
-  if (!mapped) return null;
+  if (!mapped) {
+    // The Ashby board lists every live posting for the org; one that is not on
+    // it has been removed (upstream's liveness check reads it the same way).
+    // The browser would only render an empty shell, slowly.
+    if (ats === 'ashby' && Array.isArray(body?.jobs)) throw new FetchError('ashby board no longer lists this posting', 'gone');
+    return null;
+  }
   if (mapped.text.length < MIN_TEXT) throw new FetchError(`${ats} API returned only ${mapped.text.length} characters of description`, 'empty-text');
   return { source: `${ats}-api`, title: mapped.title, text: cap(mapped.text) };
+}
+
+/**
+ * A Greenhouse posting embedded in a company site (`…/careers?gh_jid=123`).
+ *
+ * The page itself renders the job inside an iframe the browser rung cannot
+ * see, but the job id is Greenhouse's, and the board token is known when the
+ * company is in portals.yml with a Greenhouse board — `boards` is that list,
+ * from `greenhouseBoards()`. Matched by company name; the posting's host says
+ * nothing about the board.
+ *
+ * @param {string} url
+ * @param {Array<{company: string, board: string}>} boards
+ */
+export function resolveEmbeddedGreenhouse(url, boards, company = null) {
+  let u;
+  try {
+    u = new URL(url);
+  } catch {
+    return null;
+  }
+  const id = u.searchParams.get('gh_jid');
+  if (!id || !/^\d+$/.test(id) || /(^|\.)greenhouse\.io$/.test(u.hostname)) return null;
+  const host = u.hostname.replace(/^www\./, '');
+  const wanted = String(company ?? '').trim().toLowerCase();
+  const entry = boards.find((b) => (wanted && b.company.toLowerCase() === wanted) || (b.host && b.host === host));
+  if (!entry) return null;
+  return { ats: 'greenhouse', apiUrl: `https://boards-api.greenhouse.io/v1/boards/${entry.board}/jobs/${id}`, parts: { board: entry.board, id }, accept: undefined };
+}
+
+const GH_BOARD_RE = /^https?:\/\/(?:boards|job-boards)(?:\.eu)?\.greenhouse\.io\/([A-Za-z0-9_-]+)/i;
+const GH_API_RE = /^https?:\/\/boards-api(?:\.eu)?\.greenhouse\.io\/v1\/boards\/([A-Za-z0-9_-]+)/i;
+
+/**
+ * The Greenhouse boards portals.yml knows, for `resolveEmbeddedGreenhouse`.
+ *
+ * @param {Array<{name: string|null, careersUrl: string|null, api: string|null}>} companies - `readPortals().companies`
+ * @returns {Array<{company: string, board: string, host: string|null}>}
+ */
+export function greenhouseBoards(companies) {
+  const out = [];
+  for (const entry of companies ?? []) {
+    const board = GH_API_RE.exec(entry.api ?? '')?.[1] ?? GH_BOARD_RE.exec(entry.careersUrl ?? '')?.[1] ?? null;
+    if (!board || !entry.name) continue;
+    let host = null;
+    try {
+      const h = new URL(entry.careersUrl ?? '').hostname.replace(/^www\./, '');
+      if (!/greenhouse\.io$/.test(h)) host = h;
+    } catch {
+      // no usable careers host; the company name still matches
+    }
+    out.push({ company: entry.name, board, host });
+  }
+  return out;
 }
 
 /**
@@ -238,18 +298,19 @@ export function textFromBrowser(url, { repoRoot, spawnFn = spawn, timeoutMs = BR
  * Fetch one posting's text through the rungs.
  *
  * @param {{url: string, reportId?: number|null}} posting
- * @param {{root: string, repoRoot: string, fetchFn?: Function, spawnFn?: Function, boardCache?: Map, browser?: boolean}} ctx
- *   `browser: false` skips rung 3 (tests, or a machine without Playwright's browser).
+ * @param {{root: string, repoRoot: string, fetchFn?: Function, spawnFn?: Function, boardCache?: Map, browser?: boolean, boards?: object[]}} ctx
+ *   `browser: false` skips rung 3 (tests, or a machine without Playwright's browser);
+ *   `boards` is `greenhouseBoards()` for embedded Greenhouse pages.
  * @returns {Promise<{source: string, title: string|null, text: string}>}
  * @throws {FetchError}
  */
-export async function fetchPostingText(posting, { root, repoRoot, fetchFn, spawnFn, boardCache, browser = true } = {}) {
+export async function fetchPostingText(posting, { root, repoRoot, fetchFn, spawnFn, boardCache, browser = true, boards = [] } = {}) {
   const captured = textFromCapture({ root, reportId: posting.reportId ?? null });
   if (captured) return captured;
 
   let apiError = null;
   try {
-    const fromApi = await textFromApi(posting.url, { fetchFn, boardCache });
+    const fromApi = await textFromApi(posting.url, { fetchFn, boardCache, boards, company: posting.company ?? null });
     if (fromApi) return fromApi;
   } catch (error) {
     if (!(error instanceof FetchError)) throw error;

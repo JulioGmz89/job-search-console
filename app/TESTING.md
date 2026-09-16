@@ -1,5 +1,7 @@
 # M3 test plan — agent orchestration and CV Studio phase A
 
+> M4 (the Skills Gap analysis) has its own plan: [TESTING-M4.md](TESTING-M4.md).
+
 How to verify every M3 feature by hand, plus what the automated suite already covers.
 Steps assume the branch `feat/m3-agent-orchestration`, Node ≥ 22, and Claude Code
 installed (`claude --version` works in a terminal).

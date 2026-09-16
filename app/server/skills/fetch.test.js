@@ -7,7 +7,7 @@ import { after, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import { parseFetchArgs, parseFetchProgress, runFetch, selectToFetch } from './cli.js';
-import { FetchError, fetchPostingText, textFromApi, textFromAts, textFromBrowser, textFromCapture } from './fetch.js';
+import { FetchError, fetchPostingText, greenhouseBoards, resolveEmbeddedGreenhouse, textFromApi, textFromAts, textFromBrowser, textFromCapture } from './fetch.js';
 import { postingId, readPostings, writePosting } from './store.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -214,4 +214,40 @@ test('runFetch fills the cache from the corpus and records failures', async () =
   writePosting({ root, url: 'https://example.com/jobs/6', error: { code: 'http-503', message: 'old' }, fetchedAt: '2020-01-01T00:00:00Z' });
   const third = await runFetch({ root, repoRoot: root, argv: ['--limit', '1'], log: () => {}, fetchFn, spawnFn: () => fakeSpawn({ stdout: JSON.stringify({ text: long('Now works') }) })() });
   assert.equal(third.fetched, 1, 'an old failure is retried');
+});
+
+test('an Ashby posting missing from its board is gone, not a browser candidate', async () => {
+  const fetchFn = async () => jsonResponse(200, { jobs: [{ id: 'other', title: 'X', descriptionPlain: long('Go') }] });
+  await assert.rejects(textFromApi('https://jobs.ashbyhq.com/org/missing', { fetchFn }), (e) => e.code === 'gone');
+  assert.equal(await textFromApi('https://jobs.ashbyhq.com/org/missing', { fetchFn: async () => jsonResponse(200, { nope: true }) }), null, 'an unexpected board shape still falls through');
+});
+
+test('a gh_jid page on a company site resolves through portals.yml to the Greenhouse API', async () => {
+  const boards = greenhouseBoards([
+    { name: 'Wizeline', careersUrl: 'https://job-boards.greenhouse.io/wizeline', api: null },
+    { name: 'Fiber', careersUrl: 'https://getfiber.ai/careers', api: 'https://boards-api.greenhouse.io/v1/boards/fiberai/jobs' },
+    { name: 'No board', careersUrl: 'https://example.com/jobs', api: null },
+    { name: null, careersUrl: 'https://boards.greenhouse.io/anon', api: null },
+  ]);
+  assert.deepEqual(boards, [
+    { company: 'Wizeline', board: 'wizeline', host: null },
+    { company: 'Fiber', board: 'fiberai', host: 'getfiber.ai' },
+  ]);
+
+  assert.equal(resolveEmbeddedGreenhouse('https://www.wizeline.ai/careers/job?gh_jid=7376173', boards, 'Wizeline').apiUrl, 'https://boards-api.greenhouse.io/v1/boards/wizeline/jobs/7376173');
+  assert.equal(resolveEmbeddedGreenhouse('https://www.wizeline.ai/careers/job?gh_jid=7376173', boards, 'wizeline').ats, 'greenhouse', 'company match is case-insensitive');
+  assert.equal(resolveEmbeddedGreenhouse('https://getfiber.ai/careers?gh_jid=5191603007', boards, null).parts.board, 'fiberai', 'matched by careers host');
+  assert.equal(resolveEmbeddedGreenhouse('https://unknown.example/careers?gh_jid=1', boards, 'Nobody'), null);
+  assert.equal(resolveEmbeddedGreenhouse('https://boards.greenhouse.io/x/jobs/1?gh_jid=1', boards, 'Wizeline'), null, 'a real Greenhouse URL is resolveAtsApi’s job');
+  assert.equal(resolveEmbeddedGreenhouse('https://www.wizeline.ai/careers/job?gh_jid=abc', boards, 'Wizeline'), null);
+
+  const calls = [];
+  const fetchFn = async (url) => {
+    calls.push(url);
+    return jsonResponse(200, { title: 'Senior .NET Engineer', content: long('&lt;p&gt;.NET and Azure&lt;/p&gt;') });
+  };
+  const got = await textFromApi('https://www.wizeline.ai/careers/job?gh_jid=7376173', { fetchFn, boards, company: 'Wizeline' });
+  assert.equal(got.source, 'greenhouse-api');
+  assert.equal(got.title, 'Senior .NET Engineer');
+  assert.equal(calls[0], 'https://boards-api.greenhouse.io/v1/boards/wizeline/jobs/7376173');
 });

@@ -84,7 +84,8 @@ export const ALIASES = Object.freeze({
   'restful apis': 'REST APIs',
   'machine learning': 'Machine Learning',
   ml: 'Machine Learning',
-  'artificial intelligence': 'AI',
+  // Bare 'AI' is deliberately absent: 'AI-native', 'AI tools', 'AI company' name a
+  // climate, not a skill anyone can go and learn. The learnable forms are below.
   'generative ai': 'Generative AI',
   genai: 'Generative AI',
   'gen ai': 'Generative AI',
@@ -216,7 +217,7 @@ export const CATEGORIES = Object.freeze({
   // ai / ml
   pytorch: 'ai-ml', tensorflow: 'ai-ml', 'scikit-learn': 'ai-ml', mlops: 'ai-ml', mlflow: 'ai-ml', langchain: 'ai-ml',
   llamaindex: 'ai-ml', 'hugging face': 'ai-ml', rag: 'ai-ml', llms: 'ai-ml', 'prompt engineering': 'ai-ml',
-  'fine-tuning': 'ai-ml', 'computer vision': 'ai-ml', nlp: 'ai-ml', 'machine learning': 'ai-ml', ai: 'ai-ml',
+  'fine-tuning': 'ai-ml', 'computer vision': 'ai-ml', nlp: 'ai-ml', 'machine learning': 'ai-ml',
   'generative ai': 'ai-ml', 'ai agents': 'ai-ml', mcp: 'ai-ml', 'openai api': 'ai-ml',
   // practices
   oop: 'practice', 'system design': 'practice', tdd: 'practice', 'unit testing': 'practice', agile: 'practice',
@@ -290,7 +291,6 @@ export const CASE_SENSITIVE_ALIASES = Object.freeze({
   EC2: 'EC2',
   SQS: 'SQS',
   ML: 'Machine Learning',
-  AI: 'AI',
   Agile: 'Agile',
   Scrum: 'Scrum',
   Kanban: 'Kanban',
