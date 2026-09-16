@@ -17,6 +17,11 @@
  * M3 adds the agent runs (evaluate, pdf, cover) behind the same `POST /api/runs`
  * — a kind plus a narrow option set — and one more write: a pasted URL into
  * the inbox, under upstream's own lock.
+ *
+ * M4 adds the skills gap analysis: one read joining everything the skills
+ * layer knows, the extraction runs behind `POST /api/skills/extract`, and the
+ * user's status overrides — all under `data/skills/`, which nothing upstream
+ * reads.
  */
 
 import { createReadStream, existsSync } from 'node:fs';
@@ -40,6 +45,8 @@ import { createEntry, deleteEntry, readPortals, updateEntry } from './services/p
 import { listReports, readReport, resolveReportPdf } from './services/reports.js';
 import { readLastScanRun, readPortalHealth } from './services/scanner.js';
 import { setStatus } from './services/status.js';
+import { readSkillsOverview } from './skills/service.js';
+import { writeOverride } from './skills/store.js';
 import { createWatcher } from './watch.js';
 
 const uiDist = join(dirname(fileURLToPath(import.meta.url)), '..', 'ui', 'dist');
@@ -316,6 +323,32 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
   app.get('/api/cv/templates', async () => listCvTemplates({ root }));
 
   app.get('/api/cv/writing-samples', async () => listWritingSamples({ root }));
+
+  // ── the skills gap analysis (M4) ───────────────────────────────────
+
+  /** Everything the Skills page shows: coverage, ranked skills with evidence, the lists. */
+  app.get('/api/skills', async () => readSkillsOverview({ root }));
+
+  /** `{ id, status }` with status have | partial | missing | ignore, or null to clear. */
+  app.put('/api/skills/overrides', async (request, reply) => {
+    try {
+      const input = body(request);
+      if (typeof input.id !== 'string' || !input.id) {
+        return reply.code(400).send({ error: 'id must be a skill id', code: 'options-invalid' });
+      }
+      const status = input.status === null || input.status === undefined ? null : input.status;
+      let overrides;
+      try {
+        overrides = writeOverride({ root: resolveDataRoot(root), id: input.id, status });
+      } catch (error) {
+        if (error instanceof TypeError) return reply.code(400).send({ error: error.message, code: 'options-invalid' });
+        throw error;
+      }
+      return { ok: true, overrides };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
 
   // ── inline status changes ──────────────────────────────────────────
 
