@@ -81,3 +81,11 @@ export const fetchWritingSamples = () => get('/api/cv/writing-samples');
 
 export const coverUrl = (id) => `/api/reports/${id}/cover`;
 export const serverEventsUrl = () => '/api/events';
+
+// ── M4: the skills gap analysis ──────────────────────────────────────
+
+export const fetchSkills = () => get('/api/skills');
+/** Queue up to `max` Claude sessions over the postings the LLM has not seen (plus the CV when stale). */
+export const startSkillsExtract = (max) => request('POST', '/api/skills/extract', max === undefined ? {} : { max });
+export const startSkillsFetch = (options = {}) => startRun('skills-fetch', options);
+export const setSkillOverride = (id, status) => request('PUT', '/api/skills/overrides', { id, status });

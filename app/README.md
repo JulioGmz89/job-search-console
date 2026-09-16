@@ -49,6 +49,17 @@ server/
     stream-json.js     the CLI's stream-json → a readable log + a structured result
     profile.js         the few facts the runner needs from config/profile.yml
     prompts/           prompt assembly + the fork's headless overlays (evaluate.md, pdf.md, cover.md)
+  skills/              M4, the skills gap analysis (PROJECT_PLAN.md §6) — see below
+    corpus.js          which postings: scan-history.tsv ∪ the inbox ∪ the tracker/reports, keyed by URL
+    fetch.js           one URL → posting text: jds/ capture, the ATS API (upstream's resolveAtsApi), browser-extract.mjs
+    cli.js             the fetch worker the queue spawns (`skills-fetch`)
+    store.js           data/skills/: postings, extractions by text hash, cv.json, overrides.json
+    aliases.js         the fork's alias map and categories, layered over upstream's skill-extract.mjs
+    rules.js           deterministic extraction; required vs nice-to-have from the section a mention sits in
+    extract-spec.js    the Claude sessions: skills-extract (batches of ten) and skills-cv
+    prompts/           their fork-owned prompts
+    aggregate.js       pure: demand, score-band weighting, co-occurrence, trend, have/partial/missing, the lists
+    service.js         GET /api/skills: everything joined
 cv/
   theme.js             style tokens → CSS on upstream's templates (pure)
   render-cv.js         CLI the pdf session runs: apply the style, then upstream's generate-pdf.mjs
@@ -88,6 +99,16 @@ both run **exclusively** — and, when the score reaches `cv.auto_pdf_score_thre
 `pdf` run, which queues `mark-pdf-ready.mjs` on success. A failed or cancelled session
 releases its number and deletes the stray tracker TSV; nothing downstream runs.
 
+M4 adds the skills layer's runs. `skills-fetch` (a fork script, `app/server/skills/cli.js`)
+reads the text of every posting not yet cached and is chained automatically after a real
+scan; `skills-extract` and `skills-cv` are agent kinds, queued from the Skills page:
+
+| Kind | What it does | Verified by |
+|---|---|---|
+| `skills-fetch` | posting text: jds/ capture → ATS public API → `browser-extract.mjs` | one `data/skills/postings/<id>.json` per posting, failures included |
+| `skills-extract` | up to ten cached postings → `{ skill, category, level }` each | the output JSON names the postings sent; each becomes `data/skills/extractions/<textHash>.json` |
+| `skills-cv` | cv.md + profile.yml → `{ skill, category, depth }` | `data/skills/cv.json`, keyed by cv.md's hash |
+
 **Lanes.** `script` runs go one at a time. `agent` runs may overlap (`JSC_MAX_AGENTS`,
 default 2). An exclusive run waits for silence and blocks everything while it runs.
 
@@ -115,11 +136,35 @@ All under the data root and gitignored:
 - `data/jsc/logs/<run>.jsonl` — the raw stream-json transcript
 - `data/jsc/tmp/` — payloads the pdf/cover sessions write for upstream's builders
 - `data/jsc/covers.json` — report → cover-letter PDF
+- `data/jsc/tmp/skills-*.json` — the batch a skills session was given and the JSON it wrote back
+- `data/skills/` — the skills cache: `postings/` (text by normalized URL), `extractions/` (by
+  text hash, so a posting is never sent to Claude twice), `cv.json`, `overrides.json` (your
+  have / partial / missing / ignore corrections). Delete the directory to rebuild from scratch.
 - `config/cv/style.yml` — CV Studio's style tokens (`config/cv/style.example.yml` documents every key)
 - `config/cv/templates/` — your own CV templates (see the README there)
 
 `voice-dna.md` and `writing-samples/` are upstream's own user-layer files; CV Studio
 edits and lists them in place.
+
+## The skills gap analysis
+
+The Skills page answers "what should I learn next?" from the postings the scanner found.
+Upstream never keeps a posting's text, so the layer reads each one once (`skills-fetch`),
+then extracts skills in two tiers: a rules pass the moment the text lands — upstream's
+`skill-extract.mjs` vocabulary plus `aliases.js`, with required vs nice-to-have read from
+the section a mention sits in — and a Claude pass (`skills-extract`) that replaces it per
+posting, cached by content hash. The CV goes through the same two tiers with a depth per
+skill. `aggregate.js` then counts demand once per posting, weights it by the posting's
+score band (4.5+ double, under 3.0 half) and by level (nice-to-have half), mines the A–H
+reports' gap notes through upstream's `parseReportGaps`, and classifies each skill
+have / partial / missing — the user's overrides first, then the CV. Three lists come out:
+learn next (missing, asked for by ≥2 postings), deepen (partial), most demanded. Every row
+expands to the postings that ask for it, each linked to the posting and, when evaluated,
+to its report.
+
+Upstream code it leans on, all imported and none edited: `skill-extract.mjs`,
+`jd-skill-gap.mjs`, `upskill.mjs`, `liveness-api.mjs`, `browser-extract.mjs`,
+`jd-capture.mjs`, `url-key.mjs`.
 
 ## Three upstream behaviours worth knowing
 
