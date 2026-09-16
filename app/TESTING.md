@@ -31,16 +31,19 @@ printf '# Ada Lovelace\n\n## Experience\n- Built the engine\n' > $W/cv.md
 printf 'candidate:\n  name: "Ada Lovelace"\nspend_tier: standard\ncv:\n  auto_pdf_score_threshold: 3.5\n' > $W/config/profile.yml
 
 cd app && npm run build && \
-CAREER_OPS_ROOT="$W" \
+CAREER_OPS_ROOT="$(cygpath -w "$W")" \
 JSC_CLAUDE_BIN="$(pwd -W)/server/services/__fixtures__/bin/fake-claude.js" \
 FAKE_CLAUDE_SCENARIO=evaluate-ok FAKE_CLAUDE_SCORE=4.2 \
 node server/index.js
 ```
 
-`JSC_CLAUDE_BIN` must be a path Node's native `fs` can resolve. In Git Bash on Windows,
-`$PWD` is a POSIX-style path (`/c/Users/...`) that `node.exe` cannot look up — use
-`$(pwd -W)` (Windows-style, `C:/Users/...`) instead. In PowerShell, `"$PWD\server\..."`
-is already correct as-is.
+Both `CAREER_OPS_ROOT` and `JSC_CLAUDE_BIN` are read by Node's native `fs`, so on Windows
+they need a Windows-style path — Git Bash's own POSIX-style forms (`$PWD`, `/tmp/...`)
+resolve to the wrong place: `path-resolver.mjs` treats a leading `/tmp/...` as rooted at
+the *current drive*, landing on `C:\tmp\...` rather than where `mkdir`/`cp` actually wrote
+it (`C:\Users\<you>\AppData\Local\Temp\...`). Convert with `cygpath -w` (or `pwd -W` when
+the value is the current directory, as above). In PowerShell, `$PWD` is already a Windows
+path and needs no conversion.
 
 Then open <http://127.0.0.1:4317>:
 
