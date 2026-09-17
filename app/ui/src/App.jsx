@@ -8,6 +8,7 @@ import MaintenanceBar from './components/MaintenanceBar.jsx';
 import PipelineTable from './components/PipelineTable.jsx';
 import ReportDetail from './components/ReportDetail.jsx';
 import RunsPage from './components/RunsPage.jsx';
+import SkillsPage from './components/SkillsPage.jsx';
 import SourcesPage from './components/SourcesPage.jsx';
 import { RunsProvider, useRuns } from './runs.jsx';
 
@@ -28,6 +29,7 @@ function compare(a, b, key, dir) {
 const PAGES = [
   { id: 'pipeline', label: 'Pipeline' },
   { id: 'sources', label: 'Sources' },
+  { id: 'skills', label: 'Skills' },
   { id: 'runs', label: 'Runs' },
   { id: 'cv', label: 'CV Studio' },
 ];
@@ -35,9 +37,10 @@ const PAGES = [
 /**
  * Hash routing, in twenty lines.
  *
- * Four pages still do not justify a router dependency, and PROJECT_PLAN.md §11
+ * Five pages still do not justify a router dependency, and PROJECT_PLAN.md §11
  * leaves the UI stack open — pulling one in now would quietly settle that
- * question. `#/runs/<id>` deep-links to one run's log.
+ * question. `#/runs/<id>` deep-links to one run's log; `#/pipeline/<reportId>`
+ * opens that report's row (the Skills page links evidence this way).
  */
 function useHashPage() {
   const read = () => {
@@ -53,10 +56,13 @@ function useHashPage() {
   return [route, (next, arg) => { window.location.hash = arg ? `#/${next}/${arg}` : `#/${next}`; }];
 }
 
+/** Files whose change means the Skills page is stale: its own cache, the CV, the reports, the corpus. */
+const SKILLS_REFRESH_ON = [/^data\/skills\//, /^reports\//, /^cv\.md$/, /^data\/scan-history\.tsv$/, /^data\/pipeline\.md$/, /^data\/applications\.md$/];
+
 /** Files whose change means the pipeline table or an open report is stale. */
 const REFRESH_ON = [/^data\/applications\.md$/, /^reports\//, /^output\//, /^data\/pdf-index\.tsv$/, /^data\/jsc\/covers\.json$/];
 
-function Shell({ reloadRef }) {
+function Shell({ reloadRef, skillsReloadRef }) {
   const [route, goTo] = useHashPage();
   const { kinds } = useRuns();
   const [data, setData] = useState(null);
@@ -96,6 +102,18 @@ function Shell({ reloadRef }) {
     reportIdRef.current = row.reportId;
     fetchReport(row.reportId).then(setReport).catch((e) => setReportError(e.message));
   }, []);
+
+  // A deep link to a report (`#/pipeline/<reportId>`): open its row once the table is loaded.
+  const openedLinkRef = useRef(null);
+  useEffect(() => {
+    if (route.page !== 'pipeline' || !route.arg || !data) return;
+    if (openedLinkRef.current === route.arg) return;
+    const row = data.rows.find((r) => String(r.reportId) === String(route.arg));
+    if (!row) return;
+    openedLinkRef.current = route.arg;
+    openRow(row);
+    setTimeout(() => document.querySelector('.detail')?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 50);
+  }, [route, data, openRow]);
 
   // A run was started from a row or a report: say so, and offer its log.
   const onRunStarted = useCallback((run) => {
@@ -190,6 +208,16 @@ function Shell({ reloadRef }) {
       <div className="app">
         {masthead()}
         <RunsPage openId={route.arg} onOpen={(id) => goTo('runs', id)} />
+      </div>
+    );
+  }
+
+  if (route.page === 'skills') {
+    return (
+      <div className="app">
+        {masthead()}
+        <SkillsPage reloadRef={skillsReloadRef} onRunStarted={onRunStarted} />
+        {toastEl}
       </div>
     );
   }
@@ -302,7 +330,7 @@ function Shell({ reloadRef }) {
 
       {kinds.length > 0 ? (
         <MaintenanceBar
-          kinds={kinds.filter((kind) => kind.kind !== 'scan' && kind.lane !== 'agent')}
+          kinds={kinds.filter((kind) => kind.kind !== 'scan' && kind.lane !== 'agent' && !kind.page)}
           onFinish={reload}
         />
       ) : null}
@@ -317,12 +345,15 @@ export default function App() {
   // The pipeline refetches itself when a report, PDF or the tracker changes on
   // disk — whoever wrote it. A ref so the provider's handler never goes stale.
   const reloadRef = useRef(null);
+  // The Skills page depends on its own cache, the CV and the reports.
+  const skillsReloadRef = useRef(null);
   const onChanged = useCallback((event) => {
     if (event.paths.some((path) => REFRESH_ON.some((re) => re.test(path)))) reloadRef.current?.();
+    if (event.paths.some((path) => SKILLS_REFRESH_ON.some((re) => re.test(path)))) skillsReloadRef.current?.();
   }, []);
   return (
     <RunsProvider onChanged={onChanged}>
-      <Shell reloadRef={reloadRef} />
+      <Shell reloadRef={reloadRef} skillsReloadRef={skillsReloadRef} />
     </RunsProvider>
   );
 }

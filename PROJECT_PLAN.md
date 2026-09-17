@@ -271,9 +271,16 @@ Each milestone ships something usable. Do not start N+1 before N works end-to-en
 ## 11. Open questions (resolve with the user before implementing)
 
 - UI framework details beyond React + Vite (component library, styling)
-- Whether skill extraction (§6 step 1) runs through `claude -p` (no extra API key,
+- ~~Whether skill extraction (§6 step 1) runs through `claude -p` (no extra API key,
   reuses the user's Claude subscription) or a direct API call (faster for bulk,
-  needs a key). Default assumption: through the agent runner, batched.
+  needs a key). Default assumption: through the agent runner, batched.~~
+  **Resolved in M4 (2026-09-16): hybrid.** A rules pass over upstream's
+  `skill-extract.mjs` vocabulary plus a fork alias map runs instantly and free
+  when a posting's text is fetched; a batched `claude -p` pass (ten postings per
+  session, cached by content hash) replaces it per posting with category and
+  required/nice-to-have, and is started by the user from the Skills page. No
+  direct API call. Posting text is fetched by a fork worker (`skills-fetch`,
+  chained after every real scan) because `scan.mjs` never persists it.
 - License header/NOTICE format for crediting upstream files
 - Confirm JSON Resume as the CV data schema (§7c) after checking it can carry
   everything upstream's tailoring produces (keyword injection, per-job ordering);

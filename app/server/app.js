@@ -17,6 +17,11 @@
  * M3 adds the agent runs (evaluate, pdf, cover) behind the same `POST /api/runs`
  * — a kind plus a narrow option set — and one more write: a pasted URL into
  * the inbox, under upstream's own lock.
+ *
+ * M4 adds the skills gap analysis: one read joining everything the skills
+ * layer knows, the extraction runs behind `POST /api/skills/extract`, and the
+ * user's status overrides — all under `data/skills/`, which nothing upstream
+ * reads.
  */
 
 import { createReadStream, existsSync } from 'node:fs';
@@ -40,6 +45,8 @@ import { createEntry, deleteEntry, readPortals, updateEntry } from './services/p
 import { listReports, readReport, resolveReportPdf } from './services/reports.js';
 import { readLastScanRun, readPortalHealth } from './services/scanner.js';
 import { setStatus } from './services/status.js';
+import { BATCH_SIZE, pendingLlm, readCv, readPostingsWithSkills, readSkillsOverview } from './skills/service.js';
+import { writeOverride } from './skills/store.js';
 import { createWatcher } from './watch.js';
 
 const uiDist = join(dirname(fileURLToPath(import.meta.url)), '..', 'ui', 'dist');
@@ -316,6 +323,83 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
   app.get('/api/cv/templates', async () => listCvTemplates({ root }));
 
   app.get('/api/cv/writing-samples', async () => listWritingSamples({ root }));
+
+  // ── the skills gap analysis (M4) ───────────────────────────────────
+
+  /** Everything the Skills page shows: coverage, ranked skills with evidence, the lists. */
+  app.get('/api/skills', async () => readSkillsOverview({ root }));
+
+  /**
+   * Queue the Claude extraction: one run per batch of postings the LLM has not
+   * seen, plus the CV when its cached extraction is missing or stale. The
+   * server picks the batches; the client only caps how many sessions to spend.
+   */
+  app.post('/api/skills/extract', async (request, reply) => {
+    try {
+      const input = body(request);
+      const max = input.max === undefined ? 5 : Number(input.max);
+      if (!Number.isInteger(max) || max < 0 || max > 50) {
+        return reply.code(400).send({ error: 'max must be a whole number between 0 and 50', code: 'options-invalid' });
+      }
+      const pending = pendingLlm(readPostingsWithSkills({ root }));
+      const batches = [];
+      for (let i = 0; i < pending.length && batches.length < max; i += BATCH_SIZE) {
+        batches.push(pending.slice(i, i + BATCH_SIZE).map((p) => p.id));
+      }
+      const runs = [];
+      const skipped = [];
+      for (const postingIds of batches) {
+        try {
+          runs.push(runner.start(buildSpec('skills-extract', { postingIds }, specContext)));
+        } catch (error) {
+          // The same batch already queued (a double click) is not a failure of the request.
+          if (error.code !== 'run-busy') throw error;
+          skipped.push(error.activeId);
+        }
+      }
+      const cv = readCv({ root });
+      let cvRun = null;
+      if (input.cv !== false && cv.present && cv.engine !== 'llm') {
+        try {
+          cvRun = runner.start(buildSpec('skills-cv', {}, specContext));
+        } catch (error) {
+          if (error.code !== 'run-busy') throw error;
+        }
+      }
+      return reply.code(202).send({
+        ok: true,
+        pending: pending.length,
+        batches: batches.length,
+        remaining: Math.max(0, pending.length - batches.length * BATCH_SIZE),
+        runs,
+        skipped,
+        cv: cvRun,
+      });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  /** `{ id, status }` with status have | partial | missing | ignore, or null to clear. */
+  app.put('/api/skills/overrides', async (request, reply) => {
+    try {
+      const input = body(request);
+      if (typeof input.id !== 'string' || !input.id) {
+        return reply.code(400).send({ error: 'id must be a skill id', code: 'options-invalid' });
+      }
+      const status = input.status === null || input.status === undefined ? null : input.status;
+      let overrides;
+      try {
+        overrides = writeOverride({ root: resolveDataRoot(root), id: input.id, status });
+      } catch (error) {
+        if (error instanceof TypeError) return reply.code(400).send({ error: error.message, code: 'options-invalid' });
+        throw error;
+      }
+      return { ok: true, overrides };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
 
   // ── inline status changes ──────────────────────────────────────────
 

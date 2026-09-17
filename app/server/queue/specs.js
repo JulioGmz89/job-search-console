@@ -28,7 +28,21 @@
  */
 
 import { parseProgress, scanArgs } from '../services/scanner.js';
+import { parseFetchProgress } from '../skills/cli.js';
+import { buildSkillsCvSpec, buildSkillsExtractSpec } from '../skills/extract-spec.js';
 import { buildCoverSpec, buildEvaluateSpec, buildPdfSpec } from './agent-specs.js';
+
+/** Argv for the skills fetch worker (`skills/cli.js`): only flags it validates itself. */
+function skillsFetchArgs(options = {}) {
+  const args = ['fetch'];
+  if (options.retryFailed === true) args.push('--retry-failed');
+  if (options.limit !== undefined && options.limit !== null && options.limit !== '') {
+    const limit = Number(options.limit);
+    if (!Number.isInteger(limit) || limit < 1) throw new TypeError('limit must be a positive whole number');
+    args.push('--limit', String(limit));
+  }
+  return args;
+}
 
 /**
  * @typedef {object} RunKind
@@ -47,6 +61,7 @@ import { buildCoverSpec, buildEvaluateSpec, buildPdfSpec } from './agent-specs.j
  * @property {boolean} [exclusive] - Runs only when nothing else does.
  * @property {boolean} [internal] - Queued by the server after another run; never from a request.
  * @property {Function} [build] - Agent kinds: `(options, ctx) => spec`, replacing `script`/`args`.
+ * @property {string} [page] - The UI page that owns this kind's button; unset means the Maintenance bar.
  */
 export const RUN_KINDS = Object.freeze({
   scan: {
@@ -61,6 +76,9 @@ export const RUN_KINDS = Object.freeze({
     supportsDryRun: true,
     args: (options) => scanArgs(options),
     parseProgress,
+    // New postings mean new text to read for the skills analysis (M4). Only a
+    // real scan chains it: a dry run added nothing to the inbox.
+    after: (run) => (run.dryRun ? {} : { next: ['skills-fetch-auto'] }),
   },
   dedup: {
     script: 'dedup-tracker.mjs',
@@ -124,6 +142,21 @@ export const RUN_KINDS = Object.freeze({
     args: () => [],
   },
 
+  // ── the skills layer (M4) ───────────────────────────────────────────
+  'skills-fetch': {
+    script: 'app/server/skills/cli.js',
+    label: 'Fetch posting text',
+    description: 'Read the text of every scanned posting that has not been read yet, for the skills analysis.',
+    help:
+      'The scanner only records that a posting exists; the Skills page needs what it says. This reads each posting once — through the board’s public API when it is a Greenhouse, Lever, Ashby, Workday or LinkedIn posting, otherwise through upstream’s headless browser reader — and caches the text under data/skills/. Postings already read are skipped; a failed read is retried after a week (a removed posting after a month), or now with “retry failed”. Runs on its own after every real scan. Network only; writes nothing upstream reads.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    page: 'skills',
+    args: (options) => skillsFetchArgs(options),
+    parseProgress: parseFetchProgress,
+  },
+
   // ── agent kinds (headless Claude Code sessions) ─────────────────────
   evaluate: {
     label: 'Evaluate posting',
@@ -159,6 +192,31 @@ export const RUN_KINDS = Object.freeze({
     build: buildCoverSpec,
   },
 
+  'skills-extract': {
+    label: 'Extract skills',
+    description: 'Read a batch of cached postings in a Claude session and record the skills each one asks for.',
+    help:
+      'Starts a headless Claude Code session over up to ten postings whose text the console has already fetched. The session may only read the batch file and write one JSON file; the console validates that file, folds spellings onto canonical names, and caches the result by the text’s hash — a posting is never sent twice. Until this runs, a posting’s skills come from the rules-based pass, which knows the common vocabulary but not required vs nice-to-have as well. Queued from the Skills page, one run per batch.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    lane: 'agent',
+    page: 'skills',
+    build: buildSkillsExtractSpec,
+  },
+  'skills-cv': {
+    label: 'Extract CV skills',
+    description: 'Read cv.md in a Claude session and record each skill it evidences, with a depth.',
+    help:
+      'Starts a headless Claude Code session over cv.md and profile.yml that lists every skill they evidence with a depth (expert, solid, basic). The Skills page uses it to tell “have” from “deepen”. Cached against cv.md’s content, so it re-runs only after the CV changes; until then, or when it has never run, the rules-based pass reads the CV instead.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    lane: 'agent',
+    page: 'skills',
+    build: buildSkillsCvSpec,
+  },
+
   // ── internal post-steps (queued by the server, never by a request) ──
   'merge-tracker': {
     script: 'merge-tracker.mjs',
@@ -183,6 +241,17 @@ export const RUN_KINDS = Object.freeze({
     exclusive: true,
     internal: true,
     args: () => [],
+  },
+  'skills-fetch-auto': {
+    script: 'app/server/skills/cli.js',
+    label: 'Fetch posting text',
+    description: 'Read the text of newly scanned postings for the skills analysis.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    internal: true,
+    args: () => ['fetch'],
+    parseProgress: parseFetchProgress,
   },
   'mark-pdf-ready': {
     script: 'mark-pdf-ready.mjs',
@@ -225,6 +294,7 @@ export function describeKinds() {
       supportsDryRun: def.supportsDryRun,
       reportsFindings: def.reportsFindings === true,
       lane: def.lane ?? 'script',
+      page: def.page ?? null,
     }));
 }
 

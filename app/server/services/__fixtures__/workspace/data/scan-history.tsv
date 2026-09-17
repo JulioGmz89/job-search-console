@@ -1,0 +1,7 @@
+url	first_seen	portal	title	company	status	location	fingerprint	posted_at	trust_score	trust_flags	normalized_company
+https://example.com/jobs/2	2026-01-03	greenhouse-api	Backend Engineer	Acme	added	Remote		2026-01-01			acme
+https://example.com/jobs/3?utm_source=x	2026-01-03	lever-api	Staff Engineer	Globex	added	Remote — LatAm					globex
+https://example.com/jobs/4	2026-02-10	ashby-api	Data Engineer	Initech	added						initech
+https://example.com/jobs/7	2026-02-11	greenhouse-api	Sales Lead	Skipped Co	skipped_title						skipped
+https://example.com/jobs/8	2026-02-12	greenhouse-api	Gone Engineer	Expired Co	skipped_expired						expired
+https://example.invalid/jobs/acme-backend	2025-12-30	greenhouse-api	Backend Engineer	Acme Corp	added	Remote					acme-corp

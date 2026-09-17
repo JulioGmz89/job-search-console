@@ -23,6 +23,8 @@ export const TIMEOUTS = Object.freeze({
   evaluate: 780_000,
   pdf: 600_000,
   cover: 600_000,
+  skillsExtract: 600_000,
+  skillsCv: 300_000,
 });
 
 /** Everything a mode legitimately needs; nothing that could reach outside the repo. */
