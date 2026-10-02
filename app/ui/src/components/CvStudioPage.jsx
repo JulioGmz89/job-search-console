@@ -40,6 +40,19 @@ const FONT_PAIRS = [
 
 const PREVIEW_DEBOUNCE_MS = 300;
 
+/**
+ * A single named section states no order, and the server refuses it — but it
+ * is exactly where the user is after picking their first one. Until a second
+ * is added, previews (and the gallery) render as if no order were set.
+ */
+const pendingOrder = (style) => (style?.sections?.length === 1 ? { ...style, sections: [] } : style);
+
+/** A refusal's own words: the per-field details, not just "Some style values are not valid". */
+function failureText(failure) {
+  const details = Array.isArray(failure.detail) ? failure.detail.map((d) => (d.key ? `${d.key}: ${d.message}` : d.message)) : [];
+  return details.length ? `${failure.message} — ${details.join('; ')}` : failure.message;
+}
+
 function Field({ label, hint, children }) {
   return (
     <label>
@@ -167,7 +180,7 @@ export default function CvStudioPage() {
     const seq = ++previewSeq.current;
     setRendering(true);
     const timer = setTimeout(() => {
-      renderCvPreview(documentId, form)
+      renderCvPreview(documentId, pendingOrder(form))
         .then((result) => {
           if (seq !== previewSeq.current) return;
           setPreview(result);
@@ -176,7 +189,7 @@ export default function CvStudioPage() {
         })
         .catch((failure) => {
           if (seq !== previewSeq.current) return;
-          setPreviewError(failure.message);
+          setPreviewError(failureText(failure));
           setErrors(Array.isArray(failure.detail) ? failure.detail : []);
         })
         .finally(() => {
@@ -192,9 +205,9 @@ export default function CvStudioPage() {
     const seq = ++themesSeq.current;
     setThemesLoading(true);
     setThemesError(null);
-    fetchCvThemes(id, tokens)
+    fetchCvThemes(id, pendingOrder(tokens))
       .then((result) => { if (seq === themesSeq.current) setThemes(result.themes); })
-      .catch((failure) => { if (seq === themesSeq.current) setThemesError(failure.message); })
+      .catch((failure) => { if (seq === themesSeq.current) setThemesError(failureText(failure)); })
       .finally(() => { if (seq === themesSeq.current) setThemesLoading(false); });
   }, []);
 
@@ -211,6 +224,8 @@ export default function CvStudioPage() {
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value === '' ? null : e.target.value });
   const errorFor = (key) => errors.find((e) => e.key === key)?.message;
   const dirty = JSON.stringify(form) !== JSON.stringify(style.style);
+  // One section is a half-made order: nothing to save or render until a second joins it.
+  const halfOrder = form.sections?.length === 1;
   const doc = docs?.find((d) => d.id === documentId) ?? null;
   const currentTheme = themes?.find((t) => t.name === (form.template ?? 'standard'));
 
@@ -351,11 +366,13 @@ export default function CvStudioPage() {
             <div className="wide">
               <span className="field-label">Section order</span>
               <SectionOrder value={form.sections} keys={style.sectionKeys} onChange={(sections) => setForm({ ...form, sections })} />
-              <small className="hint">{errorFor('sections') ?? style.fields.sections}</small>
+              <small className={`hint${halfOrder ? ' pending' : ''}`}>
+                {errorFor('sections') ?? (halfOrder ? 'Add at least one more section — one alone sets no order, so the preview ignores it until then.' : style.fields.sections)}
+              </small>
             </div>
 
             <div className="entry-actions">
-              <button type="submit" className="chip primary" disabled={busy || !dirty}>Save as default</button>
+              <button type="submit" className="chip primary" disabled={busy || !dirty || halfOrder}>Save as default</button>
               <button type="button" className="chip" disabled={busy || !dirty} onClick={() => setForm(style.style)}>Revert</button>
               <span className="muted">{dirty ? 'Unsaved changes — the preview shows them already.' : style.exists ? 'Saved.' : 'Not saved yet — theme defaults apply.'}</span>
             </div>
@@ -385,11 +402,11 @@ export default function CvStudioPage() {
           {previewError ? <div className="notice warn">Preview failed: {previewError}</div> : null}
           {preview ? <AtsVerdict ats={preview.ats} custom={preview.template.source === 'custom'} /> : null}
           <div className="preview-actions">
-            <button type="button" className="chip primary" disabled={busy || !doc || doc.sample || render.run?.status === 'running'} onClick={renderThis}
+            <button type="button" className="chip primary" disabled={busy || !doc || doc.sample || halfOrder || render.run?.status === 'running'} onClick={renderThis}
               title={doc?.sample ? 'The sample is for previews only' : 'Render this CV to a PDF in output/ with this theme and these tokens'}>
               {dirty ? 'Save & render this CV' : 'Render this CV'}
             </button>
-            <button type="button" className="chip" disabled={busy || !docs?.some((d) => d.reportId !== null)} onClick={renderAll}
+            <button type="button" className="chip" disabled={busy || halfOrder || !docs?.some((d) => d.reportId !== null)} onClick={renderAll}
               title="Re-render every CV that belongs to a report in this theme">
               Re-render all in this theme
             </button>

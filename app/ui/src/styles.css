@@ -734,3 +734,4 @@ td.row-actions .chip { padding: 2px 8px; font-size: 11.5px; }
   .preview-frame { height: 70vh; }
 }
 .theme-error { overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.hint.pending { color: var(--review); }
