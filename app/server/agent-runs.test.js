@@ -29,6 +29,9 @@ function makeWorkspace() {
 }
 
 /** The fake CLI, parameterised per test through the environment it inherits. */
+/** Chromium is installed by the root package's postinstall; CI for app/ does not run it. */
+const needsChromium = !(await import('playwright').then((m) => existsSync(m.chromium.executablePath())).catch(() => false));
+
 const agent = { file: process.execPath, args: [FAKE_CLAUDE], found: true, shell: false, source: 'env', display: 'fake-claude' };
 
 const scenario = (name, extra = {}) => {
@@ -227,7 +230,7 @@ test('requests that cannot work are refused before anything is queued', async ()
 
 // ── pdf, cover, and the auto-PDF chain ─────────────────────────────
 
-test('a high score queues the PDF, which renders and flips the tracker flag', async () => {
+test('a high score queues the PDF; the session writes the payload and the console renders it', async () => {
   scenario('evaluate-ok', { FAKE_CLAUDE_SCORE: '4.4' });
   const url = 'https://jobs.example.com/ada/6';
   const { run } = (await post('/api/inbox/urls', { url, evaluate: true })).json();
@@ -239,15 +242,30 @@ test('a high score queues the PDF, which renders and flips the tracker flag', as
   // The PDF run is queued behind the exclusive merge; by the time it starts the
   // fake CLI must play the pdf scenario.
   scenario('pdf-ok');
-  await drained({ timeoutMs: 60_000 });
+  await drained({ timeoutMs: 90_000 });
   const { recent } = (await get('/api/runs')).json();
   const pdf = recent.find((r) => r.kind === 'pdf' && r.meta.reportNum === num);
   assert.ok(pdf, 'a pdf run was chained');
   assert.equal(pdf.status, 'succeeded', pdf.error);
   assert.equal(pdf.parentId, run.id);
+  assert.equal(pdf.meta.structured, true);
   assert.match(pdf.meta.template, /standard/);
+  assert.match(pdf.result.payload, /^output\/cv-ada-lovelace-.+\.json$/);
+  assert.ok(existsSync(join(root, pdf.result.payload)), 'the payload stays in output/ for re-theming');
 
-  const marked = recent.find((r) => r.kind === 'mark-pdf-ready' && r.parentId === pdf.id);
+  // The console renders the payload: a deterministic cv-render run, no agent.
+  const chained = recent.find((r) => r.kind === 'cv-render' && r.parentId === pdf.id);
+  assert.ok(chained, 'the render was chained to the session');
+  const render = (await get(`/api/runs/${chained.id}`)).json();
+  assert.ok(render.args.includes(`--report=${num}`), 'a new CV is tied to its report by the server');
+  if (needsChromium) return; // Rendering needs the root package's Chromium; CI for app/ does not install it.
+
+  assert.equal(render.status, 'succeeded', text(render));
+  assert.match(text(render), /CV fact check passed/);
+  // A one-line fixture CV is too thin for an ATS (under 300 characters of text),
+  // so the guardrail says so loudly — and the PDF is still rendered for the user to judge.
+  assert.match(text(render), /ATS CHECK FAILED[\s\S]*almost no selectable text/);
+  const marked = recent.find((r) => r.kind === 'mark-pdf-ready' && r.parentId === render.id);
   assert.equal(marked?.status, 'succeeded', marked?.error);
   const row = tracker().split(/\r?\n/).find((l) => l.includes('Fake Co') && l.includes(`[${num}]`));
   assert.match(row, /✅/, 'mark-pdf-ready.mjs flipped the PDF column');
@@ -255,21 +273,52 @@ test('a high score queues the PDF, which renders and flips the tracker flag', as
   const res = await get(`/api/reports/${Number(num)}/pdf`);
   assert.equal(res.statusCode, 200);
   assert.equal(res.headers['content-type'], 'application/pdf');
+  const report = (await get(`/api/reports/${Number(num)}`)).json();
+  assert.equal(report.ats?.verdict, 'fail', JSON.stringify(report.ats));
+
+  // …and the same CV re-renders in another theme with no session at all.
+  const again = (await post('/api/runs', { kind: 'cv-render', options: { documentId: pdf.result.documentId, template: 'modern' } })).json();
+  const rerendered = await settled(again.id, { timeoutMs: 60_000 });
+  assert.equal(rerendered.status, 'succeeded', text(rerendered));
+  assert.equal(rerendered.result.template, 'modern');
+  await drained();
 });
 
-test('a PDF run whose agent renders nothing fails, and refuses an unknown report', async () => {
+test('the classic PDF run, where the session renders, is still available', async () => {
+  scenario('pdf-ok');
+  const some = (await get('/api/reports')).json().reports[0].id;
+  const { id } = (await post('/api/runs', { kind: 'pdf', options: { reportId: some, structured: false } })).json();
+  const run = await settled(id);
+  assert.equal(run.status, 'succeeded', text(run));
+  assert.equal(run.meta.structured, false);
+  assert.match(run.result.pdf, /\.pdf$/);
+  await drained();
+});
+
+test('a PDF run whose agent writes nothing fails, and refuses an unknown report', async () => {
   scenario('evaluate-no-report');
   const some = (await get('/api/reports')).json().reports[0].id;
   const { id } = (await post('/api/runs', { kind: 'pdf', options: { reportId: some } })).json();
   const run = await settled(id);
   assert.equal(run.status, 'failed');
-  assert.match(run.error, /no PDF was recorded|still points at the previous PDF/);
+  assert.match(run.error, /did not write output\/cv-.+\.json/);
+
+  // A different report from the classic test above, whose PDF is seconds old.
+  const other = (await get('/api/reports')).json().reports[1].id;
+  const classic = (await post('/api/runs', { kind: 'pdf', options: { reportId: other, structured: false } })).json();
+  const failed = await settled(classic.id);
+  assert.equal(failed.status, 'failed');
+  assert.match(failed.error, /no PDF was recorded|still points at the previous PDF/);
 
   const missing = await post('/api/runs', { kind: 'pdf', options: { reportId: 999 } });
   assert.equal(missing.statusCode, 404);
   assert.equal(missing.json().code, 'report-missing');
   const bad = await post('/api/runs', { kind: 'pdf', options: { reportId: some, format: 'legal' } });
   assert.equal(bad.statusCode, 400);
+
+  // A request cannot tie a CV to a report; only the server's own chain can.
+  const forced = await post('/api/runs', { kind: 'cv-render', options: { documentId: 'sample', reportNum: '001' } });
+  assert.equal(forced.statusCode, 400);
   await drained();
 });
 

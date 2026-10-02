@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<!--
+  A deliberately broken CV theme (M5 acceptance: "a deliberately broken theme
+  triggers the ATS warning"). It fills the same placeholders as upstream's
+  templates, so build-cv-html.mjs renders it without complaint, and it looks
+  fine on screen — but an ATS reading the PDF gets very little of it:
+
+  - the contact block is an SVG image, so the email never reaches the text layer
+  - section headings are zero-size text, so no heading survives extraction
+  - the body is a two-column layout table, so Skills is read before Experience
+  - the competencies are white-on-white keyword stuffing
+
+  Copy it to config/cv/templates/broken.html and pick it in CV Studio to see
+  the warning. Never use it for a real application.
+-->
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<title>{{NAME}} — CV</title>
+<style>
+  :root { --accent-color: #b0306a; --font-family: Georgia, serif; --font-size: 10.5pt; --page-margin: 0.5in; }
+  body { font-family: var(--font-family); font-size: var(--font-size); margin: 0; color: #222; }
+  .page { max-width: {{PAGE_WIDTH}}; margin: 0 auto; }
+  .contact-image { display: block; width: 100%; height: 90px; }
+  .section-title { font-size: 0; height: 12px; border-bottom: 2px solid var(--accent-color); margin: 10px 0 6px; }
+  .stuffed { color: #fff; }
+  td { vertical-align: top; padding: 0 8px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  {{PHOTO}}
+  <!-- HEADER -->
+  <img class="contact-image" alt="" src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='90'%3E%3Crect width='700' height='90' fill='%23b0306a'/%3E%3Ctext x='20' y='50' font-size='28' fill='white'%3ECurriculum Vitae%3C/text%3E%3C/svg%3E">
+  <h1 style="font-size:0">{{NAME}}</h1>
+
+  <table><tr>
+  <td style="width:35%">
+
+  <!-- SKILLS -->
+  <div class="section">
+    <div class="section-title">{{SECTION_SKILLS}}</div>
+    <div class="skills-body">
+      {{SKILLS}}
+    </div>
+  </div>
+
+  <!-- EDUCATION -->
+  <div class="section">
+    <div class="section-title">{{SECTION_EDUCATION}}</div>
+    <div class="education-body">
+      {{EDUCATION}}
+    </div>
+  </div>
+
+  </td>
+  <td>
+
+  <!-- PROFESSIONAL SUMMARY -->
+  <div class="section">
+    <div class="section-title">{{SECTION_SUMMARY}}</div>
+    <div class="summary-text">{{SUMMARY_TEXT}}</div>
+  </div>
+
+  <!-- CORE COMPETENCIES -->
+  <div class="section">
+    <div class="section-title">{{SECTION_COMPETENCIES}}</div>
+    <div class="stuffed" style="color:#fff">
+      {{COMPETENCIES}}
+    </div>
+  </div>
+
+  <!-- WORK EXPERIENCE -->
+  <div class="section">
+    <div class="section-title">{{SECTION_EXPERIENCE}}</div>
+    <div class="experience-body">
+      {{EXPERIENCE}}
+    </div>
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="section">
+    <div class="section-title">{{SECTION_PROJECTS}}</div>
+    <div class="projects-body">
+      {{PROJECTS}}
+    </div>
+  </div>
+
+  <!-- CERTIFICATIONS -->
+  <div class="section">
+    <div class="section-title">{{SECTION_CERTIFICATIONS}}</div>
+    <div class="cert-table">{{CERTIFICATIONS}}</div>
+  </div>
+
+  <!-- AWARDS -->
+  <div class="section">
+    <div class="section-title">{{SECTION_AWARDS}}</div>
+    <div class="award-table">{{AWARDS}}</div>
+  </div>
+
+  </td>
+  </tr></table>
+
+  <!-- END -->
+
+</div>
+</body>
+</html>

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { after, before, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
@@ -168,8 +168,57 @@ test('render-cv.js writes a themed copy beside the input and pins the generate-p
   ]);
   assert.match(logs[0], /Style applied: --accent-color/);
 
-  assert.deepEqual(parseArgs(['a.html', 'b.pdf']), { input: 'a.html', output: 'b.pdf', format: 'a4', report: null, keep: false, maxPages: null, strictPages: false });
+  assert.deepEqual(parseArgs(['a.html', 'b.pdf']), { input: 'a.html', output: 'b.pdf', format: 'a4', report: null, keep: false, maxPages: null, strictPages: false, document: null, template: null, date: null });
   assert.deepEqual(generateArgs({ themedPath: 't', output: 'o', format: 'a4', report: null }), [join(repoRoot, 'generate-pdf.mjs'), 't', 'o', '--format=a4', '--allow-reorder']);
   assert.equal(await main([], { spawnFn: fakeSpawn, root }), 2);
   assert.equal(await main([input, 'x.pdf', '--format=legal'], { spawnFn: fakeSpawn, root }), 2);
+});
+
+test('render-cv.js --document builds from the payload, gates facts, renders and checks ATS, in that order', async () => {
+  const output = join(root, 'output');
+  mkdirSync(output, { recursive: true });
+  writeFileSync(join(output, 'cv-ada-globex.json'), JSON.stringify({ page_format: 'letter', candidate: { name: 'Ada' }, experience: [] }));
+
+  const spawned = [];
+  const fakeSpawn = (file, args) => {
+    spawned.push(args);
+    const script = basename(args[0]);
+    if (script === 'build-cv-html.mjs') writeFileSync(args[2], HTML);
+    if (script === 'generate-pdf.mjs') writeFileSync(args[2], '%PDF-fake');
+    const listeners = {};
+    const child = { on: (event, fn) => ((listeners[event] = fn), child) };
+    setImmediate(() => listeners.close(0));
+    return child;
+  };
+  const checked = [];
+  const ats = async (input) => checked.push(input);
+  const code = await main(['--document=cv-ada-globex', '--template=modern', '--date=2026-10-01', '--report=012'], { spawnFn: fakeSpawn, root, log: () => {}, ats });
+  assert.equal(code, 0);
+
+  const scripts = spawned.map((a) => basename(a[0]));
+  assert.deepEqual(scripts, ['build-cv-html.mjs', 'verify-cv-facts.mjs', 'generate-pdf.mjs']);
+  assert.equal(spawned[0][1], join(output, 'cv-ada-globex.json'));
+  assert.equal(spawned[0][2], join(output, 'cv-ada-globex.html'));
+  assert.match(spawned[0][3], /cv-template\.modern\.html$/);
+  assert.deepEqual(spawned[2].slice(2), [join(output, 'cv-ada-globex-2026-10-01.pdf'), '--format=letter', '--report=012', '--allow-reorder']);
+  assert.equal(checked.length, 1);
+  assert.equal(checked[0].pdfPath, join(output, 'cv-ada-globex-2026-10-01.pdf'));
+  assert.ok(!existsSync(join(output, 'cv-ada-globex.themed.html')), 'the themed copy is cleaned up');
+
+  // A failed fact gate stops before anything is rendered.
+  const gated = [];
+  const failGate = (file, args) => {
+    gated.push(basename(args[0]));
+    const listeners = {};
+    const child = { on: (event, fn) => ((listeners[event] = fn), child) };
+    setImmediate(() => listeners.close(args[0].endsWith('verify-cv-facts.mjs') ? 1 : 0));
+    return child;
+  };
+  assert.equal(await main(['--document=cv-ada-globex'], { spawnFn: failGate, root, log: () => {}, ats }), 1);
+  assert.deepEqual(gated, ['build-cv-html.mjs', 'verify-cv-facts.mjs']);
+
+  assert.equal(await main(['--document=sample'], { spawnFn: fakeSpawn, root, log: () => {}, ats }), 2);
+  assert.equal(await main(['--document=nope'], { spawnFn: fakeSpawn, root, log: () => {}, ats }), 2);
+  assert.equal(await main(['--document=cv-ada-globex', '--template=../x'], { spawnFn: fakeSpawn, root, log: () => {}, ats }), 2);
+  assert.equal(await main(['--document=cv-ada-globex', '--date=today'], { spawnFn: fakeSpawn, root, log: () => {}, ats }), 2);
 });

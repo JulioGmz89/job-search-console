@@ -279,3 +279,28 @@ test('a run streams its output as SSE and ends the stream when it finishes', asy
   assert.equal(record.exitCode, 0);
   assert.ok(record.lines.some((l) => l.text.includes('0 errors')));
 });
+
+test('CV Studio M5: documents list the sample; preview and gallery refuse bad input before rendering', async () => {
+  const docs = (await get('/api/cv/documents')).json().documents;
+  assert.deepEqual(docs.map((d) => d.id), ['sample']);
+  assert.equal(docs[0].path, undefined, 'paths stay on the server');
+
+  const post = (url, payload) => app.inject({ method: 'POST', url, payload });
+  const missing = await post('/api/cv/preview', { documentId: 'nope' });
+  assert.equal(missing.statusCode, 404);
+  assert.equal(missing.json().code, 'document-missing');
+
+  const traversal = await post('/api/cv/preview', { documentId: '../cv' });
+  assert.equal(traversal.statusCode, 400);
+
+  const badStyle = await post('/api/cv/preview', { documentId: 'sample', style: { font_size: 'huge' } });
+  assert.equal(badStyle.statusCode, 400);
+  assert.equal(badStyle.json().detail[0].key, 'font_size');
+
+  const badTheme = await post('/api/cv/themes', { documentId: 'sample', style: { template: 'no-such-theme' } });
+  assert.equal(badTheme.statusCode, 404);
+
+  assert.equal((await get('/api/cv/preview/0000')).statusCode, 404);
+  assert.equal((await get('/api/cv/thumbs/../../cv.md')).statusCode, 404);
+  assert.equal((await get('/api/cv/thumbs/0123456789abcdef01234567.png')).statusCode, 404);
+});

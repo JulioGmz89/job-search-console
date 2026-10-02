@@ -163,6 +163,21 @@ switch (scenario) {
     setInterval(() => {}, 1000);
     break;
   case 'pdf-ok': {
+    // A structured run (M5) stops at the payload; the console renders it.
+    const payload = grab(/write the JSON payload to exactly \*\*`(output\/[^`]+\.json)`\*\*/);
+    if (payload) {
+      write(payload, JSON.stringify({
+        lang: 'en',
+        page_format: 'a4',
+        candidate: { name: 'Ada Lovelace', email: 'ada@example.com' },
+        summary: 'Built the engine.',
+        experience: [{ company: 'Analytical Engine', role: 'Engineer', dates: '1843', bullets: ['Built the engine'] }],
+        skills: [{ category: 'Core', items: 'Mathematics' }],
+      }));
+      tool('Write', { file_path: payload });
+      finish({ text: `Payload at ${payload}` });
+      break;
+    }
     const pdf = grab(/`node app\/cv\/render-cv\.js \S+ (\S+)/) ?? `output/cv-fixture-${reportNum}.pdf`;
     write(pdf, '%PDF-1.4 fake');
     const index = join(root, 'data', 'pdf-index.tsv');

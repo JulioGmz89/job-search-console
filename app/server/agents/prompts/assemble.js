@@ -32,6 +32,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 export const MODES = Object.freeze({
   evaluate: { mode: 'oferta', shared: true, voice: false },
   pdf: { mode: 'pdf', shared: true, voice: true },
+  // M5 (PROJECT_PLAN.md §7c): same mode, but the session stops at the payload and the console renders it.
+  'pdf-structured': { mode: 'pdf', shared: true, voice: true },
   cover: { mode: 'cover', shared: false, voice: true },
 });
 
@@ -66,7 +68,7 @@ const section = (title, body) => `\n\n---\n\n## ${title}\n\n${body.trim()}\n`;
 
 /**
  * @param {object} options
- * @param {'evaluate'|'pdf'|'cover'} options.mode
+ * @param {'evaluate'|'pdf'|'pdf-structured'|'cover'} options.mode
  * @param {string} options.repoRoot - Where upstream's `modes/` live.
  * @param {string} options.root - The data root (profile.yml, voice-dna.md).
  * @param {object} options.vars - Overlay placeholders.

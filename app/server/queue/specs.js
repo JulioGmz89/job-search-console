@@ -31,6 +31,7 @@ import { parseProgress, scanArgs } from '../services/scanner.js';
 import { parseFetchProgress } from '../skills/cli.js';
 import { buildSkillsCvSpec, buildSkillsExtractSpec } from '../skills/extract-spec.js';
 import { buildCoverSpec, buildEvaluateSpec, buildPdfSpec } from './agent-specs.js';
+import { buildCvRenderSpec } from './cv-specs.js';
 
 /** Argv for the skills fetch worker (`skills/cli.js`): only flags it validates itself. */
 function skillsFetchArgs(options = {}) {
@@ -157,6 +158,19 @@ export const RUN_KINDS = Object.freeze({
     parseProgress: parseFetchProgress,
   },
 
+  // ── CV Studio (M5) ──────────────────────────────────────────────────
+  'cv-render': {
+    label: 'Render CV',
+    description: 'Render a structured CV to PDF in a theme — no agent, no tokens spent.',
+    help:
+      'Renders one of your CVs from its structured data (the JSON payload next to it in output/) in the chosen theme with your style tokens: upstream’s build-cv-html.mjs builds the HTML, the fact gate (verify-cv-facts.mjs) checks it against cv.md, upstream’s renderer prints the PDF and records it in data/pdf-index.tsv, and the ATS guardrail reads the text back out of the PDF to check that every heading, your contact details and your keywords survived. A failed ATS check is reported loudly but still leaves the PDF for you to judge. The new PDF becomes the report’s PDF; the previous one stays in output/.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    page: 'cv',
+    build: buildCvRenderSpec,
+  },
+
   // ── agent kinds (headless Claude Code sessions) ─────────────────────
   evaluate: {
     label: 'Evaluate posting',
@@ -173,7 +187,7 @@ export const RUN_KINDS = Object.freeze({
     label: 'Generate PDF',
     description: 'Tailor the CV to an evaluated posting and render it as a PDF.',
     help:
-      'Starts a headless Claude Code session that follows `modes/pdf.md`: it reads the report and your cv.md, tailors the content (keywords injected, nothing invented — the fact gate runs before rendering), builds the HTML with the template chosen in CV Studio, and renders the PDF through upstream’s renderer with your style tokens applied. The result appears in the report’s PDF tab and in data/pdf-index.tsv.',
+      'Starts a headless Claude Code session that follows `modes/pdf.md`: it reads the report and your cv.md and tailors the content (keywords injected, nothing invented — the fact gate must pass). The session writes the tailored CV as structured data (output/cv-…json) and stops; the console then renders it with a Render CV run in the theme and tokens chosen in CV Studio, checks the PDF against the ATS guardrail, and records it in the report’s PDF tab and data/pdf-index.tsv. Because the content is kept as data, the same CV can be re-rendered in any other theme later without another session.',
     writes: true,
     confirmRequired: false,
     supportsDryRun: false,

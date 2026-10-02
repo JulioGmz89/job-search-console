@@ -37,6 +37,10 @@ import { readProfile } from './agents/profile.js';
 import { createRunner } from './queue/runner.js';
 import { buildSpec, describeKinds, RUN_KINDS } from './queue/specs.js';
 import { resolveReportCover } from './services/covers.js';
+import { readAtsRecord } from './services/ats.js';
+import { createBrowserPool } from './services/browser.js';
+import { listCvDocuments } from './services/cvdocs.js';
+import { getPreview, listThemes, renderPreview, thumbPath } from './services/cvrender.js';
 import { listCvTemplates, listWritingSamples, readStyle, readVoice, writeStyle, writeVoice } from './services/cvstyle.js';
 import { appendInboxUrl, readInbox } from './services/inbox.js';
 import { repoRoot, resolveDataRoot } from './services/paths.js';
@@ -258,8 +262,12 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     // the report file itself does not know about.
     const row = readPipeline({ root }).rows.find((r) => r.reportId === report.id) ?? null;
     const cover = resolveReportCover(report.id, { root });
+    const pdf = resolveReportPdf(report.id, { root });
+    // The ATS verdict the console recorded when it rendered this PDF (M5); none for older PDFs.
+    const ats = pdf ? readAtsRecord(resolveDataRoot(root), pdf.fileName) : null;
     return {
       ...report,
+      ats: ats ? { verdict: ats.verdict, score: ats.score, issues: ats.issues, checkedAt: ats.checkedAt } : null,
       cover: cover ? { path: cover.path, date: cover.date } : null,
       tracker: row
         ? { id: row.id, status: row.status, statusId: row.statusId, date: row.date, notes: row.notes }
@@ -323,6 +331,81 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
   app.get('/api/cv/templates', async () => listCvTemplates({ root }));
 
   app.get('/api/cv/writing-samples', async () => listWritingSamples({ root }));
+
+  // ── CV Studio, M5: documents, live preview, the theme gallery ──────
+
+  // One warm Chromium per app (launched on the first preview, closed when idle
+  // and on shutdown), so a token change re-renders in well under a second.
+  const cvPool = createBrowserPool();
+  app.addHook('onClose', async () => cvPool.close());
+
+  /** Every structured CV the console can render: payloads in output/, plus the sample. */
+  app.get('/api/cv/documents', async () => ({ documents: listCvDocuments({ root }).map(({ path: _path, ...doc }) => doc) }));
+
+  /**
+   * Render a document with a style that need not be saved — the form's current
+   * values — and check it against the ATS guardrail. No agent, no files in
+   * output/; the PDF is kept in memory and fetched by id.
+   */
+  app.post('/api/cv/preview', async (request, reply) => {
+    try {
+      const input = body(request);
+      return await renderPreview({ documentId: input.documentId, style: input.style ?? {}, root, pool: cvPool });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.get('/api/cv/preview/:id', async (request, reply) => {
+    const preview = getPreview(String(request.params.id).replace(/\.pdf$/, ''));
+    if (!preview) return reply.code(404).send({ error: 'That preview has expired — render it again' });
+    return reply
+      .header('Content-Type', 'application/pdf')
+      .header('Cache-Control', 'no-store')
+      .header('Content-Disposition', 'inline; filename="cv-preview.pdf"')
+      .send(preview.pdf);
+  });
+
+  /** The gallery: every theme rendered with this document and the given tokens, each with its ATS verdict. */
+  app.post('/api/cv/themes', async (request, reply) => {
+    try {
+      const input = body(request);
+      return await listThemes({ documentId: input.documentId, style: input.style ?? {}, root, pool: cvPool });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  /**
+   * Re-render every CV that belongs to a report in one theme — the bulk
+   * re-theming §7c promises. One queued `cv-render` per document; a document
+   * already rendering is skipped rather than failing the batch.
+   */
+  app.post('/api/cv/render-all', async (request, reply) => {
+    try {
+      const input = body(request);
+      const queued = [];
+      const skipped = [];
+      for (const doc of listCvDocuments({ root, sample: false })) {
+        if (doc.reportId === null) continue;
+        try {
+          queued.push(runner.start(buildSpec('cv-render', { documentId: doc.id, template: input.template ?? null }, specContext)));
+        } catch (error) {
+          if (error.code === 'run-busy') skipped.push({ documentId: doc.id, reason: error.message });
+          else throw error;
+        }
+      }
+      return reply.code(202).send({ queued, skipped });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.get('/api/cv/thumbs/:key', async (request, reply) => {
+    const path = thumbPath(String(request.params.key).replace(/\.png$/, ''), { root });
+    if (!path) return reply.code(404).send({ error: 'No such thumbnail' });
+    return reply.header('Content-Type', 'image/png').header('Cache-Control', 'private, max-age=86400').send(createReadStream(path));
+  });
 
   // ── the skills gap analysis (M4) ───────────────────────────────────
 

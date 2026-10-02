@@ -1,7 +1,8 @@
 # Job Search Console — CV style tokens (PROJECT_PLAN.md §7a).
 #
 # Copy to config/cv/style.yml (gitignored) or edit from the CV Studio page.
-# Applied by app/cv/render-cv.js whenever a PDF is generated from the console;
+# Applied to CV Studio's live preview and by app/cv/render-cv.js whenever a PDF is
+# rendered from the console;
 # every key is optional and a missing key means "the template's own default".
 #
 # Note: upstream's renderer applies config/profile.yml's `style:` block and
