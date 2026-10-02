@@ -37,6 +37,9 @@ import { readProfile } from './agents/profile.js';
 import { createRunner } from './queue/runner.js';
 import { buildSpec, describeKinds, RUN_KINDS } from './queue/specs.js';
 import { resolveReportCover } from './services/covers.js';
+import { createBrowserPool } from './services/browser.js';
+import { listCvDocuments } from './services/cvdocs.js';
+import { getPreview, listThemes, renderPreview, thumbPath } from './services/cvrender.js';
 import { listCvTemplates, listWritingSamples, readStyle, readVoice, writeStyle, writeVoice } from './services/cvstyle.js';
 import { appendInboxUrl, readInbox } from './services/inbox.js';
 import { repoRoot, resolveDataRoot } from './services/paths.js';
@@ -323,6 +326,56 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
   app.get('/api/cv/templates', async () => listCvTemplates({ root }));
 
   app.get('/api/cv/writing-samples', async () => listWritingSamples({ root }));
+
+  // ── CV Studio, M5: documents, live preview, the theme gallery ──────
+
+  // One warm Chromium per app (launched on the first preview, closed when idle
+  // and on shutdown), so a token change re-renders in well under a second.
+  const cvPool = createBrowserPool();
+  app.addHook('onClose', async () => cvPool.close());
+
+  /** Every structured CV the console can render: payloads in output/, plus the sample. */
+  app.get('/api/cv/documents', async () => ({ documents: listCvDocuments({ root }).map(({ path: _path, ...doc }) => doc) }));
+
+  /**
+   * Render a document with a style that need not be saved — the form's current
+   * values — and check it against the ATS guardrail. No agent, no files in
+   * output/; the PDF is kept in memory and fetched by id.
+   */
+  app.post('/api/cv/preview', async (request, reply) => {
+    try {
+      const input = body(request);
+      return await renderPreview({ documentId: input.documentId, style: input.style ?? {}, root, pool: cvPool });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.get('/api/cv/preview/:id', async (request, reply) => {
+    const preview = getPreview(String(request.params.id).replace(/\.pdf$/, ''));
+    if (!preview) return reply.code(404).send({ error: 'That preview has expired — render it again' });
+    return reply
+      .header('Content-Type', 'application/pdf')
+      .header('Cache-Control', 'no-store')
+      .header('Content-Disposition', 'inline; filename="cv-preview.pdf"')
+      .send(preview.pdf);
+  });
+
+  /** The gallery: every theme rendered with this document and the given tokens, each with its ATS verdict. */
+  app.post('/api/cv/themes', async (request, reply) => {
+    try {
+      const input = body(request);
+      return await listThemes({ documentId: input.documentId, style: input.style ?? {}, root, pool: cvPool });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.get('/api/cv/thumbs/:key', async (request, reply) => {
+    const path = thumbPath(String(request.params.key).replace(/\.png$/, ''), { root });
+    if (!path) return reply.code(404).send({ error: 'No such thumbnail' });
+    return reply.header('Content-Type', 'image/png').header('Cache-Control', 'private, max-age=86400').send(createReadStream(path));
+  });
 
   // ── the skills gap analysis (M4) ───────────────────────────────────
 
