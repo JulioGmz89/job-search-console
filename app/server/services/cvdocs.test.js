@@ -19,11 +19,13 @@ before(() => {
   writeFileSync(join(root, 'output', 'cv-ana-acme.html'), '<html></html>');
   writeFileSync(join(root, 'output', 'cv-ana-acme-2026-01-05.pdf'), '%PDF');
   writeFileSync(join(root, 'output', 'cv-ana-loose.json'), payload('Ana'));
+  writeFileSync(join(root, 'output', 'cv-ana-themed.json'), payload('Ana'));
   writeFileSync(join(root, 'output', 'cover-payload-acme.json'), JSON.stringify({ company: 'Acme', paragraphs: [] }));
   writeFileSync(join(root, 'output', 'broken.json'), '{ not json');
   writeFileSync(
     join(root, 'data', 'pdf-index.tsv'),
-    '# report\tpdf\thtml\tformat\tdate\n004\toutput/cv-ana-acme-2026-01-05.pdf\toutput/cv-ana-acme.html\ta4\t2026-01-05\n',
+    '# report\tpdf\thtml\tformat\tdate\n004\toutput/cv-ana-acme-2026-01-05.pdf\toutput/cv-ana-acme.html\ta4\t2026-01-05\n'
+      + '009\toutput/cv-ana-themed-2026-01-06.pdf\toutput/cv-ana-themed.themed.html\ta4\t2026-01-06\n',
   );
   // An M3 run: payload in tmp, the prompt names the HTML it built.
   writeFileSync(join(root, 'data', 'jsc', 'tmp', `cv-${RUN}.json`), payload('Ana'));
@@ -54,6 +56,7 @@ test('lists payloads in output/, joined to pdf-index through the HTML basename, 
   assert.equal(acme.reportId, 4);
   assert.equal(acme.pdf, 'cv-ana-acme-2026-01-05.pdf');
   assert.equal(docs.find((d) => d.id === 'cv-ana-loose').reportId, null);
+  assert.equal(docs.find((d) => d.id === 'cv-ana-themed').reportId, 9, 'a console render records the .themed.html copy');
 });
 
 test('M3 run payloads are imported next to the HTML their run built, once', () => {

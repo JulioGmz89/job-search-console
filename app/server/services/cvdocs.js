@@ -103,7 +103,9 @@ export function listCvDocuments({ root, sample = true } = {}) {
 
   const byHtml = new Map();
   for (const entry of readPdfIndex(dataRoot).values()) {
-    if (entry.html) byHtml.set(basename(entry.html, '.html'), entry);
+    // generate-pdf.mjs records the file it was handed, which for a console
+    // render is render-cv.js's `<id>.themed.html` copy — same CV, same id.
+    if (entry.html) byHtml.set(basename(entry.html, '.html').replace(/\.themed$/, ''), entry);
   }
 
   const docs = [];

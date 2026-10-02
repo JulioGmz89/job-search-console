@@ -21,6 +21,9 @@
  * an unreadable PDF is itself a critical finding.
  */
 
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+
 import { auditAts, DEFAULT_MIN_SCORE, extractHeadings, isPass } from '../../../verify-ats.mjs';
 
 /** build-cv-html.mjs's default section titles (not exported there). */
@@ -213,4 +216,32 @@ export async function checkAts({ html, pdf, payload }) {
   const critical = issues.some((i) => i.severity === 'critical');
   const verdict = critical || !isPass(audit, DEFAULT_MIN_SCORE) ? 'fail' : issues.some((i) => i.severity === 'warning') ? 'warn' : 'pass';
   return { verdict, score: audit.score, grade: audit.grade, pages, issues, keywords: pdfCheck.keywords, sections: pdfCheck.sections };
+}
+
+// ── the record of a final render's verdict ───────────────────────────
+
+const PDF_NAME_RE = /^[A-Za-z0-9][A-Za-z0-9._-]{0,200}\.pdf$/;
+
+/** `data/jsc/cv/ats/<pdf>.json`: the verdict for a PDF in output/, written when it was rendered. */
+export function atsRecordPath(dataRoot, pdfFileName) {
+  if (!PDF_NAME_RE.test(pdfFileName ?? '')) return null;
+  return join(dataRoot, 'data', 'jsc', 'cv', 'ats', `${pdfFileName}.json`);
+}
+
+export function writeAtsRecord(dataRoot, pdfFileName, result) {
+  const path = atsRecordPath(dataRoot, pdfFileName);
+  if (!path) return null;
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, `${JSON.stringify({ ...result, pdf: pdfFileName, checkedAt: new Date().toISOString() }, null, 2)}\n`);
+  return path;
+}
+
+export function readAtsRecord(dataRoot, pdfFileName) {
+  const path = atsRecordPath(dataRoot, pdfFileName);
+  if (!path || !existsSync(path)) return null;
+  try {
+    return JSON.parse(readFileSync(path, 'utf-8'));
+  } catch {
+    return null;
+  }
 }

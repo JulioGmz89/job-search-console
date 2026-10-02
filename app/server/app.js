@@ -37,6 +37,7 @@ import { readProfile } from './agents/profile.js';
 import { createRunner } from './queue/runner.js';
 import { buildSpec, describeKinds, RUN_KINDS } from './queue/specs.js';
 import { resolveReportCover } from './services/covers.js';
+import { readAtsRecord } from './services/ats.js';
 import { createBrowserPool } from './services/browser.js';
 import { listCvDocuments } from './services/cvdocs.js';
 import { getPreview, listThemes, renderPreview, thumbPath } from './services/cvrender.js';
@@ -261,8 +262,12 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     // the report file itself does not know about.
     const row = readPipeline({ root }).rows.find((r) => r.reportId === report.id) ?? null;
     const cover = resolveReportCover(report.id, { root });
+    const pdf = resolveReportPdf(report.id, { root });
+    // The ATS verdict the console recorded when it rendered this PDF (M5); none for older PDFs.
+    const ats = pdf ? readAtsRecord(resolveDataRoot(root), pdf.fileName) : null;
     return {
       ...report,
+      ats: ats ? { verdict: ats.verdict, score: ats.score, issues: ats.issues, checkedAt: ats.checkedAt } : null,
       cover: cover ? { path: cover.path, date: cover.date } : null,
       tracker: row
         ? { id: row.id, status: row.status, statusId: row.statusId, date: row.date, notes: row.notes }
@@ -366,6 +371,31 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     try {
       const input = body(request);
       return await listThemes({ documentId: input.documentId, style: input.style ?? {}, root, pool: cvPool });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  /**
+   * Re-render every CV that belongs to a report in one theme — the bulk
+   * re-theming §7c promises. One queued `cv-render` per document; a document
+   * already rendering is skipped rather than failing the batch.
+   */
+  app.post('/api/cv/render-all', async (request, reply) => {
+    try {
+      const input = body(request);
+      const queued = [];
+      const skipped = [];
+      for (const doc of listCvDocuments({ root, sample: false })) {
+        if (doc.reportId === null) continue;
+        try {
+          queued.push(runner.start(buildSpec('cv-render', { documentId: doc.id, template: input.template ?? null }, specContext)));
+        } catch (error) {
+          if (error.code === 'run-busy') skipped.push({ documentId: doc.id, reason: error.message });
+          else throw error;
+        }
+      }
+      return reply.code(202).send({ queued, skipped });
     } catch (error) {
       return fail(reply, error);
     }

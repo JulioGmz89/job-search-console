@@ -31,6 +31,7 @@ import { parseProgress, scanArgs } from '../services/scanner.js';
 import { parseFetchProgress } from '../skills/cli.js';
 import { buildSkillsCvSpec, buildSkillsExtractSpec } from '../skills/extract-spec.js';
 import { buildCoverSpec, buildEvaluateSpec, buildPdfSpec } from './agent-specs.js';
+import { buildCvRenderSpec } from './cv-specs.js';
 
 /** Argv for the skills fetch worker (`skills/cli.js`): only flags it validates itself. */
 function skillsFetchArgs(options = {}) {
@@ -155,6 +156,19 @@ export const RUN_KINDS = Object.freeze({
     page: 'skills',
     args: (options) => skillsFetchArgs(options),
     parseProgress: parseFetchProgress,
+  },
+
+  // ── CV Studio (M5) ──────────────────────────────────────────────────
+  'cv-render': {
+    label: 'Render CV',
+    description: 'Render a structured CV to PDF in a theme — no agent, no tokens spent.',
+    help:
+      'Renders one of your CVs from its structured data (the JSON payload next to it in output/) in the chosen theme with your style tokens: upstream’s build-cv-html.mjs builds the HTML, the fact gate (verify-cv-facts.mjs) checks it against cv.md, upstream’s renderer prints the PDF and records it in data/pdf-index.tsv, and the ATS guardrail reads the text back out of the PDF to check that every heading, your contact details and your keywords survived. A failed ATS check is reported loudly but still leaves the PDF for you to judge. The new PDF becomes the report’s PDF; the previous one stays in output/.',
+    writes: true,
+    confirmRequired: false,
+    supportsDryRun: false,
+    page: 'cv',
+    build: buildCvRenderSpec,
   },
 
   // ── agent kinds (headless Claude Code sessions) ─────────────────────
