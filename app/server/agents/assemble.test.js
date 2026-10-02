@@ -92,6 +92,13 @@ test('pdf and cover prompts inline voice-dna.md and the writing rules', () => {
   order(pdf.system, '# shared rubric', '# writing rules', '# pdf mode', 'Headless run', 'node app/cv/render-cv.js', 'Voice DNA (apply)', 'No em dashes.');
   assert.ok(pdf.sections.includes('voice-dna.md'));
 
+  // The structured run (M5) loads the same mode and voice, writes the payload to
+  // output/ and is told not to render.
+  const structured = assemblePrompt({ mode: 'pdf-structured', repoRoot: repo, root, vars: { ...vars, PAYLOAD_PATH: 'output/cv-ada-lovelace-acme.json' } });
+  order(structured.system, '# pdf mode', 'structured-data run', 'exactly **`output/cv-ada-lovelace-acme.json`**', '**do not render.**', 'Voice DNA (apply)');
+  assert.doesNotMatch(structured.system, /node app\/cv\/render-cv\.js output/);
+  assert.ok(structured.sections.includes('overlay:pdf-structured'));
+
   const cover = assemblePrompt({
     mode: 'cover',
     repoRoot: repo,

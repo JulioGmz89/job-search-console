@@ -12,7 +12,7 @@
  * Nothing here trusts the agent's prose. Success is a file on disk.
  */
 
-import { appendFileSync, existsSync, mkdirSync, statSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative } from 'node:path';
 
 import { loadStyle, resolveTemplatePath } from '../../cv/theme.js';
@@ -23,6 +23,7 @@ import { agentLogPath, createAgentCommand, TIMEOUTS } from '../agents/runner.js'
 import { createStreamParser } from '../agents/stream-json.js';
 import { upsertBatchState } from '../services/batch-state.js';
 import { recordCover } from '../services/covers.js';
+import { isCvPayload } from '../services/cvdocs.js';
 import { validateInboxUrl } from '../services/inbox.js';
 import { resolveDataRoot } from '../services/paths.js';
 import { releaseReportNumber, removeStrayAdditions, reserveReportNumber } from '../services/report-numbers.js';
@@ -270,10 +271,20 @@ function paperFormat(profile, requested) {
 /**
  * Tailored CV PDF for an existing report (modes/pdf.md, headless).
  *
- * @param {{reportId: number|string, format?: 'letter'|'a4', model?: string|null}} options
+ * Two shapes (PROJECT_PLAN.md §7c):
+ * - **structured** (default, M5): the session tailors and writes the CV's
+ *   payload to `output/cv-<candidate>-<slug>.json`, builds the HTML only for
+ *   the fact gate, and stops. The console then renders the payload itself as a
+ *   chained `cv-render` run — theme, tokens, fact gate again, upstream's
+ *   renderer, ATS guardrail — so the PDF can later be re-themed with no agent.
+ * - **classic** (`structured: false`, M3): the session renders the PDF itself
+ *   through `app/cv/render-cv.js`. Kept as the fallback §7c asks for.
+ *
+ * @param {{reportId: number|string, format?: 'letter'|'a4', model?: string|null, structured?: boolean}} options
  * @param {{root?: string, repoRoot: string, agent: object}} ctx
  */
-export function buildPdfSpec({ reportId, format = null, model = null } = {}, { root, repoRoot, agent } = {}) {
+export function buildPdfSpec({ reportId, format = null, model = null, structured = true } = {}, ctx = {}) {
+  const { root, repoRoot, agent } = ctx;
   requireAgent(agent);
   requireCv(root);
   const plumbing = agentPlumbing({ root, model });
@@ -281,6 +292,9 @@ export function buildPdfSpec({ reportId, format = null, model = null } = {}, { r
   const { report, id, num, slug, path: reportPath } = requireReport(reportId, dataRoot);
   const paper = paperFormat(profile, format);
   const candidate = profile.candidateSlug ?? 'candidate';
+  const mode = structured === false ? 'pdf' : 'pdf-structured';
+  const documentId = `cv-${candidate}-${slug}`;
+  const payloadRel = `output/${documentId}.json`;
 
   return {
     kind: 'pdf',
@@ -294,7 +308,7 @@ export function buildPdfSpec({ reportId, format = null, model = null } = {}, { r
     exclusive: false,
     dedupeKey: `pdf:${num}`,
     timeoutMs: TIMEOUTS.pdf,
-    meta: { reportId: id, reportNum: num, company: report.machine?.company ?? null, slug, format: paper, model: plumbing.model },
+    meta: { reportId: id, reportNum: num, company: report.machine?.company ?? null, slug, format: paper, model: plumbing.model, structured: mode === 'pdf-structured' },
     hooks: {
       async before(run) {
         const date = today();
@@ -308,27 +322,38 @@ export function buildPdfSpec({ reportId, format = null, model = null } = {}, { r
           CANDIDATE: candidate,
           COMPANY_SLUG: slug,
           FORMAT: paper,
-          PAYLOAD_PATH: promptPath(repoRoot, join(dataRoot, 'data', 'jsc', 'tmp', `cv-${run.id}.json`)),
-          CV_HTML_PATH: `output/cv-${candidate}-${slug}.html`,
-          CV_PDF_PATH: `output/cv-${candidate}-${slug}-${date}.pdf`,
+          PAYLOAD_PATH: mode === 'pdf-structured' ? payloadRel : promptPath(repoRoot, join(dataRoot, 'data', 'jsc', 'tmp', `cv-${run.id}.json`)),
+          CV_HTML_PATH: `output/${documentId}.html`,
+          CV_PDF_PATH: `output/${documentId}-${date}.pdf`,
           TEMPLATE_PATH: promptPath(repoRoot, template.path),
         };
-        const prompt = assemblePrompt({ mode: 'pdf', repoRoot, root: dataRoot, vars });
+        const prompt = assemblePrompt({ mode, repoRoot, root: dataRoot, vars });
         const systemPromptPath = writePromptFile({ root: dataRoot, runId: run.id, text: prompt.system });
         const command = createAgentCommand({
           bin: agent,
-          userPrompt: `Generate the tailored CV PDF for report ${num} (${reportPath}). Follow the "Headless run" section of your instructions.`,
+          userPrompt: mode === 'pdf-structured'
+            ? `Tailor the CV for report ${num} (${reportPath}) and write its JSON payload. Follow the "Headless run" section of your instructions.`
+            : `Generate the tailored CV PDF for report ${num} (${reportPath}). Follow the "Headless run" section of your instructions.`,
           systemPromptPath,
           model: plumbing.model,
           cwd: repoRoot,
         });
         return {
           command,
-          meta: { date, promptPath: systemPromptPath, template: template.name, templateSource: template.source, pdfPath: vars.CV_PDF_PATH },
+          meta: {
+            date,
+            promptPath: systemPromptPath,
+            template: template.name,
+            templateSource: template.source,
+            pdfPath: vars.CV_PDF_PATH,
+            ...(mode === 'pdf-structured' ? { payloadPath: payloadRel } : {}),
+          },
           lines: [
             ...prompt.warnings.map((w) => `⚠ ${w}`),
             ...style.errors.map((e) => `⚠ config/cv/style.yml ${e.key ? `${e.key}: ` : ''}${e.message}`),
-            `Template: ${template.name} (${template.source}) · paper ${paper}`,
+            mode === 'pdf-structured'
+              ? `Structured run: the session writes ${payloadRel}; the console renders it in ${template.name} (${template.source}) · paper ${paper}`
+              : `Template: ${template.name} (${template.source}) · paper ${paper}`,
             `Prompt: ${prompt.sections.join(' + ')}${plumbing.model ? ` · model ${plumbing.model}` : ''}`,
           ],
         };
@@ -340,12 +365,34 @@ export function buildPdfSpec({ reportId, format = null, model = null } = {}, { r
         plumbing.flush(record);
         if (provisional.status === 'cancelled') return {};
 
-        const pdf = resolveReportPdf(id, { root: dataRoot });
-        const fresh = pdf ? freshFile(pdf.absolutePath, run.startedAt) : false;
         let error = null;
         if (provisional.status !== 'succeeded') error = provisional.error ?? `claude exited with code ${provisional.exitCode}`;
         else if (agentError(run)) error = agentError(run);
-        else if (!fresh) error = pdf ? `data/pdf-index.tsv still points at the previous PDF (${pdf.fileName}) — no new one was rendered` : 'no PDF was recorded in data/pdf-index.tsv for this report';
+
+        if (mode === 'pdf-structured') {
+          const payloadPath = join(dataRoot, payloadRel);
+          if (!error && !freshFile(payloadPath, run.startedAt)) error = `the session did not write ${payloadRel}`;
+          if (!error && !isCvPayload(readJsonFile(payloadPath))) error = `${payloadRel} is not a CV payload (it needs candidate.name and the CV sections)`;
+          if (error) return { status: 'failed', error };
+          let next;
+          try {
+            // The render is deterministic and owns the rest: fact gate again,
+            // upstream's renderer, the ATS check, then the tracker's PDF flag.
+            next = [internalSpec('cv-render', ctx, { documentId, reportNum: num })];
+          } catch (e) {
+            return { status: 'failed', error: `the payload was written but cannot be rendered: ${e.message}` };
+          }
+          record(`Payload written: ${payloadRel} — queuing the render`);
+          return { result: { ...(run.result ?? {}), reportId: id, payload: payloadRel, documentId }, next };
+        }
+
+        const pdf = resolveReportPdf(id, { root: dataRoot });
+        const fresh = pdf ? freshFile(pdf.absolutePath, run.startedAt) : false;
+        if (!error && !fresh) {
+          error = pdf
+            ? `data/pdf-index.tsv still points at the previous PDF (${pdf.fileName}) — no new one was rendered`
+            : 'no PDF was recorded in data/pdf-index.tsv for this report';
+        }
         if (error) return { status: 'failed', error };
 
         record(`PDF rendered: ${pdf.fileName}`);
@@ -357,6 +404,15 @@ export function buildPdfSpec({ reportId, format = null, model = null } = {}, { r
       },
     },
   };
+}
+
+/** A JSON file's contents, or null when it does not parse. */
+function readJsonFile(path) {
+  try {
+    return JSON.parse(readFileSync(path, 'utf-8'));
+  } catch {
+    return null;
+  }
 }
 
 const TONES = Object.freeze({

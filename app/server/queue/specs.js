@@ -187,7 +187,7 @@ export const RUN_KINDS = Object.freeze({
     label: 'Generate PDF',
     description: 'Tailor the CV to an evaluated posting and render it as a PDF.',
     help:
-      'Starts a headless Claude Code session that follows `modes/pdf.md`: it reads the report and your cv.md, tailors the content (keywords injected, nothing invented — the fact gate runs before rendering), builds the HTML with the template chosen in CV Studio, and renders the PDF through upstream’s renderer with your style tokens applied. The result appears in the report’s PDF tab and in data/pdf-index.tsv.',
+      'Starts a headless Claude Code session that follows `modes/pdf.md`: it reads the report and your cv.md and tailors the content (keywords injected, nothing invented — the fact gate must pass). The session writes the tailored CV as structured data (output/cv-…json) and stops; the console then renders it with a Render CV run in the theme and tokens chosen in CV Studio, checks the PDF against the ATS guardrail, and records it in the report’s PDF tab and data/pdf-index.tsv. Because the content is kept as data, the same CV can be re-rendered in any other theme later without another session.',
     writes: true,
     confirmRequired: false,
     supportsDryRun: false,

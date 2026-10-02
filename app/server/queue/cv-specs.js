@@ -22,10 +22,12 @@ import { internalSpec, SpecError } from './specs.js';
 const today = () => new Date().toISOString().slice(0, 10);
 
 /**
- * @param {{documentId: string, template?: string|null}} options
- * @param {{root?: string, repoRoot: string}} ctx
+ * @param {{documentId: string, template?: string|null, reportNum?: string}} options - `reportNum`
+ *   ties a brand-new CV (no pdf-index row yet) to its report; only a server-queued
+ *   render may set it, so a request cannot point one CV at another report.
+ * @param {{root?: string, repoRoot: string, internal?: boolean}} ctx
  */
-export function buildCvRenderSpec({ documentId, template = null } = {}, ctx = {}) {
+export function buildCvRenderSpec({ documentId, template = null, reportNum: forcedReport = null } = {}, ctx = {}) {
   const dataRoot = resolveDataRoot(ctx.root);
   let doc;
   try {
@@ -44,13 +46,17 @@ export function buildCvRenderSpec({ documentId, template = null } = {}, ctx = {}
 
   const date = today();
   const pdf = `${doc.id}-${date}.pdf`;
-  const reportNum = doc.reportId === null ? null : String(doc.reportId).padStart(3, '0');
+  if (forcedReport !== null && (ctx.internal !== true || !/^\d{1,6}$/.test(String(forcedReport)))) {
+    throw new SpecError('reportNum is set by the server, not by a request', { code: 'options-invalid' });
+  }
+  const reportNum = forcedReport !== null ? String(forcedReport) : doc.reportId === null ? null : String(doc.reportId).padStart(3, '0');
+  const reportId = reportNum === null ? null : Number.parseInt(reportNum, 10);
 
   return {
     kind: 'cv-render',
     script: 'app/cv/render-cv.js',
     label: `Render ${doc.id} · ${theme}`,
-    args: [`--document=${doc.id}`, `--template=${theme}`, `--date=${date}`],
+    args: [`--document=${doc.id}`, `--template=${theme}`, `--date=${date}`, ...(forcedReport !== null ? [`--report=${reportNum}`] : [])],
     dryRun: false,
     writes: true,
     confirmRequired: false,
@@ -58,7 +64,7 @@ export function buildCvRenderSpec({ documentId, template = null } = {}, ctx = {}
     lane: 'script',
     exclusive: false,
     dedupeKey: `cv-render:${doc.id}`,
-    meta: { documentId: doc.id, template: theme, reportId: doc.reportId, pdf },
+    meta: { documentId: doc.id, template: theme, reportId, pdf },
     hooks: {
       after(run, { provisional, record }) {
         if (provisional.status !== 'succeeded') return {};
@@ -68,7 +74,7 @@ export function buildCvRenderSpec({ documentId, template = null } = {}, ctx = {}
           result: {
             documentId: doc.id,
             template: theme,
-            reportId: doc.reportId,
+            reportId,
             pdf,
             ats: ats ? { verdict: ats.verdict, score: ats.score, issues: ats.issues } : null,
           },
