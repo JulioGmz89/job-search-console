@@ -195,7 +195,8 @@ AI-generated. Two independent layers fix this:
   de-AI signal and are currently underused.
 
 ### 7c. Content/presentation separation (the architectural core)
-- New fork-owned mode `app/modes/pdf-structured.md`: the agent outputs
+- New fork-owned mode (as built: the headless overlay
+  `app/server/agents/prompts/pdf-structured.md` on top of upstream's `modes/pdf.md`): the agent outputs
   **structured CV data (JSON)** — tailored content, keyword injection included —
   instead of final HTML. Prefer the open JSON Resume schema
   (https://jsonresume.org) unless a blocker emerges, to inherit its theme
@@ -282,6 +283,14 @@ Each milestone ships something usable. Do not start N+1 before N works end-to-en
   direct API call. Posting text is fetched by a fork worker (`skills-fetch`,
   chained after every real scan) because `scan.mjs` never persists it.
 - License header/NOTICE format for crediting upstream files
-- Confirm JSON Resume as the CV data schema (§7c) after checking it can carry
+- ~~Confirm JSON Resume as the CV data schema (§7c) after checking it can carry
   everything upstream's tailoring produces (keyword injection, per-job ordering);
-  otherwise define a minimal fork-owned schema with a JSON Resume export
+  otherwise define a minimal fork-owned schema with a JSON Resume export~~
+  **Resolved in M5 (2026-10-01): upstream's `build-cv-html.mjs` payload.** Upstream
+  already separates content from presentation: `modes/pdf.md` step 17 has the agent
+  write a JSON payload, and `build-cv-html.mjs` fills any `templates/cv-template*.html`
+  from it. That payload carries what JSON Resume cannot without extensions
+  (competencies, localized section titles, page format, photo style), every upstream
+  template renders it, and past CVs already exist in it (`output/cv-*.json`). Adopting
+  JSON Resume would have meant a converter and a parallel renderer. A JSON Resume
+  *export* remains a possible later addition.

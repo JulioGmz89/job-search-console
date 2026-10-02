@@ -39,16 +39,21 @@ server/
     report-numbers.js  reserve-report-num.mjs, and cleanup after a failed worker
     cvstyle.js         config/cv/style.yml, voice-dna.md, template and sample listings
     covers.js          which report has which cover-letter PDF (data/jsc/covers.json)
+    cvdocs.js          M5: the CV library — payloads in output/, joined to pdf-index, plus a sample
+    cvrender.js        M5: payload + theme + tokens → HTML → PDF, no agent; previews and the gallery
+    browser.js         M5: one warm Chromium for previews (fresh JS-off context per render)
+    ats.js             M5: the ATS guardrail — upstream's verify-ats.mjs + text read back from the PDF
   queue/
     runner.js          the job queue: lanes, exclusive runs, timeouts, hooks, chained follow-ups
     specs.js           the allowlist of run kinds — the browser names a kind, never a command
     agent-specs.js     evaluate / pdf / cover: the specs that spawn a Claude Code session
+    cv-specs.js        cv-render: the deterministic render of one structured CV (M5)
   agents/
     runner.js          the exact `claude -p` command line (CLI-agnostic by construction)
     claude-bin.js      finding the CLI on each platform
     stream-json.js     the CLI's stream-json → a readable log + a structured result
     profile.js         the few facts the runner needs from config/profile.yml
-    prompts/           prompt assembly + the fork's headless overlays (evaluate.md, pdf.md, cover.md)
+    prompts/           prompt assembly + the fork's headless overlays (evaluate, pdf-structured, pdf, cover)
   skills/              M4, the skills gap analysis (PROJECT_PLAN.md §6) — see below
     corpus.js          which postings: scan-history.tsv ∪ the inbox ∪ the tracker/reports, keyed by URL
     fetch.js           one URL → posting text: jds/ capture, the ATS API (upstream's resolveAtsApi), browser-extract.mjs
@@ -62,7 +67,9 @@ server/
     service.js         GET /api/skills: everything joined
 cv/
   theme.js             style tokens → CSS on upstream's templates (pure)
-  render-cv.js         CLI the pdf session runs: apply the style, then upstream's generate-pdf.mjs
+  render-cv.js         CLI: style + generate-pdf.mjs on built HTML (M3), or --document: payload →
+                       build → fact gate → PDF → ATS verdict (M5, what cv-render runs)
+  sample-payload.json  a fictional CV, so the gallery works before you have generated one
 ui/                    React + Vite SPA, plain CSS, hash routing, no router or state library
 ```
 
@@ -76,7 +83,7 @@ spawn a headless Claude Code session:
 | Kind | What it does | Verified by |
 |---|---|---|
 | `evaluate` | `modes/oferta.md` on a job URL: A–G report + tracker row | `reports/NNN-*.md` exists for the number the console reserved |
-| `pdf` | `modes/pdf.md` for a report: tailored CV, built and rendered with your style | a fresh entry for the report in `data/pdf-index.tsv` |
+| `pdf` | `modes/pdf.md` for a report: the tailored CV as structured data (`output/cv-<candidate>-<slug>.json`); chains `cv-render`. With `structured: false`, M3's path where the session renders | a fresh, payload-shaped JSON (classic: a fresh `data/pdf-index.tsv` entry) |
 | `cover` | `modes/cover.md` (slug mode) with your four answers: letter + PDF | `output/cover-<slug>-<NNN>.pdf` exists |
 
 The session is `claude -p` with `--output-format stream-json`, an **allowlist** of tools
@@ -109,6 +116,12 @@ scan; `skills-extract` and `skills-cv` are agent kinds, queued from the Skills p
 | `skills-extract` | up to ten cached postings → `{ skill, category, level }` each | the output JSON names the postings sent; each becomes `data/skills/extractions/<textHash>.json` |
 | `skills-cv` | cv.md + profile.yml → `{ skill, category, depth }` | `data/skills/cv.json`, keyed by cv.md's hash |
 
+M5 adds one deterministic kind, queued from CV Studio or chained after a `pdf` session:
+
+| Kind | What it does | Verified by |
+|---|---|---|
+| `cv-render` | `render-cv.js --document`: payload → `build-cv-html.mjs` in the chosen theme → `verify-cv-facts.mjs` (hard gate) → `generate-pdf.mjs` → ATS check | exit 0 and the PDF on disk; the ATS verdict is saved, a fail is logged loudly but does not fail the run |
+
 **Lanes.** `script` runs go one at a time. `agent` runs may overlap (`JSC_MAX_AGENTS`,
 default 2). An exclusive run waits for silence and blocks everything while it runs.
 
@@ -134,7 +147,9 @@ All under the data root and gitignored:
 
 - `data/jsc/prompts/<run>.md` — the exact system prompt a session was given
 - `data/jsc/logs/<run>.jsonl` — the raw stream-json transcript
-- `data/jsc/tmp/` — payloads the pdf/cover sessions write for upstream's builders
+- `data/jsc/tmp/` — payloads the cover sessions (and M3's pdf sessions) write for upstream's builders
+- `data/jsc/cache/cv/` — built CV HTML by payload/template hash, and the gallery's thumbnails; safe to delete
+- `data/jsc/cv/ats/<pdf>.json` — the ATS verdict recorded when the console rendered that PDF
 - `data/jsc/covers.json` — report → cover-letter PDF
 - `data/jsc/tmp/skills-*.json` — the batch a skills session was given and the JSON it wrote back
 - `data/skills/` — the skills cache: `postings/` (text by normalized URL), `extractions/` (by
@@ -145,6 +160,38 @@ All under the data root and gitignored:
 
 `voice-dna.md` and `writing-samples/` are upstream's own user-layer files; CV Studio
 edits and lists them in place.
+
+## CV Studio: structured CVs, the renderer, the ATS guardrail (M5)
+
+A CV's content and its look are separate (PROJECT_PLAN.md §7c). The **content** is upstream's
+`build-cv-html.mjs` payload — the JSON `modes/pdf.md` step 17 already has the agent write. A
+`pdf` run's session now stops there: it writes `output/cv-<candidate>-<slug>.json`, passes the
+fact gate, and the console renders it. Upstream's interactive sessions leave their payloads in
+the same place, and M3's runs' payloads are copied there from `data/jsc/tmp/` on first use, so
+every past CV with a payload is in the library.
+
+The **render** is deterministic and costs no tokens. `cvrender.js` runs upstream's builder
+(spawned; cached by payload + template hash, so a token change never rebuilds), then repeats
+what `generate-pdf.mjs` does to a CV, with its own exported functions and in its order — the
+console's tokens, profile.yml's section order, `normalizeTextForATS`, profile.yml's `style:`,
+page CSS, inlined fonts. A preview is printed on one warm Chromium into memory (~0.3–0.7 s once
+warm) and touches neither `output/` nor `data/pdf-index.tsv`; a final render (`cv-render`) goes
+through `generate-pdf.mjs`, which owns the manifest and the page budget.
+
+A **theme** is a template file: upstream's `templates/cv-template*.html` or yours in
+`config/cv/templates/`. Upstream's `templates/ats/cv-template.ats.html` cannot currently be
+filled by `build-cv-html.mjs` (its contact row does not match the builder's); the gallery says
+so rather than hiding it.
+
+The **ATS guardrail** (§7d, `ats.js`) runs on every preview, every gallery thumbnail and every
+final render. It merges upstream's structural audit (`verify-ats.mjs`: tables, columns, hidden
+text, images, headings, contact) with a check of the text pdfjs reads back out of the PDF:
+enough real text, the name and email present, every non-empty section's heading present and
+in document order, and the share of the CV's own keywords (competencies, skills) still
+findable. Any critical finding is a `fail`, shown in red in CV Studio and the report's PDF tab
+and logged loudly by the render. Upstream's font and image warnings are kept as advisory
+notes, since the PDF half measures what they estimate.
+`server/services/__fixtures__/themes/broken.html` is a theme built to fail it.
 
 ## The skills gap analysis
 
