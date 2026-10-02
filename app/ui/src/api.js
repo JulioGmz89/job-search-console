@@ -89,3 +89,13 @@ export const fetchSkills = () => get('/api/skills');
 export const startSkillsExtract = (max) => request('POST', '/api/skills/extract', max === undefined ? {} : { max });
 export const startSkillsFetch = (options = {}) => startRun('skills-fetch', options);
 export const setSkillOverride = (id, status) => request('PUT', '/api/skills/overrides', { id, status });
+
+// ── M5: CV Studio's renderer, gallery and guardrail ──────────────────
+
+export const fetchCvDocuments = () => get('/api/cv/documents');
+/** Render a document with the form's (unsaved) style; the PDF is fetched by the returned id. */
+export const renderCvPreview = (documentId, style) => request('POST', '/api/cv/preview', { documentId, style });
+export const cvPreviewUrl = (id) => `/api/cv/preview/${id}.pdf`;
+export const fetchCvThemes = (documentId, style) => request('POST', '/api/cv/themes', { documentId, style });
+export const cvThumbUrl = (key) => `/api/cv/thumbs/${key}.png`;
+export const renderAllCvs = (template) => request('POST', '/api/cv/render-all', { template });

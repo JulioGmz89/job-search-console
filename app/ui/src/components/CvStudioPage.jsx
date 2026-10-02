@@ -1,14 +1,32 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { fetchCvStyle, fetchCvTemplates, fetchVoice, fetchWritingSamples, saveCvStyle, saveVoice } from '../api.js';
+import {
+  cvPreviewUrl,
+  cvThumbUrl,
+  fetchCvDocuments,
+  fetchCvStyle,
+  fetchCvThemes,
+  fetchVoice,
+  fetchWritingSamples,
+  renderAllCvs,
+  renderCvPreview,
+  saveCvStyle,
+  saveVoice,
+} from '../api.js';
+import { useRun } from '../useRun.js';
+import AtsVerdict from './AtsVerdict.jsx';
+import RunPanel from './RunPanel.jsx';
 
 /**
- * CV Studio, phase A (PROJECT_PLAN.md §7a, §7b): the style tokens that shape
- * every PDF the console renders, and the voice rules that shape every letter.
+ * CV Studio (PROJECT_PLAN.md §7): how every CV the console renders looks
+ * (themes and style tokens), how it reads (voice rules), and whether an ATS
+ * can still read it (the guardrail).
  *
- * Nothing here renders a preview — that is M5's deterministic renderer. Both
- * layers take effect on the next PDF or cover letter generated from the
- * console (and voice-dna.md on any manual session in this directory too).
+ * The preview is the M5 core: a CV is kept as structured data (the payload
+ * next to it in output/), so changing a token re-renders it deterministically
+ * on the server in well under a second — no agent, no tokens. Every preview
+ * is a real PDF from the same pipeline a final render uses, and every one is
+ * checked against the ATS guardrail.
  */
 
 const FONT_PAIRS = [
@@ -19,6 +37,8 @@ const FONT_PAIRS = [
   'Calibri, Carlito, sans-serif',
   'Helvetica, Arial, sans-serif',
 ];
+
+const PREVIEW_DEBOUNCE_MS = 300;
 
 function Field({ label, hint, children }) {
   return (
@@ -63,42 +83,185 @@ function SectionOrder({ value, keys, onChange }) {
   );
 }
 
+/** The gallery: every theme, rendered with this CV and these tokens, with its ATS badge. */
+function ThemeGallery({ themes, loading, error, current, onPick, onRefresh }) {
+  return (
+    <section className="theme-gallery">
+      <div className="gallery-head">
+        <h3>Themes</h3>
+        <button type="button" className="chip" onClick={onRefresh} disabled={loading} title="Render every theme again with the tokens in the form">
+          {loading ? 'Rendering…' : 'Refresh with these tokens'}
+        </button>
+      </div>
+      {error ? <div className="notice warn">{error}</div> : null}
+      {!themes && loading ? <p className="muted">Rendering every theme with this CV — a few seconds the first time.</p> : null}
+      <div className="gallery-grid">
+        {(themes ?? []).map((t) => (
+          <button
+            key={t.name}
+            type="button"
+            className={`theme-card${t.name === current ? ' selected' : ''}`}
+            onClick={() => onPick(t.name)}
+            aria-pressed={t.name === current}
+            title={t.error ?? `${t.displayName} (${t.source})`}
+          >
+            {t.thumb ? <img src={cvThumbUrl(t.thumb)} alt="" loading="lazy" /> : <div className="thumb-missing">{t.error ? 'Did not render' : '…'}</div>}
+            <span className="theme-name">
+              {t.displayName}
+              {t.source === 'custom' ? <span className="badge">yours</span> : null}
+            </span>
+            {t.error ? <span className="muted small theme-error">{t.error.replace(/^build-cv-html\.mjs failed: /, 'Cannot be filled from a CV payload: ')}</span> : null}
+            {t.ats ? (
+              <span className={`ats-badge ats-${t.ats.verdict}`}>
+                {t.ats.verdict === 'fail' ? `ATS fail · ${t.ats.critical} critical` : t.ats.verdict === 'warn' ? `ATS ok · ${t.ats.warnings} warning${t.ats.warnings === 1 ? '' : 's'}` : 'ATS pass'}
+              </span>
+            ) : null}
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function CvStudioPage() {
   const [style, setStyle] = useState(null);
   const [form, setForm] = useState(null);
-  const [templates, setTemplates] = useState(null);
+  const [docs, setDocs] = useState(null);
+  const [documentId, setDocumentId] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [previewError, setPreviewError] = useState(null);
+  const [rendering, setRendering] = useState(false);
+  const [themes, setThemes] = useState(null);
+  const [themesLoading, setThemesLoading] = useState(false);
+  const [themesError, setThemesError] = useState(null);
   const [voice, setVoice] = useState(null);
   const [voiceText, setVoiceText] = useState('');
   const [samples, setSamples] = useState(null);
   const [notice, setNotice] = useState(null);
   const [errors, setErrors] = useState([]);
   const [busy, setBusy] = useState(false);
+  // A finished render changes the document's current PDF; the list says which.
+  const render = useRun({ onFinish: () => fetchCvDocuments().then(({ documents }) => setDocs(documents)).catch(() => {}) });
+  const previewSeq = useRef(0);
+  const themesSeq = useRef(0);
 
-  const load = useCallback(() => {
+  useEffect(() => {
     fetchCvStyle().then((s) => { setStyle(s); setForm(s.style); }).catch((e) => setNotice(e.message));
-    fetchCvTemplates().then(setTemplates).catch(() => setTemplates({ templates: [] }));
+    fetchCvDocuments()
+      .then(({ documents }) => {
+        setDocs(documents);
+        // Start on the newest real CV; the sample is there for a fresh install.
+        setDocumentId((current) => current ?? (documents.find((d) => !d.sample) ?? documents[0])?.id ?? null);
+      })
+      .catch((e) => setNotice(e.message));
     fetchVoice().then((v) => { setVoice(v); setVoiceText(v.text); }).catch(() => {});
     fetchWritingSamples().then(setSamples).catch(() => {});
   }, []);
-  useEffect(load, [load]);
+
+  const formKey = useMemo(() => JSON.stringify(form), [form]);
+
+  // Live preview: every change to the document or the form re-renders after a
+  // short pause. A slower, older response never replaces a newer one.
+  useEffect(() => {
+    if (!documentId || !form) return undefined;
+    const seq = ++previewSeq.current;
+    setRendering(true);
+    const timer = setTimeout(() => {
+      renderCvPreview(documentId, form)
+        .then((result) => {
+          if (seq !== previewSeq.current) return;
+          setPreview(result);
+          setPreviewError(null);
+          setErrors([]);
+        })
+        .catch((failure) => {
+          if (seq !== previewSeq.current) return;
+          setPreviewError(failure.message);
+          setErrors(Array.isArray(failure.detail) ? failure.detail : []);
+        })
+        .finally(() => {
+          if (seq === previewSeq.current) setRendering(false);
+        });
+    }, PREVIEW_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+    // formKey stands for form: a new object with the same values must not re-render.
+  }, [documentId, formKey]);
+
+  const loadThemes = useCallback((id, tokens) => {
+    if (!id || !tokens) return;
+    const seq = ++themesSeq.current;
+    setThemesLoading(true);
+    setThemesError(null);
+    fetchCvThemes(id, tokens)
+      .then((result) => { if (seq === themesSeq.current) setThemes(result.themes); })
+      .catch((failure) => { if (seq === themesSeq.current) setThemesError(failure.message); })
+      .finally(() => { if (seq === themesSeq.current) setThemesLoading(false); });
+  }, []);
+
+  // The gallery is heavier (every theme), so it follows the document and the
+  // saved style, and the form only when asked.
+  const savedKey = JSON.stringify(style?.style ?? null);
+  useEffect(() => {
+    if (documentId && style) loadThemes(documentId, style.style);
+    // savedKey stands for style.style, so a save with unchanged values does not re-render every theme.
+  }, [documentId, savedKey, loadThemes]);
 
   if (!style || !form) return <p className="empty">{notice ?? 'Loading…'}</p>;
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value === '' ? null : e.target.value });
   const errorFor = (key) => errors.find((e) => e.key === key)?.message;
+  const dirty = JSON.stringify(form) !== JSON.stringify(style.style);
+  const doc = docs?.find((d) => d.id === documentId) ?? null;
+  const currentTheme = themes?.find((t) => t.name === (form.template ?? 'standard'));
+
+  const persist = async () => {
+    const saved = await saveCvStyle(form);
+    setStyle(saved);
+    setForm(saved.style);
+    return saved;
+  };
 
   const save = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     setBusy(true);
     setNotice(null);
     setErrors([]);
     try {
-      const saved = await saveCvStyle(form);
-      setStyle(saved);
-      setForm(saved.style);
-      setNotice('Style saved. It applies to the next PDF generated from the console.');
+      await persist();
+      setNotice('Style saved. Every CV the console renders from now on uses it.');
     } catch (failure) {
       setErrors(Array.isArray(failure.detail) ? failure.detail : []);
+      setNotice(failure.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // A final render reads the saved style, so unsaved tokens are saved first —
+  // otherwise the PDF would not be the preview the user is looking at.
+  const renderThis = async () => {
+    setBusy(true);
+    setNotice(null);
+    try {
+      if (dirty) await persist();
+      await render.start('cv-render', { documentId, template: form.template ?? 'standard' });
+    } catch (failure) {
+      setNotice(failure.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const renderAll = async () => {
+    const count = docs.filter((d) => d.reportId !== null).length;
+    if (!window.confirm(`Re-render all ${count} CVs that belong to a report in “${form.template ?? 'standard'}”? Each gets a new PDF; the old ones stay in output/.`)) return;
+    setBusy(true);
+    setNotice(null);
+    try {
+      if (dirty) await persist();
+      const { queued, skipped } = await renderAllCvs(form.template ?? 'standard');
+      setNotice(`Queued ${queued.length} render${queued.length === 1 ? '' : 's'}${skipped.length ? ` (${skipped.length} already rendering)` : ''} — follow them on the Runs page.`);
+    } catch (failure) {
       setNotice(failure.message);
     } finally {
       setBusy(false);
@@ -120,8 +283,6 @@ export default function CvStudioPage() {
   };
 
   const warnings = style.profileWarnings ?? {};
-  const upstream = (templates?.templates ?? []).filter((t) => t.source === 'upstream');
-  const custom = (templates?.templates ?? []).filter((t) => t.source === 'custom');
 
   return (
     <div className="cv-studio">
@@ -133,61 +294,114 @@ export default function CvStudioPage() {
           profile.yml’s own values <em>after</em> the console’s, so
           {warnings.style ? <> its <code>style:</code> block wins over the tokens below;</> : null}
           {warnings.cvSections ? <> its <code>cv.sections</code> wins over the section order below;</> : null}
-          {warnings.cvTemplate ? <> its <code>cv.template: {warnings.cvTemplate}</code> is what a manual session uses (the console uses the template chosen here);</> : null}
-          {' '}remove those keys from profile.yml to let CV Studio decide.
+          {warnings.cvTemplate ? <> its <code>cv.template: {warnings.cvTemplate}</code> is what a manual session uses (the console uses the theme chosen here);</> : null}
+          {' '}remove those keys from profile.yml to let CV Studio decide. The preview already shows their effect.
         </div>
       ) : null}
 
-      <form className="entry-form" onSubmit={save}>
-        <h3>Look — style tokens</h3>
-        <p className="intro wide">
-          These land on upstream’s CV templates as CSS variables when a PDF is generated from the console
-          (<code>config/cv/style.yml</code>). Leave a field empty to keep the template’s own default. Every
-          template stays ATS-parseable: real text, standard headings, no images of text.
-        </p>
+      <div className="studio-bar">
+        <label>
+          <span className="field-label">CV</span>
+          <select value={documentId ?? ''} onChange={(e) => setDocumentId(e.target.value)} disabled={!docs?.length}>
+            {(docs ?? []).map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}
+          </select>
+        </label>
+        <span className="muted small">
+          {doc?.sample
+            ? 'A fictional CV, for trying themes before you have generated one.'
+            : doc
+              ? `Structured data: output/${doc.id}.json${doc.pdf ? ` · current PDF ${doc.pdf}` : ' · not rendered yet'}`
+              : 'No CVs yet.'}
+        </span>
+      </div>
 
-        <Field label="Accent colour" hint={errorFor('accent_color') ?? style.fields.accent_color}>
-          <span className="color-row">
-            <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(form.accent_color ?? '') ? form.accent_color : '#1f4e79'} onChange={set('accent_color')} />
-            <input type="text" value={form.accent_color ?? ''} onChange={set('accent_color')} placeholder="template default" />
-          </span>
-        </Field>
-        <Field label="Body font" hint={errorFor('font_family') ?? style.fields.font_family}>
-          <input type="text" list="font-pairs" value={form.font_family ?? ''} onChange={set('font_family')} placeholder="template default" />
-        </Field>
-        <Field label="Heading font" hint={errorFor('heading_font_family') ?? style.fields.heading_font_family}>
-          <input type="text" list="font-pairs" value={form.heading_font_family ?? ''} onChange={set('heading_font_family')} placeholder="same as body" />
-        </Field>
-        <datalist id="font-pairs">{FONT_PAIRS.map((f) => <option key={f} value={f} />)}</datalist>
-        <Field label="Font size" hint={errorFor('font_size') ?? style.fields.font_size}>
-          <input type="text" value={form.font_size ?? ''} onChange={set('font_size')} placeholder="e.g. 10.5pt" />
-        </Field>
-        <Field label="Page margin" hint={errorFor('margin') ?? style.fields.margin}>
-          <input type="text" value={form.margin ?? ''} onChange={set('margin')} placeholder="e.g. 0.6in" />
-        </Field>
-        <Field label="Density" hint={errorFor('density') ?? style.fields.density}>
-          <select value={form.density ?? 'normal'} onChange={set('density')}>
-            {Object.entries(style.densities).map(([k, label]) => <option key={k} value={k}>{label}</option>)}
-          </select>
-        </Field>
-        <Field label="Template" hint={errorFor('template') ?? `${style.fields.template} Drop your own into ${templates?.customDir ?? 'config/cv/templates/'}.`}>
-          <select value={form.template ?? 'standard'} onChange={set('template')}>
-            {custom.length ? <optgroup label="Yours (config/cv/templates/)">{custom.map((t) => <option key={t.name} value={t.name}>{t.displayName}</option>)}</optgroup> : null}
-            <optgroup label="Upstream (templates/)">{upstream.map((t) => <option key={t.name} value={t.name}>{t.displayName} ({t.name})</option>)}</optgroup>
-          </select>
-        </Field>
-        <div className="wide">
-          <span className="field-label">Section order</span>
-          <SectionOrder value={form.sections} keys={style.sectionKeys} onChange={(sections) => setForm({ ...form, sections })} />
-          <small className="hint">{errorFor('sections') ?? style.fields.sections}</small>
+      <div className="studio-grid">
+        <div className="studio-controls">
+          <form className="entry-form" onSubmit={save}>
+            <h3>Look — style tokens</h3>
+            <p className="intro wide">
+              Every change re-renders the preview on the right — no agent, no tokens spent. Leave a field empty to
+              keep the theme’s own default. Saved to <code>config/cv/style.yml</code>.
+            </p>
+
+            <Field label="Accent colour" hint={errorFor('accent_color') ?? style.fields.accent_color}>
+              <span className="color-row">
+                <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(form.accent_color ?? '') ? form.accent_color : '#1f4e79'} onChange={set('accent_color')} />
+                <input type="text" value={form.accent_color ?? ''} onChange={set('accent_color')} placeholder="theme default" />
+              </span>
+            </Field>
+            <Field label="Body font" hint={errorFor('font_family') ?? style.fields.font_family}>
+              <input type="text" list="font-pairs" value={form.font_family ?? ''} onChange={set('font_family')} placeholder="theme default" />
+            </Field>
+            <Field label="Heading font" hint={errorFor('heading_font_family') ?? style.fields.heading_font_family}>
+              <input type="text" list="font-pairs" value={form.heading_font_family ?? ''} onChange={set('heading_font_family')} placeholder="same as body" />
+            </Field>
+            <datalist id="font-pairs">{FONT_PAIRS.map((f) => <option key={f} value={f} />)}</datalist>
+            <Field label="Font size" hint={errorFor('font_size') ?? style.fields.font_size}>
+              <input type="text" value={form.font_size ?? ''} onChange={set('font_size')} placeholder="e.g. 10.5pt" />
+            </Field>
+            <Field label="Page margin" hint={errorFor('margin') ?? style.fields.margin}>
+              <input type="text" value={form.margin ?? ''} onChange={set('margin')} placeholder="e.g. 0.6in" />
+            </Field>
+            <Field label="Density" hint={errorFor('density') ?? style.fields.density}>
+              <select value={form.density ?? 'normal'} onChange={set('density')}>
+                {Object.entries(style.densities).map(([k, label]) => <option key={k} value={k}>{label}</option>)}
+              </select>
+            </Field>
+            <div className="wide">
+              <span className="field-label">Section order</span>
+              <SectionOrder value={form.sections} keys={style.sectionKeys} onChange={(sections) => setForm({ ...form, sections })} />
+              <small className="hint">{errorFor('sections') ?? style.fields.sections}</small>
+            </div>
+
+            <div className="entry-actions">
+              <button type="submit" className="chip primary" disabled={busy || !dirty}>Save as default</button>
+              <button type="button" className="chip" disabled={busy || !dirty} onClick={() => setForm(style.style)}>Revert</button>
+              <span className="muted">{dirty ? 'Unsaved changes — the preview shows them already.' : style.exists ? 'Saved.' : 'Not saved yet — theme defaults apply.'}</span>
+            </div>
+          </form>
+
+          <ThemeGallery
+            themes={themes}
+            loading={themesLoading}
+            error={themesError}
+            current={form.template ?? 'standard'}
+            onPick={(name) => setForm({ ...form, template: name })}
+            onRefresh={() => loadThemes(documentId, form)}
+          />
+          <p className="muted small">
+            Your own themes: drop an HTML template into <code>config/cv/templates/</code> (see the README there) and
+            refresh. Each one is checked against the ATS guardrail like upstream’s.
+          </p>
         </div>
 
-        <div className="entry-actions">
-          <button type="submit" className="chip primary" disabled={busy}>Save style</button>
-          <button type="button" className="chip" disabled={busy} onClick={() => setForm(style.style)}>Revert</button>
-          <span className="muted">{style.exists ? style.path : 'Not saved yet — template defaults apply'}</span>
+        <div className="studio-preview">
+          <div className="preview-head">
+            <strong>{currentTheme?.displayName ?? form.template ?? 'standard'}</strong>
+            <span className="muted small">
+              {rendering ? 'Rendering…' : preview ? `Rendered in ${preview.ms} ms · no agent call${preview.cached ? '' : ' · HTML rebuilt'}` : ''}
+            </span>
+          </div>
+          {previewError ? <div className="notice warn">Preview failed: {previewError}</div> : null}
+          {preview ? <AtsVerdict ats={preview.ats} custom={preview.template.source === 'custom'} /> : null}
+          <div className="preview-actions">
+            <button type="button" className="chip primary" disabled={busy || !doc || doc.sample || render.run?.status === 'running'} onClick={renderThis}
+              title={doc?.sample ? 'The sample is for previews only' : 'Render this CV to a PDF in output/ with this theme and these tokens'}>
+              {dirty ? 'Save & render this CV' : 'Render this CV'}
+            </button>
+            <button type="button" className="chip" disabled={busy || !docs?.some((d) => d.reportId !== null)} onClick={renderAll}
+              title="Re-render every CV that belongs to a report in this theme">
+              Re-render all in this theme
+            </button>
+          </div>
+          <RunPanel run={render.run} lines={render.lines} progress={render.progress} error={render.error} onCancel={render.cancel} onDismiss={render.reset} />
+          {preview ? (
+            <iframe className={`pdf-frame preview-frame${rendering ? ' stale' : ''}`} src={`${cvPreviewUrl(preview.id)}#view=FitH`} title="CV preview" />
+          ) : (
+            <div className="pdf-frame preview-frame placeholder">{docs?.length === 0 ? 'No CV to preview.' : 'Rendering the first preview…'}</div>
+          )}
         </div>
-      </form>
+      </div>
 
       <section className="entry-form voice">
         <h3>Voice — writing rules</h3>
@@ -232,36 +446,38 @@ export default function CvStudioPage() {
       </section>
 
       <details className="help">
-        <summary>Tokens vs. voice — what each changes</summary>
+        <summary>Content, look, voice and the ATS check — what each changes</summary>
         <dl>
           <div>
-            <dt>Style tokens (this page, top)</dt>
+            <dt>Content (structured data)</dt>
             <dd>
-              How the PDF looks: colour, fonts, size, margin, density, template, section order. Applied by the
-              console’s render step (<code>app/cv/render-cv.js</code>) on top of upstream’s templates; the templates
-              and upstream’s renderer are never edited. Affects only PDFs generated from the console.
+              A PDF run’s Claude session tailors your CV to the job and writes it as data —{' '}
+              <code>output/cv-…json</code>, upstream’s <code>build-cv-html.mjs</code> payload — and stops. Facts come
+              only from <code>cv.md</code>, <code>article-digest.md</code> and <code>config/profile.yml</code>; the
+              fact gate (<code>verify-cv-facts.mjs</code>) runs before every render.
             </dd>
           </div>
           <div>
-            <dt>Voice rules (this page, bottom)</dt>
+            <dt>Look (theme + tokens, this page)</dt>
             <dd>
-              How the text reads. Upstream’s <code>voice-dna.md</code>, applied by the pdf, cover and email modes
-              in any session, console or terminal.
+              The console renders that data itself: theme, then tokens, then upstream’s renderer. Because it is
+              deterministic, the preview costs nothing, and any past CV can be re-rendered in a new theme.
             </dd>
           </div>
           <div>
-            <dt>Content</dt>
+            <dt>Voice (this page, bottom)</dt>
+            <dd>How the text reads. Upstream’s <code>voice-dna.md</code>, applied by the pdf, cover and email modes in any session.</dd>
+          </div>
+          <div>
+            <dt>ATS check</dt>
             <dd>
-              Always from <code>cv.md</code>, <code>article-digest.md</code> and <code>config/profile.yml</code>.
-              Neither layer here can add a fact; the fact gate (<code>verify-cv-facts.mjs</code>) runs before
-              every render.
+              Every preview and every render is read back the way an applicant-tracking system reads it: the text is
+              extracted from the PDF and checked for your name and email, every section heading in order, and your
+              keywords — plus upstream’s structural audit (tables, columns, hidden text, images). A theme that fails it
+              gets a red warning here and in the render log.
             </dd>
           </div>
         </dl>
-        <p className="muted">
-          Live preview without an agent call, a theme gallery and the ATS check arrive with CV Studio’s next
-          phase (PROJECT_PLAN.md §7c–7d, M5).
-        </p>
       </details>
     </div>
   );

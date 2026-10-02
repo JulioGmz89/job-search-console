@@ -11,6 +11,7 @@
 import { useEffect, useState } from 'react';
 
 import { coverUrl, pdfUrl } from '../api.js';
+import AtsVerdict from './AtsVerdict.jsx';
 import { runsForReport, useRuns } from '../runs.jsx';
 import { outcome } from './RunPanel.jsx';
 import RowActions from './RowActions.jsx';
@@ -94,7 +95,11 @@ export default function ReportDetail({ report, error, onRunStarted, onCoverReque
       </div>
 
       {tab === 'pdf' && hasPdf ? (
-        <iframe className="pdf-frame" src={pdfUrl(report.id)} title={`CV for report ${report.id}`} />
+        <>
+          {/* The ATS verdict recorded when the console rendered this PDF (M5); older PDFs have none. */}
+          <AtsVerdict ats={report.ats} compact />
+          <iframe className="pdf-frame" src={pdfUrl(report.id)} title={`CV for report ${report.id}`} />
+        </>
       ) : tab === 'cover' && hasCover ? (
         <iframe className="pdf-frame" src={coverUrl(report.id)} title={`Cover letter for report ${report.id}`} />
       ) : (
