@@ -77,7 +77,10 @@ setup, and you can always drop back into a terminal in the same directory.
 | **M3** ✅ | Agent orchestration: evaluate / generate PDF / cover letter with live logs, a run queue, live refresh, and CV Studio phase A (style tokens + voice rules) |
 | **M4** | Skills Gap: extraction, aggregation, and "what should I learn next?" |
 | **M5** | CV Studio: structured CV data, themes, live preview, ATS guardrail |
-| **M6** | Polish and release: onboarding, docs, v1.0 |
+| **M6** | UX evaluation baseline: capability inventory, personas, heuristic, persona and accessibility audits |
+| **M7** | Information architecture and design direction: navigation, design system, validated prototypes |
+| **M8** | UX implementation and validation: onboarding, Profile page, in-app guidance, re-measured against the baseline |
+| **M9** | Polish and release: settings, docs, screenshots, v1.0 |
 
 ## Requirements
 
