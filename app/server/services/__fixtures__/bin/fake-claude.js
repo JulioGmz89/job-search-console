@@ -309,7 +309,16 @@ switch (scenario) {
   }
   case 'cover-ok': {
     const cover = grab(/exactly \*\*`(output\/cover-[^`]+\.pdf)`\*\*/);
-    write(cover, '%PDF-1.4 fake cover');
+    if (process.env.FAKE_CLAUDE_MARKET) {
+      // The UX sandbox shows the letter in a PDF viewer, so it must be a real
+      // PDF: one of the seed's rendered letters stands in for the new one.
+      const seedLetter = new URL('../../../../ux/sandbox/seeds/populated/output/cover-alex-rivera-cobaltfreight-2026-08-13.pdf', import.meta.url);
+      const path = join(root, cover);
+      mkdirSync(dirname(path), { recursive: true });
+      writeFileSync(path, readFileSync(seedLetter));
+    } else {
+      write(cover, '%PDF-1.4 fake cover');
+    }
     finish({ text: `Cover letter at ${cover}` });
     break;
   }
