@@ -78,4 +78,4 @@ Your goal, in your own words:
 
 ${goal}
 
-Follow your instructions: start by navigating to the URL above, work only from what the screen shows, and write your transcript and screenshots under app/ux/runs/${runId}/. When you finish, end your transcript's Steps with what you would tell a friend about the result (your answer to the goal, if it asks you to tell something).`);
+Follow your instructions: start by navigating to the URL above, work only from what the screen shows, save your screenshots under app/ux/runs/${runId}/, and return your complete transcript as your final reply. End the transcript's Steps with what you would tell a friend about the result (your answer to the goal, if it asks you to tell something).`);
