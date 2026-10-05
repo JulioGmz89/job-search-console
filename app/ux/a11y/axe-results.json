@@ -1,0 +1,1726 @@
+[
+  {
+    "key": "populated/pipeline/light/100",
+    "state": "populated",
+    "view": "pipeline",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-pipeline-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 13,
+        "targets": [
+          "nav > button:nth-child(2)",
+          "nav > button:nth-child(3)",
+          "nav > button:nth-child(4)",
+          "nav > button:nth-child(5)",
+          ".compact > summary",
+          ".sortable[aria-sort=\"none\"]:nth-child(2)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/report-detail/light/100",
+    "state": "populated",
+    "view": "report-detail",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-report-detail-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 27,
+        "targets": [
+          "nav > .chip:nth-child(2)",
+          "nav > .chip:nth-child(3)",
+          "nav > .chip:nth-child(4)",
+          "nav > .chip:nth-child(5)",
+          ".compact > summary",
+          ".sortable[aria-sort=\"none\"]:nth-child(2)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/report-pdf-tab/light/100",
+    "state": "populated",
+    "view": "report-pdf-tab",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-report-pdf-tab-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 20,
+        "targets": [
+          "nav > .chip:nth-child(2)",
+          "nav > .chip:nth-child(3)",
+          "nav > .chip:nth-child(4)",
+          "nav > .chip:nth-child(5)",
+          ".add-job > details > summary",
+          ".sortable[aria-sort=\"none\"]:nth-child(2)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/cover-dialog/light/100",
+    "state": "populated",
+    "view": "cover-dialog",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-cover-dialog-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 27,
+        "targets": [
+          "nav > .chip:nth-child(2)",
+          "nav > .chip:nth-child(3)",
+          "nav > .chip:nth-child(4)",
+          "nav > .chip:nth-child(5)",
+          ".compact > summary",
+          ".sortable[aria-sort=\"none\"]:nth-child(2)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/sources/light/100",
+    "state": "populated",
+    "view": "sources",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-sources-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 10,
+        "targets": [
+          "nav > button:nth-child(1)",
+          "button:nth-child(3)",
+          "nav > button:nth-child(4)",
+          "nav > button:nth-child(5)",
+          ".compact > summary",
+          "th:nth-child(1)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/sources-add-form/light/100",
+    "state": "populated",
+    "view": "sources-add-form",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-sources-add-form-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 9,
+        "targets": [
+          "nav > button:nth-child(1)",
+          "button:nth-child(3)",
+          "nav > button:nth-child(4)",
+          "nav > button:nth-child(5)",
+          ".compact > summary",
+          "th:nth-child(1)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/skills/light/100",
+    "state": "populated",
+    "view": "skills",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-skills-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 28,
+        "targets": [
+          "nav > .chip:nth-child(1)",
+          "nav > .chip:nth-child(2)",
+          ".chip:nth-child(4)",
+          ".chip:nth-child(5)",
+          "summary",
+          "th:nth-child(1)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/skills-expanded/light/100",
+    "state": "populated",
+    "view": "skills-expanded",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-skills-expanded-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 136,
+        "targets": [
+          "nav > .chip:nth-child(1)",
+          "nav > .chip:nth-child(2)",
+          "nav > .chip:nth-child(4)",
+          "nav > .chip:nth-child(5)",
+          "summary",
+          "th:nth-child(1)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/runs/light/100",
+    "state": "populated",
+    "view": "runs",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-runs-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 4,
+        "targets": [
+          "button:nth-child(1)",
+          "button:nth-child(2)",
+          "button:nth-child(3)",
+          "button:nth-child(5)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/cv-studio/light/100",
+    "state": "populated",
+    "view": "cv-studio",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-cv-studio-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 5,
+        "targets": [
+          "nav > button:nth-child(1)",
+          "nav > button:nth-child(2)",
+          "nav > button:nth-child(3)",
+          "nav > button:nth-child(4)",
+          ".pdf-frame"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "id": "select-name",
+        "impact": "critical",
+        "help": "Select element must have an accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".section-order > select"
+        ],
+        "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+    ]
+  },
+  {
+    "key": "populated/pipeline/light/200",
+    "state": "populated",
+    "view": "pipeline",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-pipeline-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 13,
+        "targets": [
+          "nav > button:nth-child(2)",
+          "nav > button:nth-child(3)",
+          "nav > button:nth-child(4)",
+          "nav > button:nth-child(5)",
+          ".compact > summary",
+          ".sortable[aria-sort=\"none\"]:nth-child(2)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/report-detail/light/200",
+    "state": "populated",
+    "view": "report-detail",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-report-detail-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 27,
+        "targets": [
+          "nav > .chip:nth-child(2)",
+          "nav > .chip:nth-child(3)",
+          "nav > .chip:nth-child(4)",
+          "nav > .chip:nth-child(5)",
+          ".compact > summary",
+          ".sortable[aria-sort=\"none\"]:nth-child(2)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/report-pdf-tab/light/200",
+    "state": "populated",
+    "view": "report-pdf-tab",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-report-pdf-tab-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 20,
+        "targets": [
+          "nav > .chip:nth-child(2)",
+          "nav > .chip:nth-child(3)",
+          "nav > .chip:nth-child(4)",
+          "nav > .chip:nth-child(5)",
+          ".add-job > details > summary",
+          ".sortable[aria-sort=\"none\"]:nth-child(2)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/cover-dialog/light/200",
+    "state": "populated",
+    "view": "cover-dialog",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-cover-dialog-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 27,
+        "targets": [
+          "nav > .chip:nth-child(2)",
+          "nav > .chip:nth-child(3)",
+          "nav > .chip:nth-child(4)",
+          "nav > .chip:nth-child(5)",
+          ".compact > summary",
+          ".sortable[aria-sort=\"none\"]:nth-child(2)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/sources/light/200",
+    "state": "populated",
+    "view": "sources",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-sources-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 9,
+        "targets": [
+          "nav > button:nth-child(1)",
+          "button:nth-child(3)",
+          "nav > button:nth-child(4)",
+          "nav > button:nth-child(5)",
+          ".compact > summary",
+          "th:nth-child(1)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/sources-add-form/light/200",
+    "state": "populated",
+    "view": "sources-add-form",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-sources-add-form-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 9,
+        "targets": [
+          "nav > button:nth-child(1)",
+          "button:nth-child(3)",
+          "nav > button:nth-child(4)",
+          "nav > button:nth-child(5)",
+          ".compact > summary",
+          "th:nth-child(1)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/skills/light/200",
+    "state": "populated",
+    "view": "skills",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-skills-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 28,
+        "targets": [
+          "nav > .chip:nth-child(1)",
+          "nav > .chip:nth-child(2)",
+          ".chip:nth-child(4)",
+          ".chip:nth-child(5)",
+          "summary",
+          "th:nth-child(1)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/skills-expanded/light/200",
+    "state": "populated",
+    "view": "skills-expanded",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-skills-expanded-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 136,
+        "targets": [
+          "nav > .chip:nth-child(1)",
+          "nav > .chip:nth-child(2)",
+          "nav > .chip:nth-child(4)",
+          "nav > .chip:nth-child(5)",
+          "summary",
+          "th:nth-child(1)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/runs/light/200",
+    "state": "populated",
+    "view": "runs",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-runs-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 4,
+        "targets": [
+          "button:nth-child(1)",
+          "button:nth-child(2)",
+          "button:nth-child(3)",
+          "button:nth-child(5)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/cv-studio/light/200",
+    "state": "populated",
+    "view": "cv-studio",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-cv-studio-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 5,
+        "targets": [
+          "nav > .chip:nth-child(1)",
+          "nav > .chip:nth-child(2)",
+          "nav > .chip:nth-child(3)",
+          "nav > .chip:nth-child(4)",
+          ".pdf-frame"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "id": "select-name",
+        "impact": "critical",
+        "help": "Select element must have an accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".section-order > select"
+        ],
+        "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+    ]
+  },
+  {
+    "key": "populated/pipeline/dark/100",
+    "state": "populated",
+    "view": "pipeline",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-pipeline-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          "button:nth-child(1) > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.45 (foreground color: #73716f, background color: #f5f5f4, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/report-detail/dark/100",
+    "state": "populated",
+    "view": "report-detail",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-report-detail-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".chip:nth-child(1) > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.45 (foreground color: #73716f, background color: #f5f5f4, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/report-pdf-tab/dark/100",
+    "state": "populated",
+    "view": "report-pdf-tab",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-report-pdf-tab-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".chip:nth-child(1) > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.45 (foreground color: #73716f, background color: #f5f5f4, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/cover-dialog/dark/100",
+    "state": "populated",
+    "view": "cover-dialog",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-cover-dialog-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".chip:nth-child(1) > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.45 (foreground color: #73716f, background color: #f5f5f4, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/sources/dark/100",
+    "state": "populated",
+    "view": "sources",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-sources-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".primary"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/sources-add-form/dark/100",
+    "state": "populated",
+    "view": "sources-add-form",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-sources-add-form-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 2,
+        "targets": [
+          ".toolbar > .primary",
+          "button[type=\"submit\"]"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/skills/dark/100",
+    "state": "populated",
+    "view": "skills",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-skills-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 3,
+        "targets": [
+          ".primary.chip:nth-child(1)",
+          ".primary.chip:nth-child(3)",
+          "button[title=\"In demand, not on your CV\"] > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/skills-expanded/dark/100",
+    "state": "populated",
+    "view": "skills-expanded",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-skills-expanded-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 3,
+        "targets": [
+          ".primary.chip:nth-child(1)",
+          ".primary.chip:nth-child(3)",
+          "button[title=\"In demand, not on your CV\"] > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/runs/dark/100",
+    "state": "populated",
+    "view": "runs",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-runs-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/cv-studio/dark/100",
+    "state": "populated",
+    "view": "cv-studio",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-cv-studio-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 2,
+        "targets": [
+          ".preview-actions > .primary.chip[type=\"button\"]",
+          ".entry-actions > .primary.chip[type=\"button\"]"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "id": "select-name",
+        "impact": "critical",
+        "help": "Select element must have an accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".section-order > select"
+        ],
+        "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+    ]
+  },
+  {
+    "key": "populated/pipeline/dark/200",
+    "state": "populated",
+    "view": "pipeline",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-pipeline-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          "button:nth-child(1) > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.45 (foreground color: #73716f, background color: #f5f5f4, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/report-detail/dark/200",
+    "state": "populated",
+    "view": "report-detail",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-report-detail-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".chip:nth-child(1) > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.45 (foreground color: #73716f, background color: #f5f5f4, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/report-pdf-tab/dark/200",
+    "state": "populated",
+    "view": "report-pdf-tab",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-report-pdf-tab-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".chip:nth-child(1) > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.45 (foreground color: #73716f, background color: #f5f5f4, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/cover-dialog/dark/200",
+    "state": "populated",
+    "view": "cover-dialog",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-cover-dialog-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".chip:nth-child(1) > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.45 (foreground color: #73716f, background color: #f5f5f4, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/sources/dark/200",
+    "state": "populated",
+    "view": "sources",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-sources-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".primary"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/sources-add-form/dark/200",
+    "state": "populated",
+    "view": "sources-add-form",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-sources-add-form-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 2,
+        "targets": [
+          ".toolbar > .primary",
+          "button[type=\"submit\"]"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/skills/dark/200",
+    "state": "populated",
+    "view": "skills",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-skills-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 3,
+        "targets": [
+          ".primary.chip:nth-child(1)",
+          ".primary.chip:nth-child(3)",
+          "button[title=\"In demand, not on your CV\"] > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/skills-expanded/dark/200",
+    "state": "populated",
+    "view": "skills-expanded",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-skills-expanded-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 3,
+        "targets": [
+          ".primary.chip:nth-child(1)",
+          ".primary.chip:nth-child(3)",
+          "button[title=\"In demand, not on your CV\"] > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "populated/runs/dark/200",
+    "state": "populated",
+    "view": "runs",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-runs-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/cv-studio/dark/200",
+    "state": "populated",
+    "view": "cv-studio",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-cv-studio-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 2,
+        "targets": [
+          ".preview-actions > .primary.chip[type=\"button\"]",
+          ".entry-actions > .primary.chip[type=\"button\"]"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "id": "select-name",
+        "impact": "critical",
+        "help": "Select element must have an accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".section-order > select"
+        ],
+        "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+    ]
+  },
+  {
+    "key": "empty/pipeline/light/100",
+    "state": "empty",
+    "view": "pipeline",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-pipeline-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 5,
+        "targets": [
+          "nav > button:nth-child(2)",
+          "nav > button:nth-child(3)",
+          "nav > button:nth-child(4)",
+          "nav > button:nth-child(5)",
+          ".compact > summary"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "empty/sources/light/100",
+    "state": "empty",
+    "view": "sources",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-sources-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 5,
+        "targets": [
+          "nav > button:nth-child(1)",
+          "button:nth-child(3)",
+          "button:nth-child(4)",
+          "button:nth-child(5)",
+          ".compact > summary"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "empty/skills/light/100",
+    "state": "empty",
+    "view": "skills",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-skills-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 5,
+        "targets": [
+          "nav > button:nth-child(1)",
+          "nav > button:nth-child(2)",
+          "button:nth-child(4)",
+          "button:nth-child(5)",
+          "summary"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "empty/runs/light/100",
+    "state": "empty",
+    "view": "runs",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-runs-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 4,
+        "targets": [
+          "button:nth-child(1)",
+          "button:nth-child(2)",
+          "button:nth-child(3)",
+          "button:nth-child(5)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "empty/cv-studio/light/100",
+    "state": "empty",
+    "view": "cv-studio",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-cv-studio-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 5,
+        "targets": [
+          "nav > button:nth-child(1)",
+          "nav > button:nth-child(2)",
+          "button:nth-child(3)",
+          "button:nth-child(4)",
+          ".pdf-frame"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "id": "select-name",
+        "impact": "critical",
+        "help": "Select element must have an accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".section-order > select"
+        ],
+        "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+    ]
+  },
+  {
+    "key": "empty/pipeline/light/200",
+    "state": "empty",
+    "view": "pipeline",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-pipeline-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 5,
+        "targets": [
+          "nav > button:nth-child(2)",
+          "nav > button:nth-child(3)",
+          "nav > button:nth-child(4)",
+          "nav > button:nth-child(5)",
+          ".compact > summary"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "empty/sources/light/200",
+    "state": "empty",
+    "view": "sources",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-sources-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 5,
+        "targets": [
+          "nav > button:nth-child(1)",
+          "button:nth-child(3)",
+          "button:nth-child(4)",
+          "button:nth-child(5)",
+          ".compact > summary"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "empty/skills/light/200",
+    "state": "empty",
+    "view": "skills",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-skills-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 5,
+        "targets": [
+          "nav > button:nth-child(1)",
+          "nav > button:nth-child(2)",
+          "button:nth-child(4)",
+          "button:nth-child(5)",
+          "summary"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "empty/runs/light/200",
+    "state": "empty",
+    "view": "runs",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-runs-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 4,
+        "targets": [
+          "button:nth-child(1)",
+          "button:nth-child(2)",
+          "button:nth-child(3)",
+          "button:nth-child(5)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "empty/cv-studio/light/200",
+    "state": "empty",
+    "view": "cv-studio",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-cv-studio-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 5,
+        "targets": [
+          "nav > button:nth-child(1)",
+          "nav > button:nth-child(2)",
+          "button:nth-child(3)",
+          "button:nth-child(4)",
+          ".pdf-frame"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "id": "select-name",
+        "impact": "critical",
+        "help": "Select element must have an accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".section-order > select"
+        ],
+        "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+    ]
+  },
+  {
+    "key": "empty/pipeline/dark/100",
+    "state": "empty",
+    "view": "pipeline",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-pipeline-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/sources/dark/100",
+    "state": "empty",
+    "view": "sources",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-sources-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".primary"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "empty/skills/dark/100",
+    "state": "empty",
+    "view": "skills",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-skills-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".primary:nth-child(1)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "empty/runs/dark/100",
+    "state": "empty",
+    "view": "runs",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-runs-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/cv-studio/dark/100",
+    "state": "empty",
+    "view": "cv-studio",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-cv-studio-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".entry-actions > .primary.chip[type=\"button\"]"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "id": "select-name",
+        "impact": "critical",
+        "help": "Select element must have an accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".section-order > select"
+        ],
+        "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+    ]
+  },
+  {
+    "key": "empty/pipeline/dark/200",
+    "state": "empty",
+    "view": "pipeline",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-pipeline-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/sources/dark/200",
+    "state": "empty",
+    "view": "sources",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-sources-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".primary"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "empty/skills/dark/200",
+    "state": "empty",
+    "view": "skills",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-skills-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".primary:nth-child(1)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "empty/runs/dark/200",
+    "state": "empty",
+    "view": "runs",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-runs-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/cv-studio/dark/200",
+    "state": "empty",
+    "view": "cv-studio",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-cv-studio-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".entry-actions > .primary.chip[type=\"button\"]"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #ffffff, background color: #fbbf24, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "id": "select-name",
+        "impact": "critical",
+        "help": "Select element must have an accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".section-order > select"
+        ],
+        "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+    ]
+  },
+  {
+    "key": "broken/pipeline-issues/light/100",
+    "state": "broken",
+    "view": "pipeline-issues",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/broken-pipeline-issues-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 13,
+        "targets": [
+          "nav > button:nth-child(2)",
+          "nav > button:nth-child(3)",
+          "nav > button:nth-child(4)",
+          "nav > button:nth-child(5)",
+          ".compact > summary",
+          ".sortable[aria-sort=\"none\"]:nth-child(2)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "broken/runs-failed/light/100",
+    "state": "broken",
+    "view": "runs-failed",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/broken-runs-failed-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 13,
+        "targets": [
+          "button:nth-child(1)",
+          "button:nth-child(2)",
+          "button:nth-child(3)",
+          "nav > button:nth-child(5)",
+          "th:nth-child(1)",
+          "th:nth-child(2)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "broken/cv-studio-ats-fail/light/100",
+    "state": "broken",
+    "view": "cv-studio-ats-fail",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/broken-cv-studio-ats-fail-light-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 5,
+        "targets": [
+          "nav > button:nth-child(1)",
+          "nav > button:nth-child(2)",
+          "nav > button:nth-child(3)",
+          "nav > button:nth-child(4)",
+          ".pdf-frame"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "id": "select-name",
+        "impact": "critical",
+        "help": "Select element must have an accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".section-order > select"
+        ],
+        "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+    ]
+  },
+  {
+    "key": "broken/pipeline-issues/light/200",
+    "state": "broken",
+    "view": "pipeline-issues",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/broken-pipeline-issues-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 13,
+        "targets": [
+          "nav > button:nth-child(2)",
+          "nav > button:nth-child(3)",
+          "nav > button:nth-child(4)",
+          "nav > button:nth-child(5)",
+          ".compact > summary",
+          ".sortable[aria-sort=\"none\"]:nth-child(2)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "broken/runs-failed/light/200",
+    "state": "broken",
+    "view": "runs-failed",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/broken-runs-failed-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 13,
+        "targets": [
+          "button:nth-child(1)",
+          "button:nth-child(2)",
+          "button:nth-child(3)",
+          "nav > button:nth-child(5)",
+          "th:nth-child(1)",
+          "th:nth-child(2)"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "broken/cv-studio-ats-fail/light/200",
+    "state": "broken",
+    "view": "cv-studio-ats-fail",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/broken-cv-studio-ats-fail-light-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 5,
+        "targets": [
+          "nav > button:nth-child(1)",
+          "nav > button:nth-child(2)",
+          "nav > button:nth-child(3)",
+          "nav > button:nth-child(4)",
+          ".pdf-frame"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.29 (foreground color: #78716c, background color: #f4f2f0, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "id": "select-name",
+        "impact": "critical",
+        "help": "Select element must have an accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".section-order > select"
+        ],
+        "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+    ]
+  },
+  {
+    "key": "broken/pipeline-issues/dark/100",
+    "state": "broken",
+    "view": "pipeline-issues",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/broken-pipeline-issues-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          "button:nth-child(1) > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.45 (foreground color: #73716f, background color: #f5f5f4, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "broken/runs-failed/dark/100",
+    "state": "broken",
+    "view": "runs-failed",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/broken-runs-failed-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "broken/cv-studio-ats-fail/dark/100",
+    "state": "broken",
+    "view": "cv-studio-ats-fail",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/broken-cv-studio-ats-fail-dark-100.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 3,
+        "targets": [
+          ".ats-fail",
+          ".preview-actions > .primary.chip[type=\"button\"]",
+          ".entry-actions > .primary.chip[type=\"button\"]"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.69 (foreground color: #ffffff, background color: #fb7185, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "id": "select-name",
+        "impact": "critical",
+        "help": "Select element must have an accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".section-order > select"
+        ],
+        "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+    ]
+  },
+  {
+    "key": "broken/pipeline-issues/dark/200",
+    "state": "broken",
+    "view": "pipeline-issues",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/broken-pipeline-issues-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 1,
+        "targets": [
+          "button:nth-child(1) > .n"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.45 (foreground color: #73716f, background color: #f5f5f4, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "key": "broken/runs-failed/dark/200",
+    "state": "broken",
+    "view": "runs-failed",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/broken-runs-failed-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "broken/cv-studio-ats-fail/dark/200",
+    "state": "broken",
+    "view": "cv-studio-ats-fail",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/broken-cv-studio-ats-fail-dark-200.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+        "nodes": 3,
+        "targets": [
+          ".ats-fail",
+          ".preview-actions > .primary.chip[type=\"button\"]",
+          ".entry-actions > .primary.chip[type=\"button\"]"
+        ],
+        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.69 (foreground color: #ffffff, background color: #fb7185, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "id": "select-name",
+        "impact": "critical",
+        "help": "Select element must have an accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/select-name?application=playwright",
+        "nodes": 1,
+        "targets": [
+          ".section-order > select"
+        ],
+        "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+    ]
+  }
+]
