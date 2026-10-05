@@ -1,0 +1,10 @@
+{
+  "id": "b60c03a4e904ad3cbf851391b2224a33f266eae2",
+  "url": "https://job-boards.greenhouse.io/harborlearning/jobs/4125254",
+  "fetchedAt": "2026-09-25T15:56:00.000Z",
+  "source": "greenhouse-api",
+  "title": "Infrastructure Engineer",
+  "text": "About Harbor Learning\nHarbor Learning builds a tutoring platform used by 4,000 schools. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.\nThe role\nAs a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.\nWhat you will need\n- 3+ years of hands-on experience with AWS\n- 4+ years of hands-on experience with Kubernetes\n- 5+ years of hands-on experience with Rust\n- 2+ years of hands-on experience with GCP\n- Clear written communication; we decide things in documents\nNice to have\n- Exposure to Docker\n- Exposure to TypeScript\n- Exposure to Redis\nBenefits\nCompetitive salary and equity, a learning budget, and four weeks of vacation that people actually take.",
+  "textHash": "84b4cdff1a296ddae11fa7b2bac6e9efa9137d74",
+  "error": null
+}

@@ -1,0 +1,58 @@
+{
+  "textHash": "bf2e25fa07efcef3b5908cdeb5b70be8fb5fd729",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:23:00.000Z",
+  "skills": [
+    {
+      "skill": "Go",
+      "canonical": "Go",
+      "id": "go",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "GraphQL",
+      "canonical": "GraphQL",
+      "id": "graphql",
+      "category": "framework",
+      "level": "required"
+    },
+    {
+      "skill": "Kotlin",
+      "canonical": "Kotlin",
+      "id": "kotlin",
+      "category": "language",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Observability",
+      "canonical": "Observability",
+      "id": "observability",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "PostgreSQL",
+      "canonical": "PostgreSQL",
+      "id": "postgresql",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "Python",
+      "canonical": "Python",
+      "id": "python",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "Terraform",
+      "canonical": "Terraform",
+      "id": "terraform",
+      "category": "cloud-infra",
+      "level": "required"
+    }
+  ]
+}

@@ -1,0 +1,1113 @@
+{
+ "brightwaterhealth": {
+  "name": "Brightwater Health",
+  "jobs": [
+   {
+    "id": 4100044,
+    "internal_job_id": 3100044,
+    "title": "Full Stack Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/brightwaterhealth/jobs/4100044",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-08-10T09:00:00-05:00",
+    "first_published": "2026-08-10T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Brightwater Health&lt;/h2&gt;\n&lt;p&gt;Brightwater Health builds the scheduling and records platform behind 300 community clinics. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Full Stack Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Elasticsearch&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with CI/CD&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Go&lt;/li&gt;\n&lt;li&gt;Exposure to gRPC&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4100429,
+    "internal_job_id": 3100429,
+    "title": "Backend Engineer (Go)",
+    "absolute_url": "https://job-boards.greenhouse.io/brightwaterhealth/jobs/4100429",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-08-16T09:00:00-05:00",
+    "first_published": "2026-08-16T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Brightwater Health&lt;/h2&gt;\n&lt;p&gt;Brightwater Health builds the scheduling and records platform behind 300 community clinics. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kotlin&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to TypeScript&lt;/li&gt;\n&lt;li&gt;Exposure to CI/CD&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4100983,
+    "internal_job_id": 3100983,
+    "title": "Data Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/brightwaterhealth/jobs/4100983",
+    "location": {
+     "name": "Remote (US) · EST overlap"
+    },
+    "updated_at": "2026-08-23T09:00:00-05:00",
+    "first_published": "2026-08-23T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Brightwater Health&lt;/h2&gt;\n&lt;p&gt;Brightwater Health builds the scheduling and records platform behind 300 community clinics. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Data Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with GraphQL&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Distributed Systems&lt;/li&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;li&gt;Exposure to PostgreSQL&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4101307,
+    "internal_job_id": 3101307,
+    "title": "Infrastructure Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/brightwaterhealth/jobs/4101307",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-08-30T09:00:00-05:00",
+    "first_published": "2026-08-30T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Brightwater Health&lt;/h2&gt;\n&lt;p&gt;Brightwater Health builds the scheduling and records platform behind 300 community clinics. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with GCP&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to PostgreSQL&lt;/li&gt;\n&lt;li&gt;Exposure to GraphQL&lt;/li&gt;\n&lt;li&gt;Exposure to OpenTelemetry&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4101707,
+    "internal_job_id": 3101707,
+    "title": "Data Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/brightwaterhealth/jobs/4101707",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-06T09:00:00-05:00",
+    "first_published": "2026-09-06T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Brightwater Health&lt;/h2&gt;\n&lt;p&gt;Brightwater Health builds the scheduling and records platform behind 300 community clinics. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Data Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with CI/CD&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with OpenTelemetry&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kotlin&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to gRPC&lt;/li&gt;\n&lt;li&gt;Exposure to PostgreSQL&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4101878,
+    "internal_job_id": 3101878,
+    "title": "Backend Engineer (Go)",
+    "absolute_url": "https://job-boards.greenhouse.io/brightwaterhealth/jobs/4101878",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-09-13T09:00:00-05:00",
+    "first_published": "2026-09-13T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Brightwater Health&lt;/h2&gt;\n&lt;p&gt;Brightwater Health builds the scheduling and records platform behind 300 community clinics. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Docker&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to gRPC&lt;/li&gt;\n&lt;li&gt;Exposure to Python&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4102518,
+    "internal_job_id": 3102518,
+    "title": "Data Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/brightwaterhealth/jobs/4102518",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-09-20T09:00:00-05:00",
+    "first_published": "2026-09-20T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Brightwater Health&lt;/h2&gt;\n&lt;p&gt;Brightwater Health builds the scheduling and records platform behind 300 community clinics. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Data Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Helm&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Docker&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to gRPC&lt;/li&gt;\n&lt;li&gt;Exposure to Python&lt;/li&gt;\n&lt;li&gt;Exposure to Datadog&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4102729,
+    "internal_job_id": 3102729,
+    "title": "Account Executive",
+    "absolute_url": "https://job-boards.greenhouse.io/brightwaterhealth/jobs/4102729",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-08-15T09:00:00-05:00",
+    "first_published": "2026-08-15T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Brightwater Health&lt;/h2&gt;&lt;p&gt;Brightwater Health builds the scheduling and records platform behind 300 community clinics.&lt;/p&gt;&lt;h2&gt;The role&lt;/h2&gt;&lt;p&gt;We are hiring a Account Executive. This is not an engineering role.&lt;/p&gt;"
+   }
+  ]
+ },
+ "cobaltfreight": {
+  "name": "Cobalt Freight",
+  "jobs": [
+   {
+    "id": 4103357,
+    "internal_job_id": 3103357,
+    "title": "Site Reliability Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/cobaltfreight/jobs/4103357",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-08-10T09:00:00-05:00",
+    "first_published": "2026-08-10T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Cobalt Freight&lt;/h2&gt;\n&lt;p&gt;Cobalt Freight runs a digital freight marketplace for regional carriers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Site Reliability Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Machine Learning&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Docker&lt;/li&gt;\n&lt;li&gt;Exposure to Helm&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4103862,
+    "internal_job_id": 3103862,
+    "title": "Staff Software Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/cobaltfreight/jobs/4103862",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-08-17T09:00:00-05:00",
+    "first_published": "2026-08-17T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Cobalt Freight&lt;/h2&gt;\n&lt;p&gt;Cobalt Freight runs a digital freight marketplace for regional carriers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Staff Software Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Docker&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to TypeScript&lt;/li&gt;\n&lt;li&gt;Exposure to Python&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4104564,
+    "internal_job_id": 3104564,
+    "title": "Senior Backend Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/cobaltfreight/jobs/4104564",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-08-24T09:00:00-05:00",
+    "first_published": "2026-08-24T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Cobalt Freight&lt;/h2&gt;\n&lt;p&gt;Cobalt Freight runs a digital freight marketplace for regional carriers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Senior Backend Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with CI/CD&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Docker&lt;/li&gt;\n&lt;li&gt;Exposure to Spark&lt;/li&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4104991,
+    "internal_job_id": 3104991,
+    "title": "Data Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/cobaltfreight/jobs/4104991",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-08-31T09:00:00-05:00",
+    "first_published": "2026-08-31T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Cobalt Freight&lt;/h2&gt;\n&lt;p&gt;Cobalt Freight runs a digital freight marketplace for regional carriers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Data Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with CI/CD&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;li&gt;Exposure to Prometheus&lt;/li&gt;\n&lt;li&gt;Exposure to Spark&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4105437,
+    "internal_job_id": 3105437,
+    "title": "Senior Backend Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/cobaltfreight/jobs/4105437",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-09-07T09:00:00-05:00",
+    "first_published": "2026-09-07T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Cobalt Freight&lt;/h2&gt;\n&lt;p&gt;Cobalt Freight runs a digital freight marketplace for regional carriers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Senior Backend Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with CI/CD&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Helm&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Terraform&lt;/li&gt;\n&lt;li&gt;Exposure to Python&lt;/li&gt;\n&lt;li&gt;Exposure to Kafka&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4106262,
+    "internal_job_id": 3106262,
+    "title": "Staff Software Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/cobaltfreight/jobs/4106262",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-09-14T09:00:00-05:00",
+    "first_published": "2026-09-14T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Cobalt Freight&lt;/h2&gt;\n&lt;p&gt;Cobalt Freight runs a digital freight marketplace for regional carriers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Staff Software Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Datadog&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;li&gt;Exposure to Python&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4106808,
+    "internal_job_id": 3106808,
+    "title": "Site Reliability Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/cobaltfreight/jobs/4106808",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-09-21T09:00:00-05:00",
+    "first_published": "2026-09-21T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Cobalt Freight&lt;/h2&gt;\n&lt;p&gt;Cobalt Freight runs a digital freight marketplace for regional carriers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Site Reliability Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Kotlin&lt;/li&gt;\n&lt;li&gt;Exposure to TypeScript&lt;/li&gt;\n&lt;li&gt;Exposure to Docker&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4107528,
+    "internal_job_id": 3107528,
+    "title": "Account Executive",
+    "absolute_url": "https://job-boards.greenhouse.io/cobaltfreight/jobs/4107528",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-08-24T09:00:00-05:00",
+    "first_published": "2026-08-24T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Cobalt Freight&lt;/h2&gt;&lt;p&gt;Cobalt Freight runs a digital freight marketplace for regional carriers.&lt;/p&gt;&lt;h2&gt;The role&lt;/h2&gt;&lt;p&gt;We are hiring a Account Executive. This is not an engineering role.&lt;/p&gt;"
+   }
+  ]
+ },
+ "driftwoodanalytics": {
+  "name": "Driftwood Analytics",
+  "jobs": [
+   {
+    "id": 4107766,
+    "internal_job_id": 3107766,
+    "title": "Infrastructure Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4107766",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-08-11T09:00:00-05:00",
+    "first_published": "2026-08-11T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Driftwood Analytics&lt;/h2&gt;\n&lt;p&gt;Driftwood Analytics sells product analytics to mid-size e-commerce teams. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Machine Learning&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Docker&lt;/li&gt;\n&lt;li&gt;Exposure to Distributed Systems&lt;/li&gt;\n&lt;li&gt;Exposure to React&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4108461,
+    "internal_job_id": 3108461,
+    "title": "Backend Engineer (Go)",
+    "absolute_url": "https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4108461",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-08-18T09:00:00-05:00",
+    "first_published": "2026-08-18T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Driftwood Analytics&lt;/h2&gt;\n&lt;p&gt;Driftwood Analytics sells product analytics to mid-size e-commerce teams. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Distributed Systems&lt;/li&gt;\n&lt;li&gt;Exposure to Docker&lt;/li&gt;\n&lt;li&gt;Exposure to OpenTelemetry&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4108485,
+    "internal_job_id": 3108485,
+    "title": "Backend Engineer (Go)",
+    "absolute_url": "https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4108485",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-08-25T09:00:00-05:00",
+    "first_published": "2026-08-25T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Driftwood Analytics&lt;/h2&gt;\n&lt;p&gt;Driftwood Analytics sells product analytics to mid-size e-commerce teams. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with React&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Distributed Systems&lt;/li&gt;\n&lt;li&gt;Exposure to Terraform&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4108949,
+    "internal_job_id": 3108949,
+    "title": "Full Stack Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4108949",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-09-01T09:00:00-05:00",
+    "first_published": "2026-09-01T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Driftwood Analytics&lt;/h2&gt;\n&lt;p&gt;Driftwood Analytics sells product analytics to mid-size e-commerce teams. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Full Stack Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Redis&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Machine Learning&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Docker&lt;/li&gt;\n&lt;li&gt;Exposure to Datadog&lt;/li&gt;\n&lt;li&gt;Exposure to Distributed Systems&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4109592,
+    "internal_job_id": 3109592,
+    "title": "Data Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4109592",
+    "location": {
+     "name": "Remote (US) · EST overlap"
+    },
+    "updated_at": "2026-09-08T09:00:00-05:00",
+    "first_published": "2026-09-08T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Driftwood Analytics&lt;/h2&gt;\n&lt;p&gt;Driftwood Analytics sells product analytics to mid-size e-commerce teams. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Data Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Spark&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with React&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Airflow&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to GCP&lt;/li&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;li&gt;Exposure to Kafka&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4109631,
+    "internal_job_id": 3109631,
+    "title": "Senior Backend Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4109631",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-15T09:00:00-05:00",
+    "first_published": "2026-09-15T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Driftwood Analytics&lt;/h2&gt;\n&lt;p&gt;Driftwood Analytics sells product analytics to mid-size e-commerce teams. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Senior Backend Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Prometheus&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with GCP&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Python&lt;/li&gt;\n&lt;li&gt;Exposure to gRPC&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4109663,
+    "internal_job_id": 3109663,
+    "title": "Backend Engineer (Go)",
+    "absolute_url": "https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4109663",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-22T09:00:00-05:00",
+    "first_published": "2026-09-22T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Driftwood Analytics&lt;/h2&gt;\n&lt;p&gt;Driftwood Analytics sells product analytics to mid-size e-commerce teams. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Prometheus&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Rust&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;li&gt;Exposure to Go&lt;/li&gt;\n&lt;li&gt;Exposure to Python&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4110411,
+    "internal_job_id": 3110411,
+    "title": "Site Reliability Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4110411",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Driftwood Analytics&lt;/h2&gt;\n&lt;p&gt;Driftwood Analytics sells product analytics to mid-size e-commerce teams. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Site Reliability Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Prometheus&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Airflow&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Docker&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to GraphQL&lt;/li&gt;\n&lt;li&gt;Exposure to gRPC&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   }
+  ]
+ },
+ "emberpayments": {
+  "name": "Ember Payments",
+  "jobs": [
+   {
+    "id": 4110543,
+    "internal_job_id": 3110543,
+    "title": "Backend Engineer (Go)",
+    "absolute_url": "https://job-boards.greenhouse.io/emberpayments/jobs/4110543",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-08-12T09:00:00-05:00",
+    "first_published": "2026-08-12T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ember Payments&lt;/h2&gt;\n&lt;p&gt;Ember Payments moves money for marketplaces in eleven countries. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Java&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with GCP&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Prometheus&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Kafka&lt;/li&gt;\n&lt;li&gt;Exposure to Datadog&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4111221,
+    "internal_job_id": 3111221,
+    "title": "Software Engineer, Payments",
+    "absolute_url": "https://job-boards.greenhouse.io/emberpayments/jobs/4111221",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-08-19T09:00:00-05:00",
+    "first_published": "2026-08-19T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ember Payments&lt;/h2&gt;\n&lt;p&gt;Ember Payments moves money for marketplaces in eleven countries. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Software Engineer, Payments you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Java&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with React&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with CI/CD&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;li&gt;Exposure to TypeScript&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4111284,
+    "internal_job_id": 3111284,
+    "title": "Backend Engineer (Go)",
+    "absolute_url": "https://job-boards.greenhouse.io/emberpayments/jobs/4111284",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-08-26T09:00:00-05:00",
+    "first_published": "2026-08-26T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ember Payments&lt;/h2&gt;\n&lt;p&gt;Ember Payments moves money for marketplaces in eleven countries. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with GraphQL&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Kotlin&lt;/li&gt;\n&lt;li&gt;Exposure to Observability&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4111449,
+    "internal_job_id": 3111449,
+    "title": "Software Engineer, Payments",
+    "absolute_url": "https://job-boards.greenhouse.io/emberpayments/jobs/4111449",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-01T09:00:00-05:00",
+    "first_published": "2026-09-01T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ember Payments&lt;/h2&gt;\n&lt;p&gt;Ember Payments moves money for marketplaces in eleven countries. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Software Engineer, Payments you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Docker&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Elasticsearch&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Helm&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Java&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Redis&lt;/li&gt;\n&lt;li&gt;Exposure to CI/CD&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4111508,
+    "internal_job_id": 3111508,
+    "title": "Software Engineer, Payments",
+    "absolute_url": "https://job-boards.greenhouse.io/emberpayments/jobs/4111508",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-09-08T09:00:00-05:00",
+    "first_published": "2026-09-08T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ember Payments&lt;/h2&gt;\n&lt;p&gt;Ember Payments moves money for marketplaces in eleven countries. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Software Engineer, Payments you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Java&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Redis&lt;/li&gt;\n&lt;li&gt;Exposure to Terraform&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4112238,
+    "internal_job_id": 3112238,
+    "title": "Infrastructure Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/emberpayments/jobs/4112238",
+    "location": {
+     "name": "Remote (US) · EST overlap"
+    },
+    "updated_at": "2026-09-15T09:00:00-05:00",
+    "first_published": "2026-09-15T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ember Payments&lt;/h2&gt;\n&lt;p&gt;Ember Payments moves money for marketplaces in eleven countries. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to CI/CD&lt;/li&gt;\n&lt;li&gt;Exposure to gRPC&lt;/li&gt;\n&lt;li&gt;Exposure to GraphQL&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4113002,
+    "internal_job_id": 3113002,
+    "title": "Full Stack Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/emberpayments/jobs/4113002",
+    "location": {
+     "name": "Remote (US) · EST overlap"
+    },
+    "updated_at": "2026-09-22T09:00:00-05:00",
+    "first_published": "2026-09-22T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ember Payments&lt;/h2&gt;\n&lt;p&gt;Ember Payments moves money for marketplaces in eleven countries. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Full Stack Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Prometheus&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Elasticsearch&lt;/li&gt;\n&lt;li&gt;Exposure to Python&lt;/li&gt;\n&lt;li&gt;Exposure to OpenTelemetry&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4113173,
+    "internal_job_id": 3113173,
+    "title": "Account Executive",
+    "absolute_url": "https://job-boards.greenhouse.io/emberpayments/jobs/4113173",
+    "location": {
+     "name": "Remote (US) · EST overlap"
+    },
+    "updated_at": "2026-09-02T09:00:00-05:00",
+    "first_published": "2026-09-02T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ember Payments&lt;/h2&gt;&lt;p&gt;Ember Payments moves money for marketplaces in eleven countries.&lt;/p&gt;&lt;h2&gt;The role&lt;/h2&gt;&lt;p&gt;We are hiring a Account Executive. This is not an engineering role.&lt;/p&gt;"
+   }
+  ]
+ },
+ "fernhillrobotics": {
+  "name": "Fernhill Robotics",
+  "jobs": [
+   {
+    "id": 4113493,
+    "internal_job_id": 3113493,
+    "title": "Backend Engineer (Go)",
+    "absolute_url": "https://job-boards.greenhouse.io/fernhillrobotics/jobs/4113493",
+    "location": {
+     "name": "Remote (US) · EST overlap"
+    },
+    "updated_at": "2026-08-12T09:00:00-05:00",
+    "first_published": "2026-08-12T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Fernhill Robotics&lt;/h2&gt;\n&lt;p&gt;Fernhill Robotics makes fleet software for warehouse robots. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Observability&lt;/li&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4114100,
+    "internal_job_id": 3114100,
+    "title": "Software Engineer, Payments",
+    "absolute_url": "https://job-boards.greenhouse.io/fernhillrobotics/jobs/4114100",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-08-19T09:00:00-05:00",
+    "first_published": "2026-08-19T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Fernhill Robotics&lt;/h2&gt;\n&lt;p&gt;Fernhill Robotics makes fleet software for warehouse robots. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Software Engineer, Payments you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;li&gt;Exposure to Docker&lt;/li&gt;\n&lt;li&gt;Exposure to Elasticsearch&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4114377,
+    "internal_job_id": 3114377,
+    "title": "Software Engineer, Payments",
+    "absolute_url": "https://job-boards.greenhouse.io/fernhillrobotics/jobs/4114377",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-08-26T09:00:00-05:00",
+    "first_published": "2026-08-26T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Fernhill Robotics&lt;/h2&gt;\n&lt;p&gt;Fernhill Robotics makes fleet software for warehouse robots. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Software Engineer, Payments you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kotlin&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Docker&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Prometheus&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;li&gt;Exposure to Go&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4114757,
+    "internal_job_id": 3114757,
+    "title": "Infrastructure Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/fernhillrobotics/jobs/4114757",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-09-02T09:00:00-05:00",
+    "first_published": "2026-09-02T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Fernhill Robotics&lt;/h2&gt;\n&lt;p&gt;Fernhill Robotics makes fleet software for warehouse robots. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Rust&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Machine Learning&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Python&lt;/li&gt;\n&lt;li&gt;Exposure to PostgreSQL&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4115146,
+    "internal_job_id": 3115146,
+    "title": "Platform Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/fernhillrobotics/jobs/4115146",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-09-09T09:00:00-05:00",
+    "first_published": "2026-09-09T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Fernhill Robotics&lt;/h2&gt;\n&lt;p&gt;Fernhill Robotics makes fleet software for warehouse robots. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Platform Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to CI/CD&lt;/li&gt;\n&lt;li&gt;Exposure to Rust&lt;/li&gt;\n&lt;li&gt;Exposure to PostgreSQL&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4115949,
+    "internal_job_id": 3115949,
+    "title": "Staff Software Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/fernhillrobotics/jobs/4115949",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-09-16T09:00:00-05:00",
+    "first_published": "2026-09-16T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Fernhill Robotics&lt;/h2&gt;\n&lt;p&gt;Fernhill Robotics makes fleet software for warehouse robots. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Staff Software Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Elasticsearch&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Rust&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;li&gt;Exposure to Python&lt;/li&gt;\n&lt;li&gt;Exposure to Helm&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4116717,
+    "internal_job_id": 3116717,
+    "title": "Senior Backend Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/fernhillrobotics/jobs/4116717",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-23T09:00:00-05:00",
+    "first_published": "2026-09-23T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Fernhill Robotics&lt;/h2&gt;\n&lt;p&gt;Fernhill Robotics makes fleet software for warehouse robots. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Senior Backend Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Spark&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Docker&lt;/li&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4117585,
+    "internal_job_id": 3117585,
+    "title": "Account Executive",
+    "absolute_url": "https://job-boards.greenhouse.io/fernhillrobotics/jobs/4117585",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-09-11T09:00:00-05:00",
+    "first_published": "2026-09-11T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Fernhill Robotics&lt;/h2&gt;&lt;p&gt;Fernhill Robotics makes fleet software for warehouse robots.&lt;/p&gt;&lt;h2&gt;The role&lt;/h2&gt;&lt;p&gt;We are hiring a Account Executive. This is not an engineering role.&lt;/p&gt;"
+   }
+  ]
+ },
+ "granitecloud": {
+  "name": "Granite Cloud",
+  "jobs": [
+   {
+    "id": 4118001,
+    "internal_job_id": 3118001,
+    "title": "Software Engineer, Payments",
+    "absolute_url": "https://job-boards.greenhouse.io/granitecloud/jobs/4118001",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-08-13T09:00:00-05:00",
+    "first_published": "2026-08-13T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Granite Cloud&lt;/h2&gt;\n&lt;p&gt;Granite Cloud offers managed Postgres for teams that do not want a DBA. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Software Engineer, Payments you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Java&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Datadog&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Rust&lt;/li&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4118598,
+    "internal_job_id": 3118598,
+    "title": "Senior Backend Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/granitecloud/jobs/4118598",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-08-20T09:00:00-05:00",
+    "first_published": "2026-08-20T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Granite Cloud&lt;/h2&gt;\n&lt;p&gt;Granite Cloud offers managed Postgres for teams that do not want a DBA. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Senior Backend Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Redis&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Docker&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4118737,
+    "internal_job_id": 3118737,
+    "title": "Machine Learning Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/granitecloud/jobs/4118737",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-08-27T09:00:00-05:00",
+    "first_published": "2026-08-27T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Granite Cloud&lt;/h2&gt;\n&lt;p&gt;Granite Cloud offers managed Postgres for teams that do not want a DBA. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Machine Learning Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with CI/CD&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with OpenTelemetry&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Spark&lt;/li&gt;\n&lt;li&gt;Exposure to gRPC&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4119572,
+    "internal_job_id": 3119572,
+    "title": "Senior Backend Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/granitecloud/jobs/4119572",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-09-03T09:00:00-05:00",
+    "first_published": "2026-09-03T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Granite Cloud&lt;/h2&gt;\n&lt;p&gt;Granite Cloud offers managed Postgres for teams that do not want a DBA. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Senior Backend Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Redis&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Elasticsearch&lt;/li&gt;\n&lt;li&gt;Exposure to Docker&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4120162,
+    "internal_job_id": 3120162,
+    "title": "Infrastructure Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/granitecloud/jobs/4120162",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-09-10T09:00:00-05:00",
+    "first_published": "2026-09-10T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Granite Cloud&lt;/h2&gt;\n&lt;p&gt;Granite Cloud offers managed Postgres for teams that do not want a DBA. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with GCP&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Java&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to TypeScript&lt;/li&gt;\n&lt;li&gt;Exposure to gRPC&lt;/li&gt;\n&lt;li&gt;Exposure to Snowflake&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4121060,
+    "internal_job_id": 3121060,
+    "title": "Backend Engineer (Go)",
+    "absolute_url": "https://job-boards.greenhouse.io/granitecloud/jobs/4121060",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-09-17T09:00:00-05:00",
+    "first_published": "2026-09-17T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Granite Cloud&lt;/h2&gt;\n&lt;p&gt;Granite Cloud offers managed Postgres for teams that do not want a DBA. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;li&gt;Exposure to Airflow&lt;/li&gt;\n&lt;li&gt;Exposure to Go&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4121477,
+    "internal_job_id": 3121477,
+    "title": "Data Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/granitecloud/jobs/4121477",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-09-24T09:00:00-05:00",
+    "first_published": "2026-09-24T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Granite Cloud&lt;/h2&gt;\n&lt;p&gt;Granite Cloud offers managed Postgres for teams that do not want a DBA. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Data Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Helm&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Spark&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Rust&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with React&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to GCP&lt;/li&gt;\n&lt;li&gt;Exposure to PostgreSQL&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4122295,
+    "internal_job_id": 3122295,
+    "title": "Data Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/granitecloud/jobs/4122295",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Granite Cloud&lt;/h2&gt;\n&lt;p&gt;Granite Cloud offers managed Postgres for teams that do not want a DBA. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Data Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Snowflake&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Airflow&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Go&lt;/li&gt;\n&lt;li&gt;Exposure to Java&lt;/li&gt;\n&lt;li&gt;Exposure to PostgreSQL&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   }
+  ]
+ },
+ "harborlearning": {
+  "name": "Harbor Learning",
+  "jobs": [
+   {
+    "id": 4123081,
+    "internal_job_id": 3123081,
+    "title": "Data Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/harborlearning/jobs/4123081",
+    "location": {
+     "name": "Remote (US) · EST overlap"
+    },
+    "updated_at": "2026-08-14T09:00:00-05:00",
+    "first_published": "2026-08-14T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Harbor Learning&lt;/h2&gt;\n&lt;p&gt;Harbor Learning builds a tutoring platform used by 4,000 schools. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Data Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Java&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Redis&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Rust&lt;/li&gt;\n&lt;li&gt;Exposure to Terraform&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4123176,
+    "internal_job_id": 3123176,
+    "title": "Backend Engineer (Go)",
+    "absolute_url": "https://job-boards.greenhouse.io/harborlearning/jobs/4123176",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-08-21T09:00:00-05:00",
+    "first_published": "2026-08-21T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Harbor Learning&lt;/h2&gt;\n&lt;p&gt;Harbor Learning builds a tutoring platform used by 4,000 schools. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Rust&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Machine Learning&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Datadog&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;li&gt;Exposure to Observability&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4123992,
+    "internal_job_id": 3123992,
+    "title": "Software Engineer, Payments",
+    "absolute_url": "https://job-boards.greenhouse.io/harborlearning/jobs/4123992",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-08-28T09:00:00-05:00",
+    "first_published": "2026-08-28T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Harbor Learning&lt;/h2&gt;\n&lt;p&gt;Harbor Learning builds a tutoring platform used by 4,000 schools. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Software Engineer, Payments you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kotlin&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with GraphQL&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Machine Learning&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to GCP&lt;/li&gt;\n&lt;li&gt;Exposure to Observability&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4124393,
+    "internal_job_id": 3124393,
+    "title": "Software Engineer, Payments",
+    "absolute_url": "https://job-boards.greenhouse.io/harborlearning/jobs/4124393",
+    "location": {
+     "name": "Remote (US) · EST overlap"
+    },
+    "updated_at": "2026-09-04T09:00:00-05:00",
+    "first_published": "2026-09-04T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Harbor Learning&lt;/h2&gt;\n&lt;p&gt;Harbor Learning builds a tutoring platform used by 4,000 schools. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Software Engineer, Payments you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Rust&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Spark&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Datadog&lt;/li&gt;\n&lt;li&gt;Exposure to Kafka&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4124552,
+    "internal_job_id": 3124552,
+    "title": "Software Engineer, Payments",
+    "absolute_url": "https://job-boards.greenhouse.io/harborlearning/jobs/4124552",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-09-11T09:00:00-05:00",
+    "first_published": "2026-09-11T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Harbor Learning&lt;/h2&gt;\n&lt;p&gt;Harbor Learning builds a tutoring platform used by 4,000 schools. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Software Engineer, Payments you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with CI/CD&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with React&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Datadog&lt;/li&gt;\n&lt;li&gt;Exposure to Prometheus&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4125254,
+    "internal_job_id": 3125254,
+    "title": "Infrastructure Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/harborlearning/jobs/4125254",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-17T09:00:00-05:00",
+    "first_published": "2026-09-17T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Harbor Learning&lt;/h2&gt;\n&lt;p&gt;Harbor Learning builds a tutoring platform used by 4,000 schools. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Rust&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with GCP&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Docker&lt;/li&gt;\n&lt;li&gt;Exposure to TypeScript&lt;/li&gt;\n&lt;li&gt;Exposure to Redis&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4125835,
+    "internal_job_id": 3125835,
+    "title": "Backend Engineer (Go)",
+    "absolute_url": "https://job-boards.greenhouse.io/harborlearning/jobs/4125835",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Harbor Learning&lt;/h2&gt;\n&lt;p&gt;Harbor Learning builds a tutoring platform used by 4,000 schools. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with GCP&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Terraform&lt;/li&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4126451,
+    "internal_job_id": 3126451,
+    "title": "Full Stack Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/harborlearning/jobs/4126451",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Harbor Learning&lt;/h2&gt;\n&lt;p&gt;Harbor Learning builds a tutoring platform used by 4,000 schools. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Full Stack Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with GraphQL&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Docker&lt;/li&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;li&gt;Exposure to Go&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   }
+  ]
+ },
+ "ironleafsecurity": {
+  "name": "Ironleaf Security",
+  "jobs": [
+   {
+    "id": 4126888,
+    "internal_job_id": 3126888,
+    "title": "Site Reliability Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/ironleafsecurity/jobs/4126888",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-08-14T09:00:00-05:00",
+    "first_published": "2026-08-14T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ironleaf Security&lt;/h2&gt;\n&lt;p&gt;Ironleaf Security detects account takeover for consumer apps. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Site Reliability Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Prometheus&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Terraform&lt;/li&gt;\n&lt;li&gt;Exposure to Go&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4127155,
+    "internal_job_id": 3127155,
+    "title": "Machine Learning Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/ironleafsecurity/jobs/4127155",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-08-21T09:00:00-05:00",
+    "first_published": "2026-08-21T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ironleaf Security&lt;/h2&gt;\n&lt;p&gt;Ironleaf Security detects account takeover for consumer apps. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Machine Learning Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Prometheus&lt;/li&gt;\n&lt;li&gt;Exposure to GCP&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4127726,
+    "internal_job_id": 3127726,
+    "title": "Infrastructure Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/ironleafsecurity/jobs/4127726",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-08-28T09:00:00-05:00",
+    "first_published": "2026-08-28T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ironleaf Security&lt;/h2&gt;\n&lt;p&gt;Ironleaf Security detects account takeover for consumer apps. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Elasticsearch&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Redis&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Airflow&lt;/li&gt;\n&lt;li&gt;Exposure to OpenTelemetry&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4128318,
+    "internal_job_id": 3128318,
+    "title": "Site Reliability Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/ironleafsecurity/jobs/4128318",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-04T09:00:00-05:00",
+    "first_published": "2026-09-04T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ironleaf Security&lt;/h2&gt;\n&lt;p&gt;Ironleaf Security detects account takeover for consumer apps. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Site Reliability Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Java&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Docker&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Redis&lt;/li&gt;\n&lt;li&gt;Exposure to Python&lt;/li&gt;\n&lt;li&gt;Exposure to PostgreSQL&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4128983,
+    "internal_job_id": 3128983,
+    "title": "Staff Software Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/ironleafsecurity/jobs/4128983",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-09-11T09:00:00-05:00",
+    "first_published": "2026-09-11T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ironleaf Security&lt;/h2&gt;\n&lt;p&gt;Ironleaf Security detects account takeover for consumer apps. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Staff Software Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Rust&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Elasticsearch&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to PostgreSQL&lt;/li&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;li&gt;Exposure to TypeScript&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4129041,
+    "internal_job_id": 3129041,
+    "title": "Full Stack Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/ironleafsecurity/jobs/4129041",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-09-18T09:00:00-05:00",
+    "first_published": "2026-09-18T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ironleaf Security&lt;/h2&gt;\n&lt;p&gt;Ironleaf Security detects account takeover for consumer apps. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Full Stack Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with GraphQL&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Spark&lt;/li&gt;\n&lt;li&gt;Exposure to Helm&lt;/li&gt;\n&lt;li&gt;Exposure to Go&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4129652,
+    "internal_job_id": 3129652,
+    "title": "Staff Software Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/ironleafsecurity/jobs/4129652",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ironleaf Security&lt;/h2&gt;\n&lt;p&gt;Ironleaf Security detects account takeover for consumer apps. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Staff Software Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Airflow&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Rust&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Datadog&lt;/li&gt;\n&lt;li&gt;Exposure to Prometheus&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4129833,
+    "internal_job_id": 3129833,
+    "title": "Engineering Intern",
+    "absolute_url": "https://job-boards.greenhouse.io/ironleafsecurity/jobs/4129833",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Ironleaf Security&lt;/h2&gt;&lt;p&gt;Ironleaf Security detects account takeover for consumer apps.&lt;/p&gt;&lt;h2&gt;The role&lt;/h2&gt;&lt;p&gt;We are hiring a Engineering Intern. This is not an engineering role.&lt;/p&gt;"
+   }
+  ]
+ },
+ "kestrelmedia": {
+  "name": "Kestrel Media",
+  "jobs": [
+   {
+    "id": 4133789,
+    "internal_job_id": 3133789,
+    "title": "Machine Learning Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/kestrelmedia/jobs/4133789",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Kestrel Media&lt;/h2&gt;\n&lt;p&gt;Kestrel Media streams local sports to 2 million subscribers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Machine Learning Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Prometheus&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Helm&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Redis&lt;/li&gt;\n&lt;li&gt;Exposure to Terraform&lt;/li&gt;\n&lt;li&gt;Exposure to Docker&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4134586,
+    "internal_job_id": 3134586,
+    "title": "Site Reliability Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/kestrelmedia/jobs/4134586",
+    "location": {
+     "name": "Remote (US) · EST overlap"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Kestrel Media&lt;/h2&gt;\n&lt;p&gt;Kestrel Media streams local sports to 2 million subscribers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Site Reliability Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to CI/CD&lt;/li&gt;\n&lt;li&gt;Exposure to Docker&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4134913,
+    "internal_job_id": 3134913,
+    "title": "Senior Backend Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/kestrelmedia/jobs/4134913",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Kestrel Media&lt;/h2&gt;\n&lt;p&gt;Kestrel Media streams local sports to 2 million subscribers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Senior Backend Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Docker&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Rust&lt;/li&gt;\n&lt;li&gt;Exposure to Observability&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4135769,
+    "internal_job_id": 3135769,
+    "title": "Backend Engineer (Go)",
+    "absolute_url": "https://job-boards.greenhouse.io/kestrelmedia/jobs/4135769",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Kestrel Media&lt;/h2&gt;\n&lt;p&gt;Kestrel Media streams local sports to 2 million subscribers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with OpenTelemetry&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Rust&lt;/li&gt;\n&lt;li&gt;Exposure to GCP&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4136326,
+    "internal_job_id": 3136326,
+    "title": "Platform Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/kestrelmedia/jobs/4136326",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Kestrel Media&lt;/h2&gt;\n&lt;p&gt;Kestrel Media streams local sports to 2 million subscribers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Platform Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Rust&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Kafka&lt;/li&gt;\n&lt;li&gt;Exposure to Go&lt;/li&gt;\n&lt;li&gt;Exposure to OpenTelemetry&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4136659,
+    "internal_job_id": 3136659,
+    "title": "Software Engineer, Payments",
+    "absolute_url": "https://job-boards.greenhouse.io/kestrelmedia/jobs/4136659",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Kestrel Media&lt;/h2&gt;\n&lt;p&gt;Kestrel Media streams local sports to 2 million subscribers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Software Engineer, Payments you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Kotlin&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Spark&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Airflow&lt;/li&gt;\n&lt;li&gt;Exposure to gRPC&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4137056,
+    "internal_job_id": 3137056,
+    "title": "Senior Backend Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/kestrelmedia/jobs/4137056",
+    "location": {
+     "name": "Remote (US) · EST overlap"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Kestrel Media&lt;/h2&gt;\n&lt;p&gt;Kestrel Media streams local sports to 2 million subscribers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Senior Backend Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with GraphQL&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Machine Learning&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Rust&lt;/li&gt;\n&lt;li&gt;Exposure to OpenTelemetry&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4137652,
+    "internal_job_id": 3137652,
+    "title": "Infrastructure Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/kestrelmedia/jobs/4137652",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Kestrel Media&lt;/h2&gt;\n&lt;p&gt;Kestrel Media streams local sports to 2 million subscribers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Redis&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to GCP&lt;/li&gt;\n&lt;li&gt;Exposure to Terraform&lt;/li&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   }
+  ]
+ },
+ "lumengrid": {
+  "name": "Lumen Grid",
+  "jobs": [
+   {
+    "id": 4138296,
+    "internal_job_id": 3138296,
+    "title": "Backend Engineer (Go)",
+    "absolute_url": "https://job-boards.greenhouse.io/lumengrid/jobs/4138296",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-08-15T09:00:00-05:00",
+    "first_published": "2026-08-15T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Lumen Grid&lt;/h2&gt;\n&lt;p&gt;Lumen Grid forecasts demand for utilities moving to renewables. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with GraphQL&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to OpenTelemetry&lt;/li&gt;\n&lt;li&gt;Exposure to CI/CD&lt;/li&gt;\n&lt;li&gt;Exposure to Prometheus&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4138681,
+    "internal_job_id": 3138681,
+    "title": "Infrastructure Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/lumengrid/jobs/4138681",
+    "location": {
+     "name": "Remote (US) · EST overlap"
+    },
+    "updated_at": "2026-08-22T09:00:00-05:00",
+    "first_published": "2026-08-22T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Lumen Grid&lt;/h2&gt;\n&lt;p&gt;Lumen Grid forecasts demand for utilities moving to renewables. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with GCP&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Datadog&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Kubernetes&lt;/li&gt;\n&lt;li&gt;Exposure to Go&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4139114,
+    "internal_job_id": 3139114,
+    "title": "Site Reliability Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/lumengrid/jobs/4139114",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-08-29T09:00:00-05:00",
+    "first_published": "2026-08-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Lumen Grid&lt;/h2&gt;\n&lt;p&gt;Lumen Grid forecasts demand for utilities moving to renewables. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Site Reliability Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Helm&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Redis&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Elasticsearch&lt;/li&gt;\n&lt;li&gt;Exposure to Terraform&lt;/li&gt;\n&lt;li&gt;Exposure to Distributed Systems&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4139379,
+    "internal_job_id": 3139379,
+    "title": "Machine Learning Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/lumengrid/jobs/4139379",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-09-05T09:00:00-05:00",
+    "first_published": "2026-09-05T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Lumen Grid&lt;/h2&gt;\n&lt;p&gt;Lumen Grid forecasts demand for utilities moving to renewables. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Machine Learning Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to CI/CD&lt;/li&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4139504,
+    "internal_job_id": 3139504,
+    "title": "Machine Learning Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/lumengrid/jobs/4139504",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-12T09:00:00-05:00",
+    "first_published": "2026-09-12T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Lumen Grid&lt;/h2&gt;\n&lt;p&gt;Lumen Grid forecasts demand for utilities moving to renewables. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Machine Learning Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Python&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Java&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to gRPC&lt;/li&gt;\n&lt;li&gt;Exposure to OpenTelemetry&lt;/li&gt;\n&lt;li&gt;Exposure to Helm&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4140134,
+    "internal_job_id": 3140134,
+    "title": "Site Reliability Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/lumengrid/jobs/4140134",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-19T09:00:00-05:00",
+    "first_published": "2026-09-19T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Lumen Grid&lt;/h2&gt;\n&lt;p&gt;Lumen Grid forecasts demand for utilities moving to renewables. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Site Reliability Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Docker&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with gRPC&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Distributed Systems&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Redis&lt;/li&gt;\n&lt;li&gt;Exposure to Datadog&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4141016,
+    "internal_job_id": 3141016,
+    "title": "Platform Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/lumengrid/jobs/4141016",
+    "location": {
+     "name": "Remote (US) · EST overlap"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Lumen Grid&lt;/h2&gt;\n&lt;p&gt;Lumen Grid forecasts demand for utilities moving to renewables. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Platform Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with React&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Docker&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Snowflake&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Prometheus&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Distributed Systems&lt;/li&gt;\n&lt;li&gt;Exposure to Go&lt;/li&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4141580,
+    "internal_job_id": 3141580,
+    "title": "Technical Recruiter",
+    "absolute_url": "https://job-boards.greenhouse.io/lumengrid/jobs/4141580",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Lumen Grid&lt;/h2&gt;&lt;p&gt;Lumen Grid forecasts demand for utilities moving to renewables.&lt;/p&gt;&lt;h2&gt;The role&lt;/h2&gt;&lt;p&gt;We are hiring a Technical Recruiter. This is not an engineering role.&lt;/p&gt;"
+   }
+  ]
+ },
+ "mosaicretail": {
+  "name": "Mosaic Retail",
+  "jobs": [
+   {
+    "id": 4142172,
+    "internal_job_id": 3142172,
+    "title": "Infrastructure Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/mosaicretail/jobs/4142172",
+    "location": {
+     "name": "Austin, TX"
+    },
+    "updated_at": "2026-08-16T09:00:00-05:00",
+    "first_published": "2026-08-16T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Mosaic Retail&lt;/h2&gt;\n&lt;p&gt;Mosaic Retail powers checkout and inventory for 900 independent stores. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Observability&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with GCP&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with CI/CD&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to OpenTelemetry&lt;/li&gt;\n&lt;li&gt;Exposure to Rust&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4142735,
+    "internal_job_id": 3142735,
+    "title": "Senior Backend Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/mosaicretail/jobs/4142735",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-08-23T09:00:00-05:00",
+    "first_published": "2026-08-23T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Mosaic Retail&lt;/h2&gt;\n&lt;p&gt;Mosaic Retail powers checkout and inventory for 900 independent stores. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Senior Backend Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with GCP&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to React&lt;/li&gt;\n&lt;li&gt;Exposure to Distributed Systems&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4143566,
+    "internal_job_id": 3143566,
+    "title": "Senior Backend Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/mosaicretail/jobs/4143566",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-08-30T09:00:00-05:00",
+    "first_published": "2026-08-30T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Mosaic Retail&lt;/h2&gt;\n&lt;p&gt;Mosaic Retail powers checkout and inventory for 900 independent stores. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Senior Backend Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Prometheus&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;li&gt;Exposure to Terraform&lt;/li&gt;\n&lt;li&gt;Exposure to gRPC&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4144141,
+    "internal_job_id": 3144141,
+    "title": "Full Stack Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/mosaicretail/jobs/4144141",
+    "location": {
+     "name": "New York, NY · Hybrid"
+    },
+    "updated_at": "2026-09-06T09:00:00-05:00",
+    "first_published": "2026-09-06T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Mosaic Retail&lt;/h2&gt;\n&lt;p&gt;Mosaic Retail powers checkout and inventory for 900 independent stores. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Full Stack Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with GraphQL&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Elasticsearch&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Prometheus&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with GCP&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Go&lt;/li&gt;\n&lt;li&gt;Exposure to Terraform&lt;/li&gt;\n&lt;li&gt;Exposure to CI/CD&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4144142,
+    "internal_job_id": 3144142,
+    "title": "Senior Backend Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/mosaicretail/jobs/4144142",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-09-13T09:00:00-05:00",
+    "first_published": "2026-09-13T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Mosaic Retail&lt;/h2&gt;\n&lt;p&gt;Mosaic Retail powers checkout and inventory for 900 independent stores. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Senior Backend Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Elasticsearch&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with Prometheus&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Airflow&lt;/li&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;li&gt;Exposure to Redis&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4144301,
+    "internal_job_id": 3144301,
+    "title": "Data Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/mosaicretail/jobs/4144301",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-20T09:00:00-05:00",
+    "first_published": "2026-09-20T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Mosaic Retail&lt;/h2&gt;\n&lt;p&gt;Mosaic Retail powers checkout and inventory for 900 independent stores. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Data Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with Spark&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kafka&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Machine Learning&lt;/li&gt;\n&lt;li&gt;Exposure to Snowflake&lt;/li&gt;\n&lt;li&gt;Exposure to Terraform&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4144639,
+    "internal_job_id": 3144639,
+    "title": "Senior Backend Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/mosaicretail/jobs/4144639",
+    "location": {
+     "name": "Remote (US)"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Mosaic Retail&lt;/h2&gt;\n&lt;p&gt;Mosaic Retail powers checkout and inventory for 900 independent stores. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Senior Backend Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with PostgreSQL&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with GCP&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Rust&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Go&lt;/li&gt;\n&lt;li&gt;several years of hands-on experience with TypeScript&lt;/li&gt;\n&lt;li&gt;3+ years of hands-on experience with Prometheus&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to OpenTelemetry&lt;/li&gt;\n&lt;li&gt;Exposure to AWS&lt;/li&gt;\n&lt;li&gt;Exposure to Terraform&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   },
+   {
+    "id": 4145192,
+    "internal_job_id": 3145192,
+    "title": "Platform Engineer",
+    "absolute_url": "https://job-boards.greenhouse.io/mosaicretail/jobs/4145192",
+    "location": {
+     "name": "Remote (Americas)"
+    },
+    "updated_at": "2026-09-29T09:00:00-05:00",
+    "first_published": "2026-09-29T09:00:00-05:00",
+    "content": "&lt;h2&gt;About Mosaic Retail&lt;/h2&gt;\n&lt;p&gt;Mosaic Retail powers checkout and inventory for 900 independent stores. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.&lt;/p&gt;\n&lt;h2&gt;The role&lt;/h2&gt;\n&lt;p&gt;As a Platform Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.&lt;/p&gt;\n&lt;h3&gt;What you will need&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;3+ years of hands-on experience with AWS&lt;/li&gt;\n&lt;li&gt;4+ years of hands-on experience with Terraform&lt;/li&gt;\n&lt;li&gt;5+ years of hands-on experience with Kubernetes&lt;/li&gt;\n&lt;li&gt;2+ years of hands-on experience with Helm&lt;/li&gt;\n&lt;li&gt;Clear written communication; we decide things in documents&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Nice to have&lt;/h3&gt;\n&lt;ul&gt;\n&lt;li&gt;Exposure to Go&lt;/li&gt;\n&lt;li&gt;Exposure to OpenTelemetry&lt;/li&gt;\n&lt;li&gt;Exposure to gRPC&lt;/li&gt;\n&lt;/ul&gt;\n&lt;h3&gt;Benefits&lt;/h3&gt;\n&lt;p&gt;Competitive salary and equity, a learning budget, and four weeks of vacation that people actually take.&lt;/p&gt;"
+   }
+  ]
+ }
+}

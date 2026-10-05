@@ -1,0 +1,10 @@
+{
+  "id": "a072d5d4c93bd74411411a916e51f8daaa5fe2f1",
+  "url": "https://job-boards.greenhouse.io/granitecloud/jobs/4120162",
+  "fetchedAt": "2026-09-25T15:45:00.000Z",
+  "source": "greenhouse-api",
+  "title": "Infrastructure Engineer",
+  "text": "About Granite Cloud\nGranite Cloud offers managed Postgres for teams that do not want a DBA. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.\nThe role\nAs a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.\nWhat you will need\n- 3+ years of hands-on experience with GCP\n- 4+ years of hands-on experience with Kubernetes\n- 5+ years of hands-on experience with Java\n- 2+ years of hands-on experience with AWS\n- several years of hands-on experience with Terraform\n- Clear written communication; we decide things in documents\nNice to have\n- Exposure to TypeScript\n- Exposure to gRPC\n- Exposure to Snowflake\nBenefits\nCompetitive salary and equity, a learning budget, and four weeks of vacation that people actually take.",
+  "textHash": "4e541bcae1cb781a5f89c41b831c9ac0bc69d597",
+  "error": null
+}

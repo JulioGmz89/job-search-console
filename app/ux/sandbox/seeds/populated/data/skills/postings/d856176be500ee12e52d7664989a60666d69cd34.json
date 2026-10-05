@@ -1,0 +1,10 @@
+{
+  "id": "d856176be500ee12e52d7664989a60666d69cd34",
+  "url": "https://job-boards.greenhouse.io/granitecloud/jobs/4121060",
+  "fetchedAt": "2026-09-25T15:55:00.000Z",
+  "source": "greenhouse-api",
+  "title": "Backend Engineer (Go)",
+  "text": "About Granite Cloud\nGranite Cloud offers managed Postgres for teams that do not want a DBA. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.\nThe role\nAs a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.\nWhat you will need\n- 3+ years of hands-on experience with PostgreSQL\n- 4+ years of hands-on experience with gRPC\n- 5+ years of hands-on experience with Terraform\n- 2+ years of hands-on experience with TypeScript\n- Clear written communication; we decide things in documents\nNice to have\n- Exposure to Kubernetes\n- Exposure to Airflow\n- Exposure to Go\nBenefits\nCompetitive salary and equity, a learning budget, and four weeks of vacation that people actually take.",
+  "textHash": "691827a865ee13c933b59fe621c3394c6405ac75",
+  "error": null
+}

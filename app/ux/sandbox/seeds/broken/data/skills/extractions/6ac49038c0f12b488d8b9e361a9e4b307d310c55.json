@@ -1,0 +1,58 @@
+{
+  "textHash": "6ac49038c0f12b488d8b9e361a9e4b307d310c55",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:02:00.000Z",
+  "skills": [
+    {
+      "skill": "AWS",
+      "canonical": "AWS",
+      "id": "aws",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Distributed Systems",
+      "canonical": "Distributed Systems",
+      "id": "distributed-systems",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Docker",
+      "canonical": "Docker",
+      "id": "docker",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Go",
+      "canonical": "Go",
+      "id": "go",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "Machine Learning",
+      "canonical": "Machine Learning",
+      "id": "machine-learning",
+      "category": "ai-ml",
+      "level": "required"
+    },
+    {
+      "skill": "React",
+      "canonical": "React",
+      "id": "react",
+      "category": "framework",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Terraform",
+      "canonical": "Terraform",
+      "id": "terraform",
+      "category": "cloud-infra",
+      "level": "required"
+    }
+  ]
+}

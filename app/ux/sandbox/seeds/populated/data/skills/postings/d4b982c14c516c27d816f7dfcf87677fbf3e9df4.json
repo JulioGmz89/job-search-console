@@ -1,0 +1,10 @@
+{
+  "id": "d4b982c14c516c27d816f7dfcf87677fbf3e9df4",
+  "url": "https://job-boards.greenhouse.io/mosaicretail/jobs/4142172",
+  "fetchedAt": "2026-09-25T15:09:00.000Z",
+  "source": "greenhouse-api",
+  "title": "Infrastructure Engineer",
+  "text": "About Mosaic Retail\nMosaic Retail powers checkout and inventory for 900 independent stores. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.\nThe role\nAs a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.\nWhat you will need\n- 3+ years of hands-on experience with Kubernetes\n- 4+ years of hands-on experience with Observability\n- 5+ years of hands-on experience with Go\n- 2+ years of hands-on experience with Terraform\n- several years of hands-on experience with GCP\n- 3+ years of hands-on experience with CI/CD\n- Clear written communication; we decide things in documents\nNice to have\n- Exposure to OpenTelemetry\n- Exposure to Rust\nBenefits\nCompetitive salary and equity, a learning budget, and four weeks of vacation that people actually take.",
+  "textHash": "bedfba27a101e1523a8d70c858f936dd14a10feb",
+  "error": null
+}

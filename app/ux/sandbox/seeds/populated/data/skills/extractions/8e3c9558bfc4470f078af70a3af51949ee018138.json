@@ -1,0 +1,65 @@
+{
+  "textHash": "8e3c9558bfc4470f078af70a3af51949ee018138",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:03:00.000Z",
+  "skills": [
+    {
+      "skill": "Datadog",
+      "canonical": "Datadog",
+      "id": "datadog",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "GCP",
+      "canonical": "GCP",
+      "id": "gcp",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Go",
+      "canonical": "Go",
+      "id": "go",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "Java",
+      "canonical": "Java",
+      "id": "java",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "Kafka",
+      "canonical": "Kafka",
+      "id": "kafka",
+      "category": "data",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Kubernetes",
+      "canonical": "Kubernetes",
+      "id": "kubernetes",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "PostgreSQL",
+      "canonical": "PostgreSQL",
+      "id": "postgresql",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "Prometheus",
+      "canonical": "Prometheus",
+      "id": "prometheus",
+      "category": "cloud-infra",
+      "level": "required"
+    }
+  ]
+}

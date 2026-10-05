@@ -1,0 +1,58 @@
+{
+  "textHash": "0aa8213ca6c28c56fdf3ad0a1c8df334e621164d",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:10:00.000Z",
+  "skills": [
+    {
+      "skill": "CI/CD",
+      "canonical": "CI/CD",
+      "id": "ci-cd",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Go",
+      "canonical": "Go",
+      "id": "go",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "gRPC",
+      "canonical": "gRPC",
+      "id": "grpc",
+      "category": "framework",
+      "level": "required"
+    },
+    {
+      "skill": "Kotlin",
+      "canonical": "Kotlin",
+      "id": "kotlin",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "PostgreSQL",
+      "canonical": "PostgreSQL",
+      "id": "postgresql",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "Python",
+      "canonical": "Python",
+      "id": "python",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "TypeScript",
+      "canonical": "TypeScript",
+      "id": "typescript",
+      "category": "language",
+      "level": "nice-to-have"
+    }
+  ]
+}

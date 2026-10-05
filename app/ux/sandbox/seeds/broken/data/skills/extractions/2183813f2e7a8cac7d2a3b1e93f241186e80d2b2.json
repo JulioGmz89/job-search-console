@@ -1,0 +1,58 @@
+{
+  "textHash": "2183813f2e7a8cac7d2a3b1e93f241186e80d2b2",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:25:00.000Z",
+  "skills": [
+    {
+      "skill": "CI/CD",
+      "canonical": "CI/CD",
+      "id": "ci-cd",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Distributed Systems",
+      "canonical": "Distributed Systems",
+      "id": "distributed-systems",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Go",
+      "canonical": "Go",
+      "id": "go",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "gRPC",
+      "canonical": "gRPC",
+      "id": "grpc",
+      "category": "framework",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Kubernetes",
+      "canonical": "Kubernetes",
+      "id": "kubernetes",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "OpenTelemetry",
+      "canonical": "OpenTelemetry",
+      "id": "opentelemetry",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Spark",
+      "canonical": "Spark",
+      "id": "spark",
+      "category": "data",
+      "level": "nice-to-have"
+    }
+  ]
+}

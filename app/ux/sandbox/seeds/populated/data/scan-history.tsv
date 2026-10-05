@@ -1,0 +1,74 @@
+url	first_seen	portal	title	company	status	location	fingerprint	posted_at	trust_score	trust_flags	normalized_company
+https://job-boards.greenhouse.io/brightwaterhealth/jobs/4100044	2026-08-10	greenhouse-api	Full Stack Engineer	Brightwater Health	added	Remote (US)		2026-08-10			brightwaterhealth
+https://job-boards.greenhouse.io/cobaltfreight/jobs/4103357	2026-08-10	greenhouse-api	Site Reliability Engineer	Cobalt Freight	added	New York, NY · Hybrid		2026-08-10			cobaltfreight
+https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4107766	2026-08-11	greenhouse-api	Infrastructure Engineer	Driftwood Analytics	added	New York, NY · Hybrid		2026-08-11			driftwoodanalytics
+https://job-boards.greenhouse.io/emberpayments/jobs/4110543	2026-08-12	greenhouse-api	Backend Engineer (Go)	Ember Payments	added	Remote (Americas)		2026-08-12			emberpayments
+https://job-boards.greenhouse.io/fernhillrobotics/jobs/4113493	2026-08-12	greenhouse-api	Backend Engineer (Go)	Fernhill Robotics	added	Remote (US) · EST overlap		2026-08-12			fernhillrobotics
+https://job-boards.greenhouse.io/granitecloud/jobs/4118001	2026-08-13	greenhouse-api	Software Engineer, Payments	Granite Cloud	added	Remote (Americas)		2026-08-13			granitecloud
+https://job-boards.greenhouse.io/harborlearning/jobs/4123081	2026-08-14	greenhouse-api	Data Engineer	Harbor Learning	added	Remote (US) · EST overlap		2026-08-14			harborlearning
+https://job-boards.greenhouse.io/ironleafsecurity/jobs/4126888	2026-08-14	greenhouse-api	Site Reliability Engineer	Ironleaf Security	added	Austin, TX		2026-08-14			ironleafsecurity
+https://job-boards.greenhouse.io/lumengrid/jobs/4138296	2026-08-15	greenhouse-api	Backend Engineer (Go)	Lumen Grid	added	Remote (US)		2026-08-15			lumengrid
+https://job-boards.greenhouse.io/brightwaterhealth/jobs/4102729	2026-08-15	greenhouse-api	Account Executive	Brightwater Health	skipped_title	Austin, TX		2026-08-15			brightwaterhealth
+https://job-boards.greenhouse.io/mosaicretail/jobs/4142172	2026-08-16	greenhouse-api	Infrastructure Engineer	Mosaic Retail	added	Austin, TX		2026-08-16			mosaicretail
+https://job-boards.greenhouse.io/brightwaterhealth/jobs/4100429	2026-08-16	greenhouse-api	Backend Engineer (Go)	Brightwater Health	added	New York, NY · Hybrid		2026-08-16			brightwaterhealth
+https://job-boards.greenhouse.io/cobaltfreight/jobs/4103862	2026-08-17	greenhouse-api	Staff Software Engineer	Cobalt Freight	added	Remote (Americas)		2026-08-17			cobaltfreight
+https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4108461	2026-08-18	greenhouse-api	Backend Engineer (Go)	Driftwood Analytics	added	New York, NY · Hybrid		2026-08-18			driftwoodanalytics
+https://job-boards.greenhouse.io/emberpayments/jobs/4111221	2026-08-19	greenhouse-api	Software Engineer, Payments	Ember Payments	added	Remote (US)		2026-08-19			emberpayments
+https://job-boards.greenhouse.io/fernhillrobotics/jobs/4114100	2026-08-19	greenhouse-api	Software Engineer, Payments	Fernhill Robotics	added	Remote (US)		2026-08-19			fernhillrobotics
+https://job-boards.greenhouse.io/granitecloud/jobs/4118598	2026-08-20	greenhouse-api	Senior Backend Engineer	Granite Cloud	added	Remote (Americas)		2026-08-20			granitecloud
+https://job-boards.greenhouse.io/harborlearning/jobs/4123176	2026-08-21	greenhouse-api	Backend Engineer (Go)	Harbor Learning	added	Remote (Americas)		2026-08-21			harborlearning
+https://job-boards.greenhouse.io/ironleafsecurity/jobs/4127155	2026-08-21	greenhouse-api	Machine Learning Engineer	Ironleaf Security	added	Remote (Americas)		2026-08-21			ironleafsecurity
+https://job-boards.greenhouse.io/lumengrid/jobs/4138681	2026-08-22	greenhouse-api	Infrastructure Engineer	Lumen Grid	added	Remote (US) · EST overlap		2026-08-22			lumengrid
+https://job-boards.greenhouse.io/mosaicretail/jobs/4142735	2026-08-23	greenhouse-api	Senior Backend Engineer	Mosaic Retail	added	Remote (US)		2026-08-23			mosaicretail
+https://job-boards.greenhouse.io/brightwaterhealth/jobs/4100983	2026-08-23	greenhouse-api	Data Engineer	Brightwater Health	added	Remote (US) · EST overlap		2026-08-23			brightwaterhealth
+https://job-boards.greenhouse.io/cobaltfreight/jobs/4104564	2026-08-24	greenhouse-api	Senior Backend Engineer	Cobalt Freight	added	Austin, TX		2026-08-24			cobaltfreight
+https://job-boards.greenhouse.io/cobaltfreight/jobs/4107528	2026-08-24	greenhouse-api	Account Executive	Cobalt Freight	skipped_title	Remote (US)		2026-08-24			cobaltfreight
+https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4108485	2026-08-25	greenhouse-api	Backend Engineer (Go)	Driftwood Analytics	added	Remote (Americas)		2026-08-25			driftwoodanalytics
+https://job-boards.greenhouse.io/emberpayments/jobs/4111284	2026-08-26	greenhouse-api	Backend Engineer (Go)	Ember Payments	added	New York, NY · Hybrid		2026-08-26			emberpayments
+https://job-boards.greenhouse.io/fernhillrobotics/jobs/4114377	2026-08-26	greenhouse-api	Software Engineer, Payments	Fernhill Robotics	added	New York, NY · Hybrid		2026-08-26			fernhillrobotics
+https://job-boards.greenhouse.io/granitecloud/jobs/4118737	2026-08-27	greenhouse-api	Machine Learning Engineer	Granite Cloud	added	Remote (US)		2026-08-27			granitecloud
+https://job-boards.greenhouse.io/harborlearning/jobs/4123992	2026-08-28	greenhouse-api	Software Engineer, Payments	Harbor Learning	added	Austin, TX		2026-08-28			harborlearning
+https://job-boards.greenhouse.io/ironleafsecurity/jobs/4127726	2026-08-28	greenhouse-api	Infrastructure Engineer	Ironleaf Security	added	New York, NY · Hybrid		2026-08-28			ironleafsecurity
+https://job-boards.greenhouse.io/lumengrid/jobs/4139114	2026-08-29	greenhouse-api	Site Reliability Engineer	Lumen Grid	added	Remote (Americas)		2026-08-29			lumengrid
+https://job-boards.greenhouse.io/mosaicretail/jobs/4143566	2026-08-30	greenhouse-api	Senior Backend Engineer	Mosaic Retail	added	Remote (Americas)		2026-08-30			mosaicretail
+https://job-boards.greenhouse.io/brightwaterhealth/jobs/4101307	2026-08-30	greenhouse-api	Infrastructure Engineer	Brightwater Health	added	Remote (US)		2026-08-30			brightwaterhealth
+https://job-boards.greenhouse.io/cobaltfreight/jobs/4104991	2026-08-31	greenhouse-api	Data Engineer	Cobalt Freight	added	Austin, TX		2026-08-31			cobaltfreight
+https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4108949	2026-09-01	greenhouse-api	Full Stack Engineer	Driftwood Analytics	added	New York, NY · Hybrid		2026-09-01			driftwoodanalytics
+https://job-boards.greenhouse.io/emberpayments/jobs/4111449	2026-09-01	greenhouse-api	Software Engineer, Payments	Ember Payments	added	Remote (US)		2026-09-01			emberpayments
+https://job-boards.greenhouse.io/fernhillrobotics/jobs/4114757	2026-09-02	greenhouse-api	Infrastructure Engineer	Fernhill Robotics	added	Remote (Americas)		2026-09-02			fernhillrobotics
+https://job-boards.greenhouse.io/emberpayments/jobs/4113173	2026-09-02	greenhouse-api	Account Executive	Ember Payments	skipped_title	Remote (US) · EST overlap		2026-09-02			emberpayments
+https://job-boards.greenhouse.io/granitecloud/jobs/4119572	2026-09-03	greenhouse-api	Senior Backend Engineer	Granite Cloud	added	New York, NY · Hybrid		2026-09-03			granitecloud
+https://job-boards.greenhouse.io/harborlearning/jobs/4124393	2026-09-04	greenhouse-api	Software Engineer, Payments	Harbor Learning	added	Remote (US) · EST overlap		2026-09-04			harborlearning
+https://job-boards.greenhouse.io/ironleafsecurity/jobs/4128318	2026-09-04	greenhouse-api	Site Reliability Engineer	Ironleaf Security	added	Remote (US)		2026-09-04			ironleafsecurity
+https://job-boards.greenhouse.io/lumengrid/jobs/4139379	2026-09-05	greenhouse-api	Machine Learning Engineer	Lumen Grid	added	New York, NY · Hybrid		2026-09-05			lumengrid
+https://job-boards.greenhouse.io/mosaicretail/jobs/4144141	2026-09-06	greenhouse-api	Full Stack Engineer	Mosaic Retail	added	New York, NY · Hybrid		2026-09-06			mosaicretail
+https://job-boards.greenhouse.io/brightwaterhealth/jobs/4101707	2026-09-06	greenhouse-api	Data Engineer	Brightwater Health	added	Remote (US)		2026-09-06			brightwaterhealth
+https://job-boards.greenhouse.io/cobaltfreight/jobs/4105437	2026-09-07	greenhouse-api	Senior Backend Engineer	Cobalt Freight	added	Remote (Americas)		2026-09-07			cobaltfreight
+https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4109592	2026-09-08	greenhouse-api	Data Engineer	Driftwood Analytics	added	Remote (US) · EST overlap		2026-09-08			driftwoodanalytics
+https://job-boards.greenhouse.io/emberpayments/jobs/4111508	2026-09-08	greenhouse-api	Software Engineer, Payments	Ember Payments	added	Austin, TX		2026-09-08			emberpayments
+https://job-boards.greenhouse.io/fernhillrobotics/jobs/4115146	2026-09-09	greenhouse-api	Platform Engineer	Fernhill Robotics	added	Remote (Americas)		2026-09-09			fernhillrobotics
+https://job-boards.greenhouse.io/granitecloud/jobs/4120162	2026-09-10	greenhouse-api	Infrastructure Engineer	Granite Cloud	added	Austin, TX		2026-09-10			granitecloud
+https://job-boards.greenhouse.io/harborlearning/jobs/4124552	2026-09-11	greenhouse-api	Software Engineer, Payments	Harbor Learning	added	New York, NY · Hybrid		2026-09-11			harborlearning
+https://job-boards.greenhouse.io/ironleafsecurity/jobs/4128983	2026-09-11	greenhouse-api	Staff Software Engineer	Ironleaf Security	added	Remote (Americas)		2026-09-11			ironleafsecurity
+https://job-boards.greenhouse.io/fernhillrobotics/jobs/4117585	2026-09-11	greenhouse-api	Account Executive	Fernhill Robotics	skipped_title	Austin, TX		2026-09-11			fernhillrobotics
+https://job-boards.greenhouse.io/lumengrid/jobs/4139504	2026-09-12	greenhouse-api	Machine Learning Engineer	Lumen Grid	added	Remote (US)		2026-09-12			lumengrid
+https://job-boards.greenhouse.io/mosaicretail/jobs/4144142	2026-09-13	greenhouse-api	Senior Backend Engineer	Mosaic Retail	added	Remote (Americas)		2026-09-13			mosaicretail
+https://job-boards.greenhouse.io/brightwaterhealth/jobs/4101878	2026-09-13	greenhouse-api	Backend Engineer (Go)	Brightwater Health	added	Austin, TX		2026-09-13			brightwaterhealth
+https://job-boards.greenhouse.io/cobaltfreight/jobs/4106262	2026-09-14	greenhouse-api	Staff Software Engineer	Cobalt Freight	added	Remote (Americas)		2026-09-14			cobaltfreight
+https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4109631	2026-09-15	greenhouse-api	Senior Backend Engineer	Driftwood Analytics	added	Remote (US)		2026-09-15			driftwoodanalytics
+https://job-boards.greenhouse.io/emberpayments/jobs/4112238	2026-09-15	greenhouse-api	Infrastructure Engineer	Ember Payments	added	Remote (US) · EST overlap		2026-09-15			emberpayments
+https://job-boards.greenhouse.io/fernhillrobotics/jobs/4115949	2026-09-16	greenhouse-api	Staff Software Engineer	Fernhill Robotics	added	Remote (Americas)		2026-09-16			fernhillrobotics
+https://job-boards.greenhouse.io/granitecloud/jobs/4121060	2026-09-17	greenhouse-api	Backend Engineer (Go)	Granite Cloud	added	Remote (Americas)		2026-09-17			granitecloud
+https://job-boards.greenhouse.io/harborlearning/jobs/4125254	2026-09-17	greenhouse-api	Infrastructure Engineer	Harbor Learning	added	Remote (US)		2026-09-17			harborlearning
+https://job-boards.greenhouse.io/ironleafsecurity/jobs/4129041	2026-09-18	greenhouse-api	Full Stack Engineer	Ironleaf Security	added	Austin, TX		2026-09-18			ironleafsecurity
+https://job-boards.greenhouse.io/lumengrid/jobs/4140134	2026-09-19	greenhouse-api	Site Reliability Engineer	Lumen Grid	added	Remote (US)		2026-09-19			lumengrid
+https://job-boards.greenhouse.io/mosaicretail/jobs/4144301	2026-09-20	greenhouse-api	Data Engineer	Mosaic Retail	added	Remote (US)		2026-09-20			mosaicretail
+https://job-boards.greenhouse.io/brightwaterhealth/jobs/4102518	2026-09-20	greenhouse-api	Data Engineer	Brightwater Health	added	Austin, TX		2026-09-20			brightwaterhealth
+https://job-boards.greenhouse.io/cobaltfreight/jobs/4106808	2026-09-21	greenhouse-api	Site Reliability Engineer	Cobalt Freight	added	Austin, TX		2026-09-21			cobaltfreight
+https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4109663	2026-09-22	greenhouse-api	Backend Engineer (Go)	Driftwood Analytics	added	Remote (US)		2026-09-22			driftwoodanalytics
+https://job-boards.greenhouse.io/emberpayments/jobs/4113002	2026-09-22	greenhouse-api	Full Stack Engineer	Ember Payments	added	Remote (US) · EST overlap		2026-09-22			emberpayments
+https://job-boards.greenhouse.io/fernhillrobotics/jobs/4116717	2026-09-23	greenhouse-api	Senior Backend Engineer	Fernhill Robotics	added	Remote (US)		2026-09-23			fernhillrobotics
+https://job-boards.greenhouse.io/granitecloud/jobs/4121477	2026-09-24	greenhouse-api	Data Engineer	Granite Cloud	added	New York, NY · Hybrid		2026-09-24			granitecloud
+https://job-boards.greenhouse.io/junipermobility/jobs/4130325	2026-09-24	greenhouse-api	Backend Engineer (Go)	Juniper Mobility	added	New York, NY · Hybrid		2026-09-24			junipermobility
+https://job-boards.greenhouse.io/junipermobility/jobs/4130813	2026-09-25	greenhouse-api	Backend Engineer (Go)	Juniper Mobility	added	Remote (US)		2026-09-25			junipermobility
+https://job-boards.greenhouse.io/junipermobility/jobs/4131210	2026-09-26	greenhouse-api	Full Stack Engineer	Juniper Mobility	added	New York, NY · Hybrid		2026-09-26			junipermobility

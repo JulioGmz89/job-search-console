@@ -1,0 +1,135 @@
+{
+  "cvHash": "820b6c4d6c469b96c65309d2ceddbaf167512f8f",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:30:00.000Z",
+  "skills": [
+    {
+      "skill": "AWS",
+      "canonical": "AWS",
+      "id": "aws",
+      "category": "cloud-infra",
+      "depth": "solid"
+    },
+    {
+      "skill": "CI/CD",
+      "canonical": "CI/CD",
+      "id": "ci-cd",
+      "category": "cloud-infra",
+      "depth": "basic"
+    },
+    {
+      "skill": "Distributed Systems",
+      "canonical": "Distributed Systems",
+      "id": "distributed-systems",
+      "category": "cloud-infra",
+      "depth": "solid"
+    },
+    {
+      "skill": "Docker",
+      "canonical": "Docker",
+      "id": "docker",
+      "category": "cloud-infra",
+      "depth": "solid"
+    },
+    {
+      "skill": "Event-Driven Architecture",
+      "canonical": "Event-Driven Architecture",
+      "id": "event-driven-architecture",
+      "category": "cloud-infra",
+      "depth": "expert"
+    },
+    {
+      "skill": "Go",
+      "canonical": "Go",
+      "id": "go",
+      "category": "language",
+      "depth": "expert"
+    },
+    {
+      "skill": "Kafka",
+      "canonical": "Kafka",
+      "id": "kafka",
+      "category": "data",
+      "depth": "solid"
+    },
+    {
+      "skill": "Kubernetes",
+      "canonical": "Kubernetes",
+      "id": "kubernetes",
+      "category": "cloud-infra",
+      "depth": "solid"
+    },
+    {
+      "skill": "Node.js",
+      "canonical": "Node.js",
+      "id": "node-js",
+      "category": "framework",
+      "depth": "basic"
+    },
+    {
+      "skill": "Observability",
+      "canonical": "Observability",
+      "id": "observability",
+      "category": "cloud-infra",
+      "depth": "solid"
+    },
+    {
+      "skill": "OpenTelemetry",
+      "canonical": "OpenTelemetry",
+      "id": "opentelemetry",
+      "category": "cloud-infra",
+      "depth": "solid"
+    },
+    {
+      "skill": "PostgreSQL",
+      "canonical": "PostgreSQL",
+      "id": "postgresql",
+      "category": "data",
+      "depth": "expert"
+    },
+    {
+      "skill": "Python",
+      "canonical": "Python",
+      "id": "python",
+      "category": "language",
+      "depth": "basic"
+    },
+    {
+      "skill": "Redis",
+      "canonical": "Redis",
+      "id": "redis",
+      "category": "data",
+      "depth": "solid"
+    },
+    {
+      "skill": "REST APIs",
+      "canonical": "REST APIs",
+      "id": "rest-apis",
+      "category": "framework",
+      "depth": "expert"
+    },
+    {
+      "skill": "SQL",
+      "canonical": "SQL",
+      "id": "sql",
+      "category": "language",
+      "depth": "expert"
+    },
+    {
+      "skill": "Terraform",
+      "canonical": "Terraform",
+      "id": "terraform",
+      "category": "cloud-infra",
+      "depth": "basic"
+    },
+    {
+      "skill": "TypeScript",
+      "canonical": "TypeScript",
+      "id": "typescript",
+      "category": "language",
+      "depth": "solid"
+    }
+  ]
+}

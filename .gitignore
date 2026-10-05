@@ -68,10 +68,24 @@ portals.yml.bak
 # above is unanchored, so it swallows them at any depth and CI then runs
 # against files that were never committed.
 !app/server/services/__fixtures__/**/portals.yml
+# The UX sandbox's seed workspaces are fictional fixtures too (app/ux/sandbox/).
+!app/ux/sandbox/seeds/**/portals.yml
+!app/ux/sandbox/seeds/**/cv.md
+# Screenshots the Playwright MCP server writes before an agent files them as evidence.
+app/ux/.shots-tmp/
+# The scripted axe pass re-creates these on every run; findings keep their own evidence.
+app/ux/a11y/shots/
+# Real-user session recordings are never committed (PROJECT_PLAN.md §12.5); only notes are.
+app/ux/sessions/**/*.webm
+app/ux/sessions/**/*.mkv
+app/ux/sessions/**/*.m4a
+app/ux/sessions/**/*.wav
+app/ux/sessions/**/*.mp3
 modes/_profile.md
 modes/_custom.md
 modes/_brief.md
 voice-dna.md
+!app/ux/sandbox/seeds/**/voice-dna.md
 .update-dismissed
 .update-lock
 .manifesto-noted

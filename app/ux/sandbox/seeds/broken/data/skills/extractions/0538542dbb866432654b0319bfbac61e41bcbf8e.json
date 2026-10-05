@@ -1,0 +1,72 @@
+{
+  "textHash": "0538542dbb866432654b0319bfbac61e41bcbf8e",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:08:00.000Z",
+  "skills": [
+    {
+      "skill": "CI/CD",
+      "canonical": "CI/CD",
+      "id": "ci-cd",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Distributed Systems",
+      "canonical": "Distributed Systems",
+      "id": "distributed-systems",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Go",
+      "canonical": "Go",
+      "id": "go",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "GraphQL",
+      "canonical": "GraphQL",
+      "id": "graphql",
+      "category": "framework",
+      "level": "required"
+    },
+    {
+      "skill": "gRPC",
+      "canonical": "gRPC",
+      "id": "grpc",
+      "category": "framework",
+      "level": "required"
+    },
+    {
+      "skill": "OpenTelemetry",
+      "canonical": "OpenTelemetry",
+      "id": "opentelemetry",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "PostgreSQL",
+      "canonical": "PostgreSQL",
+      "id": "postgresql",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "Prometheus",
+      "canonical": "Prometheus",
+      "id": "prometheus",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Terraform",
+      "canonical": "Terraform",
+      "id": "terraform",
+      "category": "cloud-infra",
+      "level": "required"
+    }
+  ]
+}

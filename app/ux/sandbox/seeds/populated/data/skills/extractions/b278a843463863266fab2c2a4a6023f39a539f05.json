@@ -1,0 +1,58 @@
+{
+  "textHash": "b278a843463863266fab2c2a4a6023f39a539f05",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:14:00.000Z",
+  "skills": [
+    {
+      "skill": "AWS",
+      "canonical": "AWS",
+      "id": "aws",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Distributed Systems",
+      "canonical": "Distributed Systems",
+      "id": "distributed-systems",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Docker",
+      "canonical": "Docker",
+      "id": "docker",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Elasticsearch",
+      "canonical": "Elasticsearch",
+      "id": "elasticsearch",
+      "category": "data",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Kubernetes",
+      "canonical": "Kubernetes",
+      "id": "kubernetes",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "PostgreSQL",
+      "canonical": "PostgreSQL",
+      "id": "postgresql",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "TypeScript",
+      "canonical": "TypeScript",
+      "id": "typescript",
+      "category": "language",
+      "level": "required"
+    }
+  ]
+}

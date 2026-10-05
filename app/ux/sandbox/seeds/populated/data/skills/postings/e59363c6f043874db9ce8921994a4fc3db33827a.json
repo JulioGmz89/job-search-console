@@ -1,0 +1,10 @@
+{
+  "id": "e59363c6f043874db9ce8921994a4fc3db33827a",
+  "url": "https://job-boards.greenhouse.io/cobaltfreight/jobs/4104991",
+  "fetchedAt": "2026-09-25T15:31:00.000Z",
+  "source": "greenhouse-api",
+  "title": "Data Engineer",
+  "text": "About Cobalt Freight\nCobalt Freight runs a digital freight marketplace for regional carriers. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.\nThe role\nAs a Data Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.\nWhat you will need\n- 3+ years of hands-on experience with AWS\n- 4+ years of hands-on experience with Go\n- 5+ years of hands-on experience with CI/CD\n- 2+ years of hands-on experience with Kafka\n- Clear written communication; we decide things in documents\nNice to have\n- Exposure to Kubernetes\n- Exposure to Prometheus\n- Exposure to Spark\nBenefits\nCompetitive salary and equity, a learning budget, and four weeks of vacation that people actually take.",
+  "textHash": "aa95ef90b5af5e78b04dedcf64f9c26a1b6d4b4a",
+  "error": null
+}

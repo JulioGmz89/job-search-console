@@ -1,0 +1,110 @@
+{
+  "lang": "en",
+  "page_format": "a4",
+  "candidate": {
+    "name": "Alex Rivera",
+    "phone": "+1 555 010 0199",
+    "email": "alex.rivera@example.com",
+    "linkedin": {
+      "url": "https://linkedin.com/in/alex-rivera-example",
+      "display": "linkedin.com/in/alex-rivera-example"
+    },
+    "github": {
+      "url": "https://github.com/alex-rivera-example",
+      "display": "github.com/alex-rivera-example"
+    },
+    "location": "Remote",
+    "photo": ""
+  },
+  "summary": "Backend engineer with seven years building **payment and data platforms** in TypeScript and Go. Comfortable owning a service from design review to on-call, and happiest where reliability work pays for itself in fewer incidents.",
+  "competencies": [
+    "Kubernetes",
+    "Distributed Systems",
+    "Observability",
+    "API Design",
+    "PostgreSQL",
+    "Event-Driven Architecture",
+    "TypeScript",
+    "Go"
+  ],
+  "experience": [
+    {
+      "company": "Northwind Payments",
+      "role": "Senior Backend Engineer",
+      "location": "Remote",
+      "dates": "March 2022 - Present",
+      "bullets": [
+        "Rebuilt the settlement pipeline as an event-driven service in Go, cutting end-of-day reconciliation from **4 hours to 25 minutes**.",
+        "Led the move from cron jobs to a queue-backed scheduler with idempotent retries; payment-related incidents fell **60%** in two quarters.",
+        "Introduced OpenTelemetry tracing across 14 services and wrote the runbooks the on-call rotation now uses."
+      ]
+    },
+    {
+      "company": "Contoso Analytics",
+      "role": "Backend Engineer",
+      "location": "Austin, TX",
+      "dates": "June 2019 - February 2022",
+      "bullets": [
+        "Designed the public REST API for the reporting product (TypeScript, PostgreSQL), serving 3,000 customer integrations.",
+        "Cut p95 query latency from 1.8 s to 300 ms by reworking indexes and adding a read replica for heavy reports.",
+        "Mentored three junior engineers through their first production launches."
+      ]
+    },
+    {
+      "company": "Fabrikam Labs",
+      "role": "Software Engineer",
+      "location": "Austin, TX",
+      "dates": "July 2017 - May 2019",
+      "bullets": [
+        "Built internal tooling in Node.js for test-data generation, used by every QA team in the company.",
+        "Containerized the legacy monolith and wrote its first Kubernetes deployment manifests."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "pg-shadow",
+      "url": "https://github.com/alex-rivera-example/pg-shadow",
+      "badge": "Open Source",
+      "tech": "Go, PostgreSQL",
+      "description": "Replays production query traffic against a candidate schema to catch slow migrations before they ship."
+    }
+  ],
+  "education": [
+    {
+      "title": "B.S. Computer Science",
+      "org": "University of Texas at Austin",
+      "year": "2017"
+    }
+  ],
+  "certifications": [
+    {
+      "title": "Certified Kubernetes Application Developer",
+      "org": "CNCF",
+      "year": "2023"
+    }
+  ],
+  "skills": [
+    {
+      "category": "Languages",
+      "items": "Go, TypeScript, SQL, Python"
+    },
+    {
+      "category": "Infrastructure",
+      "items": [
+        "Kubernetes",
+        "Docker",
+        "Terraform",
+        "AWS"
+      ]
+    },
+    {
+      "category": "Data",
+      "items": [
+        "PostgreSQL",
+        "Kafka",
+        "Redis"
+      ]
+    }
+  ]
+}
