@@ -121,7 +121,8 @@ const write = (relative, text) => {
   return path;
 };
 
-emit({ type: 'system', subtype: 'init', model: 'fake-claude', tools: ['Read', 'Write', 'Bash'] });
+// In the UX sandbox the log names a plausible model, so testers do not judge the stand-in.
+emit({ type: 'system', subtype: 'init', model: process.env.FAKE_CLAUDE_MARKET ? 'claude-sonnet-5-5' : 'fake-claude', tools: ['Read', 'Write', 'Bash'] });
 say(`Received: ${userPrompt.slice(0, 60)}\n`);
 
 const writeReport = (num, score) => {
@@ -158,14 +159,46 @@ const writeReport = (num, score) => {
       'next_action: "Apply"',
       '```',
       '',
-      '## A) Role Summary',
-      '',
-      'A fixture report written by fake-claude.js.',
-      '',
-      '## Cover Letter Draft',
-      '',
-      `Dear ${company}, I am the fixture.`,
-      '',
+      ...(posting
+        ? [
+            // The UX sandbox: a report that reads like one, so testers judge the
+            // console rather than a placeholder.
+            '## A) Role Summary',
+            '',
+            `${company} is hiring a ${role}: a small remote team that owns its services end to end, on call included.`,
+            '',
+            '## B) CV Match',
+            '',
+            '| JD Requirement | CV Match | Source |',
+            '|----------------|----------|--------|',
+            '| Production backend services | Settlement pipeline rebuilt as an event-driven Go service | cv.md: Northwind Payments |',
+            '| Reliability and on-call ownership | Queue-backed scheduler with idempotent retries; incidents down 60% | cv.md: Northwind Payments |',
+            '| PostgreSQL | Public REST API on PostgreSQL | cv.md: Contoso Analytics |',
+            '',
+            '### Gaps',
+            '',
+            '| Gap | Severity | Mitigation |',
+            '|-----|----------|------------|',
+            '| gRPC | Medium | Name the internal service APIs; plan a small side project |',
+            '',
+            '## C) Level and Strategy',
+            '',
+            'Senior level matches. Lead with the settlement pipeline and the incident reduction.',
+            '',
+            '## D) Comp and Demand',
+            '',
+            'Advertised: not stated. Target: $165K-190K.',
+            '',
+            '## E) Personalization Plan',
+            '',
+            "Move Go and event-driven work to the top of the summary; mirror the posting's wording.",
+            '',
+            '## F) Interview Plan',
+            '',
+            'Settlement pipeline rebuild (STAR), queue-backed scheduler (STAR), tracing rollout (STAR).',
+            '',
+          ]
+        : ['## A) Role Summary', '', 'A fixture report written by fake-claude.js.', '', '## Cover Letter Draft', '', `Dear ${company}, I am the fixture.`, '']),
     ].join('\n'),
   );
   write(
