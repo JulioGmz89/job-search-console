@@ -200,6 +200,13 @@ test('render-cv.js --document builds from the payload, gates facts, renders and 
   assert.equal(spawned[0][1], join(output, 'cv-ada-globex.json'));
   assert.equal(spawned[0][2], join(output, 'cv-ada-globex.html'));
   assert.match(spawned[0][3], /cv-template\.modern\.html$/);
+  // The fact gate reads this root's CV, not whatever cv.md sits in its cwd.
+  assert.deepEqual(spawned[1].slice(1), [
+    join(output, 'cv-ada-globex.html'),
+    '--source', join(root, 'cv.md'),
+    '--source', join(root, 'article-digest.md'),
+    '--config', join(root, 'config', 'cv-facts.json'),
+  ]);
   assert.deepEqual(spawned[2].slice(2), [join(output, 'cv-ada-globex-2026-10-01.pdf'), '--format=letter', '--report=012', '--allow-reorder']);
   assert.equal(checked.length, 1);
   assert.equal(checked[0].pdfPath, join(output, 'cv-ada-globex-2026-10-01.pdf'));

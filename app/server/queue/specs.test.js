@@ -71,6 +71,13 @@ test('a real scan chains the skills fetch; a dry run does not', () => {
   assert.throws(() => buildSpec('skills-fetch-auto'), (e) => e.code === 'kind-unknown');
 });
 
+test('a confined scan runs in the data root, so its relative bookkeeping paths stay there', () => {
+  assert.equal(buildSpec('scan', {}, { root: '/tmp/sandbox' }).cwd, '/tmp/sandbox');
+  assert.equal(buildSpec('scan', {}).cwd, undefined);
+  // Only scan needs it: the other scripts resolve every path from the environment.
+  assert.equal(buildSpec('verify-pipeline', {}, { root: '/tmp/sandbox' }).cwd, undefined);
+});
+
 test('scripts that rewrite the tracker are the ones that need confirming', () => {
   assert.equal(buildSpec('dedup', {}).confirmRequired, true);
   assert.equal(buildSpec('reconcile', {}).confirmRequired, true);

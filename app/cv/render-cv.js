@@ -81,6 +81,26 @@ export function generateArgs({ themedPath, output, format, report, maxPages, str
   ];
 }
 
+/**
+ * The fact gate's argv, with its sources named under the data root.
+ *
+ * verify-cv-facts.mjs resolves its default sources (`cv.md`,
+ * `article-digest.md`) against its cwd and its config against its own
+ * directory — the repository either way. That is the data root in the usual
+ * setup, but a render confined to another root (the UX sandbox, a test) would
+ * otherwise check that root's CV against the repository's cv.md. Naming the
+ * paths keeps the usual setup identical and the confined one honest.
+ */
+export function factGateArgs(html, root) {
+  return [
+    join(repoRoot, 'verify-cv-facts.mjs'),
+    html,
+    '--source', join(root, 'cv.md'),
+    '--source', join(root, 'article-digest.md'),
+    '--config', join(root, 'config', 'cv-facts.json'),
+  ];
+}
+
 /** Run a Node script with output passed through; resolves with its exit code. */
 function runNode(spawnFn, args, label) {
   return new Promise((done) => {
@@ -221,7 +241,7 @@ export async function renderDocument(args, { spawnFn = spawn, root = getCareerOp
     console.error('❌ build-cv-html.mjs could not build the CV from its payload.');
     return code;
   }
-  code = await runNode(spawnFn, [join(repoRoot, 'verify-cv-facts.mjs'), html], 'verify-cv-facts.mjs');
+  code = await runNode(spawnFn, factGateArgs(html, root), 'verify-cv-facts.mjs');
   if (code !== 0) {
     console.error('❌ The fact gate (verify-cv-facts.mjs) failed — nothing was rendered.');
     return code;

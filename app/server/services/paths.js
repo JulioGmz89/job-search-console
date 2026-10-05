@@ -167,7 +167,9 @@ export function inboxPath(root) {
  * two are the same directory — and then silently report "never scanned" for
  * every source the moment anyone points CAREER_OPS_ROOT somewhere else.
  *
- * An explicit `root` still wins, so tests can supply fixtures.
+ * An explicit `root` still wins, so tests can supply fixtures — and a confined
+ * app launches its scans in that root (`cwdAtRoot` in queue/specs.js), so the
+ * files it reads are the ones its own scans wrote.
  */
 function scanBookkeepingDir(root) {
   return root ? resolveDataRoot(root) : repoRoot;
