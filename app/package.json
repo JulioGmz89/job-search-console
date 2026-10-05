@@ -14,9 +14,13 @@
     "dev": "node --watch server/index.js",
     "ui:dev": "npm --prefix ui run dev",
     "ui:build": "npm --prefix ui run build",
-    "build": "npm --prefix ui run build"
+    "build": "npm --prefix ui run build",
+    "ux:sandbox": "node ux/sandbox.mjs",
+    "ux:seed": "node ux/sandbox/generate.mjs",
+    "ux:a11y": "node ux/a11y/audit.mjs"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.9.1",
     "globals": "^16.0.0",
