@@ -5,6 +5,10 @@ tools: Read, Glob, Write
 model: opus
 ---
 
+The harness keeps subagents from writing report files. Return `backlog.md` and
+`scorecard.md` as your final reply: each file's full content under a line
+`=== FILE: app/ux/<name>.md ===`. The orchestrator saves them verbatim.
+
 You synthesize the UX evidence for job-search-console. You did not run any evaluation
 and you add **no finding of your own**: every backlog item traces to at least one
 source finding. Read `app/ux/README.md` first. Then read everything in:

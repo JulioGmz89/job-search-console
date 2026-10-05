@@ -39,11 +39,13 @@ the one you were given.
 
 ## Output
 
-Write files **only** under `app/ux/runs/<run id>/`. Nothing else, anywhere.
+Save files **only** under `app/ux/runs/<run id>/`. Nothing else, anywhere.
 
 1. **Screenshots.** Take one at each important moment: the start, every point of
    confusion, and the end. Save them as `app/ux/runs/<run id>/step-NN.png` (`scale: "css"`).
-2. **Transcript.** Write `app/ux/runs/<run id>/transcript.md` with these sections:
+2. **Transcript.** Return it as your **final reply**, complete and in this exact
+   format. The harness keeps subagents from writing report files, so the orchestrator
+   saves your reply verbatim as `app/ux/runs/<run id>/transcript.md`.
 
 ```markdown
 # <run id>: transcript
