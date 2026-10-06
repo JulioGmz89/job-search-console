@@ -181,12 +181,16 @@ function load(root) {
       code: error.code === 'ENOENT' ? 'portals-missing' : 'portals-unreadable',
       message:
         error.code === 'ENOENT'
-          ? 'No portals.yml yet — add a company to create one.'
+          ? 'No portals.yml yet — follow a company to create one.'
           : `Could not read portals.yml: ${error.message}`,
     });
     return { path, exists: false, text: null, lines: [], doc: null, sections: {}, issues };
   }
+  return index(path, text, issues);
+}
 
+/** Parse and index a portals.yml text. `exists` says whether it is on disk yet. */
+function index(path, text, issues = [], exists = true) {
   let doc = null;
   try {
     // JSON_SCHEMA for the same reason reports.js uses it: the file is user-owned
@@ -207,7 +211,39 @@ function load(root) {
     sections[kind] = { key, range, items: split.items, indent: split.indent };
   }
 
-  return { path, exists: true, text, lines, doc, sections, issues };
+  return { path, exists, text, lines, doc, sections, issues };
+}
+
+/**
+ * The file a first follow starts from, when there is no portals.yml yet.
+ *
+ * Upstream's `templates/portals.example.yml` is one maintainer's search: its
+ * title filter keeps only AI, platform and solutions titles, so copying it would
+ * silently drop most other people's jobs. The seed keeps upstream's format and
+ * its intern exclusions, and leaves `positive` empty, which `scan.mjs` reads as
+ * "every title passes". Only the section being added is written: an empty
+ * top-level key parses as null, which `validate-portals.mjs` rejects.
+ */
+export function seedText(kind) {
+  return [
+    '# Companies and job boards to check for new openings (career-ops portals.yml).',
+    '# Created by Job Search Console when you followed your first company.',
+    '# Every option is documented in templates/portals.example.yml.',
+    '#',
+    '# title_filter: a job title is kept when it contains one of the `positive`',
+    '# keywords (an empty list keeps every title) and none of the `negative` ones.',
+    '# Add the roles you are looking for to `positive` to narrow the scan.',
+    '',
+    'title_filter:',
+    '  positive: []',
+    '  negative:',
+    '    - "word:Intern"',
+    '    - "word:Interns"',
+    '    - "Internship"',
+    '',
+    `${SECTIONS[kind]}:`,
+    '',
+  ].join('\n');
 }
 
 /** Project one parsed entry into the wire shape, keeping unknown keys visible. */
@@ -533,7 +569,7 @@ function checkIdentity(block, expectedName) {
 
 /** Reject edits to a file whose YAML and line index disagree. */
 function requireEditable(state, kind) {
-  if (!state.exists) throw new PortalsError('No portals.yml to edit', { code: 'portals-missing', status: 404 });
+  if (state.text === null) throw new PortalsError('No portals.yml to edit', { code: 'portals-missing', status: 404 });
   if (state.doc === null) {
     throw new PortalsError('portals.yml does not parse; fix it by hand first', { code: 'portals-unparseable', status: 422 });
   }
@@ -553,7 +589,18 @@ function requireEditable(state, kind) {
  */
 export function createEntry({ root, kind, entry, etag }) {
   if (!(kind in SECTIONS)) throw new PortalsError(`Unknown entry kind "${kind}"`, { code: 'kind-unknown' });
-  const state = load(root);
+  let state = load(root);
+  // The first follow creates the file (ia.md §4). A client that loaded the page
+  // while the file was missing sends no etag; one that sends an etag saw a file
+  // that has since gone, which is as stale as an edited one.
+  if (!state.exists && state.issues.some((i) => i.code === 'portals-missing')) {
+    if (etag !== undefined && etag !== null && etag !== '') {
+      throw new PortalsError('portals.yml changed on disk since it was loaded — reload before saving', { code: 'stale-etag', status: 409 });
+    }
+    const text = seedText(kind);
+    state = index(state.path, text, [], false);
+    etag = etagOf(text);
+  }
   requireEditable(state, kind);
 
   const fields = normalizeEntry(entry, { partial: false });

@@ -294,6 +294,44 @@ test('a missing portals.yml is an empty page, not a crash', () => {
   assert.equal(portals.issues[0].code, 'portals-missing');
 });
 
+test('the first follow creates portals.yml in upstream format, validated', () => {
+  const root = mkdtempSync(join(tmpdir(), 'jsc-portals-test-'));
+  scratches.push(root);
+  mkdirSync(join(root, 'data'), { recursive: true });
+
+  const result = createEntry({
+    root,
+    kind: 'company',
+    entry: { name: 'Kestrel Media', careersUrl: 'https://job-boards.greenhouse.io/kestrelmedia' },
+    etag: null,
+  });
+  assert.equal(result.index, 0);
+  assert.equal(result.backup.endsWith('.bak'), true);
+
+  const portals = readPortals({ root });
+  assert.equal(portals.exists, true);
+  assert.equal(portals.etag, result.etag);
+  assert.deepEqual(portals.companies.map((c) => [c.name, c.enabled, c.careersUrl]), [
+    ['Kestrel Media', true, 'https://job-boards.greenhouse.io/kestrelmedia'],
+  ]);
+  // Every title passes until the user narrows it; interns are left out as upstream does.
+  assert.deepEqual(portals.filters.title_filter, { positive: [], negative: ['word:Intern', 'word:Interns', 'Internship'] });
+  assert.match(read(root), /^tracked_companies:\n\n {2}- name: Kestrel Media$/m);
+
+  // A second follow edits the file it just made, through the normal path.
+  createEntry({ root, kind: 'company', entry: { name: 'Granite Cloud', careersUrl: 'https://job-boards.greenhouse.io/granitecloud' }, etag: portals.etag });
+  assert.equal(readPortals({ root }).companies.length, 2);
+});
+
+test('the first follow refuses an etag for a file that is gone', () => {
+  const root = mkdtempSync(join(tmpdir(), 'jsc-portals-test-'));
+  scratches.push(root);
+  assert.throws(
+    () => createEntry({ root, kind: 'company', entry: { name: 'X', careersUrl: 'https://example.com/jobs' }, etag: 'abc' }),
+    (error) => error.code === 'stale-etag' && error.status === 409,
+  );
+});
+
 test('normalizeEntry maps the wire shape onto upstream keys', () => {
   const fields = normalizeEntry({
     name: '  Spaced  ',
