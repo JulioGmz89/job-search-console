@@ -148,3 +148,27 @@ test('a failed check is named after its job, kept across restarts, and Try again
   assert.ok(recent.some((r) => r.id === failed.id && r.restored && r.status === 'failed'));
   delete process.env.FAKE_CLAUDE_SCENARIO;
 });
+
+test('workspace: an empty folder is day one, and set-up fills in step by step', async () => {
+  const { call } = await emptyWorkspace();
+  const day1 = (await call('GET', '/api/workspace')).body;
+  assert.deepEqual(day1.setup, { cv: false, company: false, assistant: false, done: false });
+  assert.deepEqual(day1.files, { cv: false, profile: false, portals: false, tracker: false, inbox: false, voice: false });
+  assert.equal(day1.counts.applications, 0);
+
+  await call('PUT', '/api/cv/content', { text: '# Alex Rivera\n' });
+  await call('POST', '/api/portals/entries', { kind: 'company', entry: { name: 'Kestrel Media', careersUrl: 'https://job-boards.greenhouse.io/kestrelmedia' }, etag: null });
+  const later = (await call('GET', '/api/workspace')).body;
+  assert.deepEqual([later.setup.cv, later.setup.company, later.setup.assistant], [true, true, false]);
+  assert.equal(later.counts.companies, 1);
+});
+
+test('today: last seen and dismissed cards are remembered, with Undo', async () => {
+  const { call } = await emptyWorkspace();
+  assert.deepEqual((await call('GET', '/api/today')).body, { lastSeen: null, dismissed: [] });
+  const seen = await call('PUT', '/api/today', { lastSeen: '2026-10-06T10:00:00Z', dismiss: 'run-1' });
+  assert.equal(seen.status, 200);
+  assert.deepEqual([seen.body.lastSeen, seen.body.dismissed], ['2026-10-06T10:00:00.000Z', ['run-1']]);
+  assert.deepEqual((await call('PUT', '/api/today', { undismiss: 'run-1' })).body.dismissed, []);
+  assert.equal((await call('PUT', '/api/today', { lastSeen: 'yesterday' })).status, 400);
+});

@@ -51,6 +51,7 @@ import { listReports, readReport, resolveReportPdf } from './services/reports.js
 import { readLastScanRun, readPortalHealth } from './services/scanner.js';
 import { setStatus } from './services/status.js';
 import { subjectFor } from './services/subjects.js';
+import { readToday, writeToday } from './services/today.js';
 import { BATCH_SIZE, pendingLlm, readCv, readPostingsWithSkills, readSkillsOverview } from './skills/service.js';
 import { writeOverride } from './skills/store.js';
 import { createWatcher } from './watch.js';
@@ -253,6 +254,57 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
       },
       issues,
     };
+  });
+
+  /**
+   * Everything first run and the Workspace page need in one read (ia.md §2.1,
+   * §2.9): which of the user's files exist, the set-up steps, counts, and the
+   * data problems in words. Missing files are normal on day one, not errors.
+   */
+  app.get('/api/workspace', async () => {
+    const dataRoot = resolveDataRoot(root);
+    const { reports, rows, issues } = load();
+    const portals = readPortals({ root });
+    const inbox = readInbox({ root });
+    const companies = portals.companies.filter((c) => c.enabled);
+    const check = await checkAgent();
+    const has = (rel) => existsSync(join(dataRoot, rel));
+    return {
+      dataRoot,
+      files: {
+        cv: has('cv.md'),
+        profile: has(join('config', 'profile.yml')),
+        portals: portals.exists,
+        tracker: has(join('data', 'applications.md')),
+        inbox: has(join('data', 'pipeline.md')),
+        voice: has('voice-dna.md'),
+      },
+      setup: {
+        cv: has('cv.md'),
+        company: companies.length > 0,
+        assistant: claude.found && check.ok,
+        done: has('cv.md') && companies.length > 0 && claude.found && check.ok,
+      },
+      counts: {
+        applications: rows.length,
+        reports: reports.length,
+        pdfs: reports.filter((r) => r.pdf?.exists).length,
+        companies: companies.length,
+        toReview: inbox.pending.length,
+      },
+      issues,
+    };
+  });
+
+  app.get('/api/today', async () => readToday({ root }));
+
+  app.put('/api/today', async (request, reply) => {
+    try {
+      const input = body(request);
+      return { ok: true, ...writeToday({ root, lastSeen: input.lastSeen, dismiss: input.dismiss, undismiss: input.undismiss }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
   });
 
   app.get('/api/pipeline', async () => {
