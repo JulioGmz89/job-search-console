@@ -257,8 +257,14 @@ The three views as links with `aria-current` (not tabs):
   17 by quick rules · **Improve the analysis** (reads 17 postings with Claude, about 4
   sessions, uses your Claude plan)".
 - **Filters:**
-  - **Only jobs I'd apply to (fit 4+)**, which shows what it changed ("showing 23 of 69
-    postings");
+  - **Only jobs I'd apply to (fit 4+)**, which shows what it changed ("Counting only the
+    14 postings whose fit is 4 or more"). The filter applies to **everything** in a row:
+    - the count and its required / nice-to-have split;
+    - the evidence (postings and fit reports);
+    - the ranking.
+
+    Skills with no matching posting are hidden, and the page says how many (closes
+    WP-T6-01 from the M7 walkthrough);
   - **Show skills I ignored**;
   - **Category**;
   - **Find a skill**.
@@ -267,8 +273,13 @@ The three views as links with `aria-current` (not tabs):
   - **Asked for in 22 postings (12 required, 10 nice to have)**;
   - a bar with an axis label;
   - **Your CV: missing / partly / has it**, as a select named after the skill;
-  - expand: postings by company (links), reports that flag it as a gap, and "often asked
-    together with…".
+  - expand: postings by company, each a link with its fit when known; reports that flag
+    it as a gap, named with their number and fit so two jobs with the same title can be
+    told apart; and "often asked together with…".
+- **Ranking.** Always by the count shown (more "required" first on a tie). The sentence
+  above the list says so in those words.
+- **Basis line.** Shows the date the postings were last read, which updates after
+  **Improve the analysis**, and accounts for every posting ("… 3 couldn't be loaded").
 
   A status change confirms with "Moved to Have · **Undo**".
 

@@ -383,7 +383,8 @@
       S.skills.coverage.extractedLlm += S.skills.coverage.pendingLlm;
       S.skills.coverage.rulesOnly = 0;
       S.skills.coverage.pendingLlm = 0;
-      r.outcomeText = 'Skills analysis improved: every posting read by Claude';
+      S.skills.coverage.readOn = TODAY;
+      r.outcomeText = `Skills analysis improved: ${S.skills.coverage.extractedLlm} postings now read by Claude`;
     },
     boards(r) {
       r.outcomeText = brokenBoards().length ? `${brokenBoards().length} job board needs attention: ${brokenBoards().map((c) => c.name).join(', ')}` : 'All job boards answered';
@@ -734,27 +735,45 @@ ${S.ui.followOpen ? companyForm('new') : ''}
     const src = v === 'learn' ? S.skills.learn : v === 'strengthen' ? S.skills.deepen : S.skills.demanded;
     const cov = S.skills.coverage;
     const strong = S.ui.skillsStrong;
-    const list = src
+    const keep = (p) => !strong || (typeof p.score === 'number' && p.score >= 4);
+    // Every number in a row, its evidence and the ranking come from the same postings (WP-T6-01).
+    const allPostings = new Map();
+    [...S.skills.learn, ...S.skills.deepen, ...S.skills.demanded].forEach((s) => (s.postings || []).forEach((p) => allPostings.set(p.url, p)));
+    const goodFit = [...allPostings.values()].filter((p) => typeof p.score === 'number' && p.score >= 4).length;
+    const rows0 = src
       .filter((s) => S.ui.skillsIgnored || (S.skillStatus[s.id] || s.status) !== 'ignore')
-      .map((s) => ({ ...s, shown: strong ? Math.max(1, s.strong || Math.round(s.demand / 3)) : s.demand }));
-    const max = Math.max(...list.map((s) => s.shown), 1);
-    const statusLabel = { missing: 'Missing', partial: 'Partly', have: 'Has it', ignore: 'Ignored' };
-    const rows = list
       .map((s, i) => {
+        const ps = (s.postings || []).filter(keep);
+        const byCo = new Map();
+        ps.forEach((p) => byCo.set(p.company, [...(byCo.get(p.company) || []), p]));
+        const gaps = s.gapReports.map((id) => appById(id)).filter((a) => a && (!strong || a.score >= 4));
+        return { ...s, i, ps, count: ps.length, req: ps.filter((p) => p.level === 'required').length, nice: ps.filter((p) => p.level !== 'required').length, byCo, gaps };
+      });
+    const hidden = rows0.filter((s) => !s.count).length;
+    const list = rows0.filter((s) => s.count).sort((x, y) => y.count - x.count || y.req - x.req || x.i - y.i);
+    const max = Math.max(...list.map((s) => s.count), 1);
+    const statusLabel = { missing: 'Missing', partial: 'Partly', have: 'Has it', ignore: 'Ignored' };
+    const what = strong ? 'good-fit postings' : 'postings';
+    const rows = list
+      .map((s, n) => {
         const st = S.skillStatus[s.id] || s.status || 'missing';
-        return `<div class="skill-row"><div><b>${i + 1}. ${esc(s.name)}</b><br><span class="small muted">${esc(s.category || '')}</span></div>
-<div><span class="bar" style="width:${Math.round((s.shown / max) * 100)}%" aria-hidden="true"></span><br><span class="small">Asked for in <b>${s.shown}</b> ${strong ? 'good-fit ' : ''}postings (${s.required} required, ${s.nice} nice to have)</span>
-<details><summary>Show the evidence for ${esc(s.name)}</summary><p class="small"><b>Companies asking for it:</b> ${s.companies.map(esc).join(', ') || '—'}</p>${s.gapReports.length ? `<p class="small"><b>Flagged as a gap in your fit reports:</b> ${s.gapReports.slice(0, 6).map((id) => { const a = appById(id); return a ? `<a href="#/applications/${id}">${esc(jobName(a))}</a>` : `report ${id}`; }).join(', ')}</p>` : ''}${s.cooccur.length ? `<p class="small"><b>Often asked for together with:</b> ${s.cooccur.map(esc).join(', ')}</p>` : ''}</details></div>
+        const cos = [...s.byCo.entries()].sort((a, b) => b[1].length - a[1].length);
+        return `<div class="skill-row"><div><b>${n + 1}. ${esc(s.name)}</b><br><span class="small muted">${esc(s.category || '')}</span></div>
+<div><span class="bar" style="width:${Math.round((s.count / max) * 100)}%" aria-hidden="true"></span><br><span class="small">Asked for in <b>${s.count}</b> ${s.count === 1 ? what.replace(/s$/, '') : what} (${s.req} required, ${s.nice} nice to have)</span>
+<details><summary>Show the evidence for ${esc(s.name)}</summary><p class="small"><b>The ${plural(s.count, what.replace(/s$/, ''), what)} asking for it, by company:</b></p><ul class="small">${cos.map(([co, ps]) => `<li>${esc(co)} (${ps.length}): ${ps.map((p) => `<a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.role)}${typeof p.score === 'number' ? ` · fit ${fit(p.score)}` : ''} ↗</a>`).join(', ')}</li>`).join('')}</ul>
+${s.gaps.length ? `<p class="small"><b>Flagged as a gap in your fit reports${strong ? ' (fit 4 and up)' : ''}:</b> ${s.gaps.slice(0, 6).map((a) => `<a href="#/applications/${a.id}">${esc(jobName(a))} (#${a.id}, fit ${fit(a.score)})</a>`).join(', ')}</p>` : ''}${s.cooccur.length ? `<p class="small"><b>Often asked for together with:</b> ${s.cooccur.map(esc).join(', ')}</p>` : ''}</details></div>
 <div><span class="label small" style="margin:0">Your CV</span>${menu(`sk-${s.id}`, statusLabel[st], `Your CV has ${s.name}: ${statusLabel[st]}`, [['missing', 'Missing'], ['partial', 'Partly'], ['have', 'Has it'], ['ignore', 'Ignore this skill']].filter(([k]) => k !== st).map(([k, l]) => ({ action: 'skill-status', arg: `${s.id}|${k}`, label: l })))}</div></div>`;
       })
       .join('');
     const improving = S.runs.find((r) => r.kind === 'skills' && r.status === 'working');
+    const read = cov.extractedLlm + cov.rulesOnly;
+    const unread = cov.postings - read;
     return `${pageHead('Skills', 'What employers in your job search keep asking for, and what your CV is missing.')}${notice()}
 <nav class="subnav" aria-label="Skills views"><ul><li><a href="#/skills/learn"${v === 'learn' ? ' aria-current="page"' : ''}>Learn next</a></li><li><a href="#/skills/strengthen"${v === 'strengthen' ? ' aria-current="page"' : ''}>Strengthen</a></li><li><a href="#/skills/asked"${v === 'asked' ? ' aria-current="page"' : ''}>Most asked for</a></li></ul></nav>
-<p class="notice info">Based on <b>${cov.postings} postings</b> from ${S.companies.length} companies, last read ${fmtDate(cov.lastFetchAt?.slice(0, 10))} · ${cov.extractedLlm} read by Claude, ${cov.rulesOnly} by quick rules. ${cov.pendingLlm ? (improving ? `Improving… ${progress('Improving the analysis')}` : `<button class="btn2 btn-sm" data-action="improve-skills">Improve the analysis</button> <span class="small">(reads ${cov.pendingLlm} postings with Claude · about ${cov.sessionsNeeded} sessions · uses your Claude plan)</span>`) : ''}</p>
-<p class="small muted">${v === 'learn' ? 'Learn next: skills your CV doesn’t show, ranked by how many postings ask for them.' : v === 'strengthen' ? 'Strengthen: skills your CV shows only partly.' : 'Most asked for: every skill, whether or not you have it.'}</p>
-<div class="row"><label class="check"><input type="checkbox" data-action="skills-strong" ${strong ? 'checked' : ''}> Only jobs I’d apply to (fit 4 and up)</label><label class="check"><input type="checkbox" data-action="skills-ignored" ${S.ui.skillsIgnored ? 'checked' : ''}> Show skills I ignored</label></div>
-<p class="small" role="status">${strong ? 'Showing counts from the 14 postings with a fit of 4 or more.' : `Showing counts from all ${cov.postings} postings.`}</p>
+<p class="notice info">Based on <b>${cov.postings} postings</b> from ${S.companies.length} companies, last read ${fmtDate(cov.readOn || cov.lastFetchAt?.slice(0, 10))} · ${cov.extractedLlm} read by Claude, ${cov.rulesOnly} by quick rules${unread > 0 ? `, ${unread} couldn’t be loaded (the job was taken down)` : ''}. ${cov.pendingLlm ? (improving ? `Improving… ${progress('Improving the analysis')}` : `<button class="btn2 btn-sm" data-action="improve-skills">Improve the analysis</button> <span class="small">(reads ${cov.pendingLlm} postings with Claude · about ${cov.sessionsNeeded} sessions · uses your Claude plan)</span>`) : ''}</p>
+<p class="small muted">${v === 'learn' ? 'Learn next: skills your CV doesn’t show' : v === 'strengthen' ? 'Strengthen: skills your CV shows only partly' : 'Most asked for: every skill, whether or not you have it'}, ranked by how many ${what} ask for them (more “required” first on a tie).</p>
+<div class="row"><label class="check"><input type="checkbox" id="skills-strong" data-action="skills-strong" ${strong ? 'checked' : ''}> Only jobs I’d apply to (fit 4 and up)</label><label class="check"><input type="checkbox" id="skills-ignored" data-action="skills-ignored" ${S.ui.skillsIgnored ? 'checked' : ''}> Show skills I ignored</label></div>
+<p class="small" role="status">${strong ? `Counting only the ${goodFit} postings whose fit is 4 or more: every number, the evidence and the order below use just those.${hidden ? ` ${plural(hidden, 'skill')} with no good-fit posting ${hidden === 1 ? 'is' : 'are'} hidden.` : ''}` : `Counting all ${cov.postings} postings.`}</p>
 <section class="card" style="padding:0" aria-label="Skills list">${rows || '<p style="padding:var(--space-4)">No skills to show.</p>'}</section>`;
   }
 
@@ -946,7 +965,7 @@ ${toolCard('boards', 'Find the right job board for a company', 'For a company wh
 
     const active = document.activeElement;
     const keepId = active && active !== document.body ? active.id || null : null;
-    const keepAction = active?.dataset?.action ? `[data-action="${active.dataset.action}"][data-arg="${CSS.escape(active.dataset.arg || '')}"]` : null;
+    const keepAction = active?.dataset?.action ? `[data-action="${active.dataset.action}"]${active.dataset.arg !== undefined ? `[data-arg="${CSS.escape(active.dataset.arg)}"]` : ''}` : null;
 
     const navPage = page === 'document' ? 'applications' : page === 'search' ? '' : page;
     document.getElementById('top').innerHTML = topbar(navPage);
@@ -1061,6 +1080,8 @@ ${toolCard('boards', 'Find the right job board for a company', 'For a company wh
       } else if (u.type === 'skill') {
         delete S.skillStatus[u.id];
         setNotice('Skill status put back.');
+        announce('Skill status put back.');
+        focusLater(`#mb-sk-${u.id}`);
       }
       S.undo = null;
       if (u.type !== 'status') S.ui.notice = { ...S.ui.notice, undo: false };
@@ -1258,9 +1279,13 @@ ${toolCard('boards', 'Find the right job board for a company', 'For a company wh
     },
     'skills-strong': () => {
       S.ui.skillsStrong = !S.ui.skillsStrong;
+      announce(S.ui.skillsStrong ? 'Counting only postings with a fit of 4 or more. Numbers, evidence and order updated.' : 'Counting all postings again.');
+      focusLater('#skills-strong');
     },
     'skills-ignored': () => {
       S.ui.skillsIgnored = !S.ui.skillsIgnored;
+      announce(S.ui.skillsIgnored ? 'Showing skills you ignored.' : 'Hiding skills you ignored.');
+      focusLater('#skills-ignored');
     },
     'skill-status': (arg) => {
       const [id, st] = arg.split('|');

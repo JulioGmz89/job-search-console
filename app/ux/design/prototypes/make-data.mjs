@@ -118,6 +118,11 @@ const skill = (id) => {
     gapReports: s.gapReports ?? [],
     companies: companiesFor,
     cooccur: (s.cooccur ?? []).slice(0, 4).map((c) => c.name),
+    // Every posting behind the count, so a filter can recompute all of a row (WP-T6-01).
+    postings: (s.postings ?? []).map((p) => {
+      const post = sk.postings?.[p.id] ?? {};
+      return { company: post.company ?? null, role: post.title ?? null, level: p.level, score: post.score ?? null, url: post.url ?? null, reportId: post.reportId ?? null };
+    }),
   };
 };
 const skills = {
