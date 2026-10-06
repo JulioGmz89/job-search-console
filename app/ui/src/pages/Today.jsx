@@ -1,6 +1,661 @@
-import { PageHead } from '../shell/router.jsx';
+import { useEffect, useRef, useState } from 'react';
 
-/** Placeholder while the page is rebuilt (M8 Phase 3). */
+import { checkAgent, createPortalEntry, saveCvContent, saveToday } from '../api.js';
+import { AddJob, shownInline } from '../components/AddJob.jsx';
+import { RunItem } from '../components/RunItem.jsx';
+import { HelpLink, Tag } from '../components/ui.jsx';
+import { reload, setResource, useResource } from '../data.js';
+import { fit, jobName, plural, shortDate, statusLabel } from '../lib/labels.js';
+import { outcome, runTitle } from '../lib/runs.js';
+import { todayCards } from '../lib/today.js';
+import { useRuns } from '../runs.jsx';
+import { announce } from '../shell/announce.jsx';
+import { PageHead } from '../shell/router.jsx';
+import { offerUndo } from '../shell/undo.jsx';
+
+/** "Alex Rivera · Summary, Experience (2 roles), Education, Skills". */
+export function cvSummaryText(summary) {
+  if (!summary) return '';
+  const sections = summary.sections.map((s) => (s.entries ? `${s.title} (${plural(s.entries, 'role')})` : s.title)).join(', ');
+  return [summary.name, sections].filter(Boolean).join(' · ');
+}
+
+/** Read a chosen .md/.txt file in the browser; only its text is sent (ia.md §4). */
+export function readTextFile(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) return reject(new Error('No file chosen'));
+    if (file.size > 512 * 1024) return reject(new Error('That file is larger than 512 KB — choose your CV as a .md or .txt file'));
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ''));
+    reader.onerror = () => reject(new Error('Could not read that file'));
+    reader.readAsText(file);
+  });
+}
+
+function StepHead({ n, done, id, children }) {
+  return (
+    <div className="row">
+      <span className={`stepnum ${done ? 'done' : ''}`} aria-hidden="true">
+        {done ? '✓' : n}
+      </span>
+      <h3 id={id}>
+        {children}
+        {done ? <span className="visually-hidden"> (done)</span> : null}
+      </h3>
+    </div>
+  );
+}
+
+function CvStep() {
+  const cv = useResource('cv');
+  const [text, setText] = useState('');
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const savedRef = useRef(null);
+  const [justSaved, setJustSaved] = useState(false);
+  const done = cv.data?.exists === true;
+
+  useEffect(() => {
+    if (justSaved) savedRef.current?.focus();
+  }, [justSaved]);
+
+  const save = async (value) => {
+    setError(null);
+    setBusy(true);
+    try {
+      const saved = await saveCvContent(value);
+      setResource('cv', saved);
+      reload('workspace');
+      reload('agent');
+      setJustSaved(true);
+      announce(`Your CV is saved: ${cvSummaryText(saved.summary)}`);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <li className={`card ${done ? 'ok' : ''}`} aria-labelledby="step-cv">
+      <StepHead n={1} done={done} id="step-cv">
+        Add your CV
+      </StepHead>
+      {done ? (
+        <p id="cv-saved" tabIndex={-1} ref={savedRef}>
+          Saved: {cvSummaryText(cv.data.summary)}. <a href="#/my-cv/content">Edit in My CV</a>
+        </p>
+      ) : (
+        <>
+          <p className="muted">Every check, tailored CV and letter starts from it. Paste it, or choose a Markdown or text file.</p>
+          <form
+            className="stack-sm"
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!text.trim()) setError('Paste your CV first, or choose a file.');
+              else save(text);
+            }}
+          >
+            <div className="field">
+              <label htmlFor="cv-paste">Your CV</label>
+              <textarea
+                id="cv-paste"
+                rows={8}
+                value={text}
+                placeholder="Paste your CV here (Markdown or plain text)"
+                onChange={(e) => setText(e.target.value)}
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? 'cv-paste-err cv-paste-hint' : 'cv-paste-hint'}
+              />
+              {error ? (
+                <p className="error" id="cv-paste-err">
+                  {error}
+                </p>
+              ) : null}
+              <p className="hint" id="cv-paste-hint">
+                Saved in your workspace folder as cv.md, so the command-line tools see it too. You can edit it later in My CV.
+              </p>
+            </div>
+            <div className="field">
+              <label htmlFor="cv-file">Or choose a file</label>
+              <input
+                id="cv-file"
+                type="file"
+                accept=".md,.txt,text/markdown,text/plain"
+                onChange={async (e) => {
+                  try {
+                    const value = await readTextFile(e.target.files?.[0]);
+                    setText(value);
+                    await save(value);
+                  } catch (err) {
+                    setError(err.message);
+                  }
+                }}
+              />
+            </div>
+            <div className="row">
+              <button type="submit" className="btn" disabled={busy}>
+                Save my CV
+              </button>
+            </div>
+          </form>
+        </>
+      )}
+    </li>
+  );
+}
+
+function CompanyStep() {
+  const portals = useResource('portals');
+  const { start } = useRuns();
+  const [name, setName] = useState('');
+  const [link, setLink] = useState('');
+  const [errors, setErrors] = useState({});
+  const [busy, setBusy] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
+  const savedRef = useRef(null);
+  const following = (portals.data?.companies ?? []).filter((c) => c.enabled);
+  const done = following.length > 0;
+
+  useEffect(() => {
+    if (justSaved) savedRef.current?.focus();
+  }, [justSaved]);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    const found = {};
+    if (!name.trim()) found.name = 'Type the company name.';
+    if (!/^https?:\/\/\S+$/i.test(link.trim())) found.link = 'Paste the careers page link, starting with https://';
+    setErrors(found);
+    if (Object.keys(found).length) return;
+    setBusy(true);
+    try {
+      await createPortalEntry('company', { name: name.trim(), careersUrl: link.trim(), enabled: true }, portals.data?.etag ?? null);
+      await reload('portals');
+      reload('workspace');
+      setJustSaved(true);
+      announce(`Following ${name.trim()}`);
+    } catch (err) {
+      setErrors({ form: err.message });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <li className={`card ${done ? 'ok' : ''}`} aria-labelledby="step-co">
+      <StepHead n={2} done={done} id="step-co">
+        Follow a company
+      </StepHead>
+      {done ? (
+        <div className="stack-sm">
+          <p id="co-saved" tabIndex={-1} ref={savedRef}>
+            Following <b>{following[0].name}</b>
+            {following.length > 1 ? ` and ${plural(following.length - 1, 'other company', 'other companies')}` : ''}. <a href="#/companies">Companies you follow</a>
+          </p>
+          <div className="row">
+            <button
+              type="button"
+              className="btn2 btn-sm"
+              onClick={async () => {
+                const run = await start('scan', {});
+                announce(`Started: ${runTitle(run)}`);
+              }}
+            >
+              Check {following.length === 1 ? following[0].name : 'them'} for new openings now
+            </button>
+            <span className="hint inline">A few seconds · no AI involved</span>
+          </div>
+        </div>
+      ) : (
+        <>
+          <p className="muted">The app checks the companies you follow for new openings. Start with one; add more any time.</p>
+          <form className="stack-sm" noValidate onSubmit={submit}>
+            <div className="grid-2">
+              <div className="field">
+                <label htmlFor="co-name">Company name</label>
+                <input id="co-name" type="text" value={name} placeholder="e.g. Example Corp" onChange={(e) => setName(e.target.value)} aria-invalid={errors.name ? true : undefined} aria-describedby={errors.name ? 'co-name-err' : undefined} />
+                {errors.name ? (
+                  <p className="error" id="co-name-err">
+                    {errors.name}
+                  </p>
+                ) : null}
+              </div>
+              <div className="field">
+                <label htmlFor="co-url">Careers page link</label>
+                <input id="co-url" type="url" value={link} placeholder="https://…" onChange={(e) => setLink(e.target.value)} aria-invalid={errors.link ? true : undefined} aria-describedby={errors.link ? 'co-url-err' : 'co-url-hint'} />
+                {errors.link ? (
+                  <p className="error" id="co-url-err">
+                    {errors.link}
+                  </p>
+                ) : (
+                  <p className="hint" id="co-url-hint">
+                    Greenhouse, Lever, Ashby and most other job boards are recognised from the link.
+                  </p>
+                )}
+              </div>
+            </div>
+            {errors.form ? (
+              <p className="error" role="alert">
+                {errors.form}
+              </p>
+            ) : null}
+            <div className="row">
+              <button type="submit" className="btn" disabled={busy}>
+                Follow company
+              </button>
+            </div>
+          </form>
+        </>
+      )}
+    </li>
+  );
+}
+
+function AssistantStep() {
+  const agent = useResource('agent');
+  const [busy, setBusy] = useState(false);
+  const check = agent.data?.check;
+  const ready = check?.ready === true;
+  return (
+    <li className={`card ${ready ? 'ok' : agent.data ? 'attn' : ''}`} aria-labelledby="step-ai">
+      <StepHead n={3} done={ready} id="step-ai">
+        {ready ? 'AI assistant ready' : 'AI assistant'}
+      </StepHead>
+      {!agent.data ? <p className="muted">Checking for Claude Code…</p> : null}
+      {ready ? (
+        <p>
+          Claude Code is installed{check.version ? ` (version ${check.version})` : ''}. Each check takes 2–5 minutes and uses your Claude plan.{' '}
+          <HelpLink topic="costs">What a check costs</HelpLink>
+        </p>
+      ) : null}
+      {agent.data && !ready ? (
+        <>
+          <p>
+            {check?.error === 'not-found'
+              ? 'Claude Code was not found on this computer. The app uses it to check jobs and write tailored CVs and letters.'
+              : `Claude Code was found but did not start${check?.error && check.error !== 'not-found' ? ` (${check.error})` : ''}.`}
+          </p>
+          <div className="row">
+            <a className="btn2" href="#/help/assistant">
+              How to install it
+            </a>
+            <button
+              type="button"
+              className="btn"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                try {
+                  const status = await checkAgent();
+                  setResource('agent', status);
+                  reload('workspace');
+                  announce(status.check?.ready ? 'Claude Code is ready.' : 'Claude Code is still not available.', { assertive: !status.check?.ready });
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              Check again
+            </button>
+          </div>
+          <p className="small muted">Everything else in the app works without it: following companies, checking for openings, your CV and its design.</p>
+        </>
+      ) : null}
+    </li>
+  );
+}
+
+function Setup({ setup }) {
+  const left = [setup.cv, setup.company, setup.assistant].filter((x) => !x).length;
+  return (
+    <>
+      <PageHead title="Welcome. Let’s get you set up." lead={`${plural(left, 'step')} left · about 5 minutes. Everything else in the app works meanwhile.`} />
+      <section aria-labelledby="setup-h" className="stack">
+        <h2 id="setup-h">Get set up</h2>
+        <ol className="steps">
+          <CvStep />
+          <CompanyStep />
+          <AssistantStep />
+        </ol>
+      </section>
+      {setup.cv ? (
+        <section aria-labelledby="fj-h" className="card stack">
+          <h2 id="fj-h" className="card-title">
+            Check your first job
+          </h2>
+          <p className="muted">Have a job in mind? Paste its link and the assistant tells you how well it fits your CV.</p>
+          <AddJob idPrefix="first" headingId="fj-h" />
+        </section>
+      ) : null}
+    </>
+  );
+}
+
+function FailureCard({ run, onDismiss }) {
+  return (
+    <div className="stack-sm">
+      <Tag tone="attn">Needs you · {run.kind === 'evaluate' ? 'a fit check' : 'something'} didn’t finish</Tag>
+      <RunItem run={run} headingLevel={3} />
+      <div className="row">
+        <button type="button" className="btn2 btn-sm" onClick={() => onDismiss(run)}>
+          Dismiss<span className="visually-hidden"> {runTitle(run)}</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** Set-up was finished on this visit: say so, and keep focus on something real (WP-T1). */
+function SetupDone({ cvSummary, company, onClose }) {
+  const ref = useRef(null);
+  useEffect(() => ref.current?.focus(), []);
+  return (
+    <article className="card ok" aria-labelledby="setup-done-h">
+      <Tag tone="ok">Set-up complete</Tag>
+      <h2 id="setup-done-h" className="card-title" tabIndex={-1} ref={ref}>
+        You’re set up
+      </h2>
+      <ul className="plain stack-sm">
+        <li>✓ Your CV: {cvSummary} · <a href="#/my-cv/content">Edit in My CV</a></li>
+        <li>
+          ✓ Following <b>{company}</b> · <a href="#/companies">Companies you follow</a>
+        </li>
+        <li>✓ AI assistant ready</li>
+      </ul>
+      <p>Next: check a job you already like (below), or look for new openings at {company}.</p>
+      <div className="row">
+        <button type="button" className="btn2" onClick={onClose}>
+          Got it
+        </button>
+      </div>
+    </article>
+  );
+}
+
+function greeting(name) {
+  const hour = new Date().getHours();
+  const part = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  return name ? `${part}, ${name.split(/\s+/)[0]}` : part;
+}
+
 export function TodayPage() {
-  return <PageHead title="Today" lead="This page is being rebuilt." />;
+  const workspace = useResource('workspace');
+  const today = useResource('today');
+  const pipeline = useResource('pipeline');
+  const inbox = useResource('inbox');
+  const portals = useResource('portals');
+  const design = useResource('design');
+  const cv = useResource('cv');
+  const { list, start } = useRuns();
+  const [ackd, setAckd] = useState([]);
+  const [justSetUp, setJustSetUp] = useState(false);
+  const wasDone = useRef(null);
+  const setupDone = workspace.data?.setup?.done;
+  useEffect(() => {
+    if (setupDone === undefined) return;
+    if (wasDone.current === false && setupDone) {
+      setJustSetUp(true);
+      announce('You’re set up.');
+    }
+    wasDone.current = setupDone;
+  }, [setupDone]);
+  const lastSeenRef = useRef(null);
+  lastSeenRef.current = today.data?.lastSeen ?? null;
+
+  // "Last looked" is written when the user leaves Today (ia.md §2.1).
+  useEffect(() => {
+    const leave = () => saveToday({ lastSeen: new Date().toISOString() }).then(() => reload('today')).catch(() => {});
+    window.addEventListener('pagehide', leave);
+    return () => {
+      window.removeEventListener('pagehide', leave);
+      leave();
+    };
+  }, []);
+
+  if (!workspace.data) return <PageHead title="Today" lead={workspace.error ? `Could not load your workspace: ${workspace.error.message}` : 'Loading…'} />;
+  if (!workspace.data.setup.done) return <Setup setup={workspace.data.setup} />;
+
+  const dismissed = today.data?.dismissed ?? [];
+  const cards = todayCards({
+    runs: list,
+    dismissed,
+    rows: pipeline.data?.rows ?? [],
+    issues: pipeline.data?.issues ?? [],
+    design: design.data,
+    companies: portals.data?.companies ?? [],
+    health: portals.data?.health ?? {},
+    pending: inbox.data?.pending ?? [],
+    lastSeen: lastSeenRef.current,
+    lastScan: inbox.data?.lastScan ?? null,
+  });
+  const rowForReport = (id) => pipeline.data?.rows?.find((r) => r.reportId === id) ?? null;
+  const finished = list.filter(
+    (r) => r.status === 'succeeded' && ['evaluate', 'pdf', 'cover', 'scan', 'cv-render'].includes(r.kind) && !dismissed.includes(r.id) && !ackd.includes(r.id) && !shownInline.has(r.id) && (r.endedAt ?? 0) > (lastSeenRef.current ? Date.parse(lastSeenRef.current) : 0),
+  );
+
+  const dismiss = async (run) => {
+    await saveToday({ dismiss: run.id });
+    await reload('today');
+    offerUndo(`Dismissed ${runTitle(run)}`, async () => {
+      await saveToday({ undismiss: run.id });
+      await reload('today');
+    });
+  };
+
+  const { needs, fresh, waiting, working } = cards;
+  const noJobs = (pipeline.data?.rows ?? []).length === 0;
+  const firstCompany = (portals.data?.companies ?? []).find((c) => c.enabled)?.name ?? '';
+
+  return (
+    <>
+      <PageHead
+        title={greeting(cv.data?.summary?.name)}
+        lead={`${needs.count ? `${plural(needs.count, 'thing needs', 'things need')} you. ` : 'Nothing needs you right now. '}Here is what changed and what is waiting.`}
+      />
+      {justSetUp ? <SetupDone cvSummary={cvSummaryText(cv.data?.summary)} company={firstCompany} onClose={() => setJustSetUp(false)} /> : null}
+
+      {needs.count ? (
+        <section aria-labelledby="needs-h" className="stack">
+          <h2 id="needs-h" className="group-title">
+            Needs you
+          </h2>
+          {needs.failures.map((r) => (
+            <FailureCard key={r.id} run={r} onDismiss={dismiss} />
+          ))}
+          {needs.unreadable.length ? (
+            <article className="card attn" aria-labelledby="unread-h">
+              <Tag tone="attn">Needs you · data problem</Tag>
+              <h3 id="unread-h">{plural(needs.unreadable.length, 'application')} could not be read</h3>
+              <ul>
+                {needs.unreadable.map((i) => (
+                  <li key={i.line}>
+                    {i.message ?? `Line ${i.line} of your applications file.`} It is left out of Applications until it is fixed.
+                  </li>
+                ))}
+              </ul>
+              <div className="row">
+                <a className="btn2" href="#/workspace">
+                  Show me how to fix it
+                </a>
+              </div>
+            </article>
+          ) : null}
+          {needs.designFails ? (
+            <article className="card attn" aria-labelledby="design-h">
+              <Tag tone="attn">Needs you · your CV design</Tag>
+              <h3 id="design-h">Your CV design fails the screening check</h3>
+              <p>
+                Tailored CVs made with the “{design.data.template}” design lose text when an applicant-tracking system reads them
+                {design.data.issues?.length ? `: ${design.data.issues[0]}` : ''}.
+              </p>
+              <div className="row">
+                <a className="btn" href="#/my-cv/design">
+                  Choose a design that passes
+                </a>
+                <HelpLink topic="screening">What the screening check is</HelpLink>
+              </div>
+            </article>
+          ) : null}
+          {needs.boards.map((c) => (
+            <article className="card attn" key={c.name} aria-labelledby={`board-${c.index}`}>
+              <Tag tone="attn">Needs you · a job board isn’t working</Tag>
+              <h3 id={`board-${c.index}`}>
+                {c.name}: board not found since {shortDate(c.since)}
+              </h3>
+              <p>The app can’t check {c.name} for new openings until the link is fixed or the company is paused.</p>
+              <div className="row">
+                <a className="btn2" href="#/companies">
+                  Fix {c.name}
+                </a>
+              </div>
+            </article>
+          ))}
+        </section>
+      ) : null}
+
+      {finished.length ? (
+        <section aria-labelledby="done-h" className="stack">
+          <h2 id="done-h" className="group-title">
+            Just finished
+          </h2>
+          {finished.map((r) => {
+            const row = rowForReport(Number(r.result?.reportId ?? r.meta?.reportId));
+            const res = outcome(r, { rowForReport });
+            return (
+              <article className="card ok" key={r.id} aria-labelledby={`done-${r.id}`}>
+                <Tag tone="ok">Done</Tag>
+                <h3 id={`done-${r.id}`}>{row ? jobName(row) : runTitle(r)}</h3>
+                {r.kind === 'evaluate' && row ? (
+                  <p className="big">
+                    <b>Fit {fit(row.score)} / 5</b>
+                    {row.report?.decision ? (
+                      <>
+                        {' '}
+                        · Recommendation: <b>{row.report.decision}</b>
+                      </>
+                    ) : null}
+                  </p>
+                ) : (
+                  <p>{res.text}</p>
+                )}
+                <div className="row">
+                  {res.open ? (
+                    <a className="btn" href={res.open.href}>
+                      {res.open.label}
+                    </a>
+                  ) : null}
+                  <button type="button" className="btn2" onClick={() => setAckd((a) => [...a, r.id])}>
+                    Got it<span className="visually-hidden">: {runTitle(r)}</span>
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </section>
+      ) : null}
+
+      {working.length ? (
+        <section aria-labelledby="work-h" className="stack">
+          <h2 id="work-h" className="group-title">
+            Working now
+          </h2>
+          {working.map((r) => (
+            <RunItem key={r.id} run={r} />
+          ))}
+        </section>
+      ) : null}
+
+      {noJobs ? (
+        <section aria-labelledby="fj-h" className="card stack">
+          <h2 id="fj-h" className="card-title">
+            Check your first job
+          </h2>
+          <p className="muted">Paste a job’s link and the assistant tells you how well it fits your CV.</p>
+          <AddJob idPrefix="first" headingId="fj-h" />
+        </section>
+      ) : null}
+
+      <section aria-labelledby="new-h" className="stack">
+        <h2 id="new-h" className="group-title">
+          New since you last looked
+        </h2>
+        {fresh.length ? (
+          <article className="card" aria-labelledby="fresh-h">
+            <h3 id="fresh-h">{plural(fresh.length, 'new opening')} at the companies you follow</h3>
+            <ul>
+              {fresh.slice(0, 6).map((p) => (
+                <li key={p.url}>{jobName(p)}</li>
+              ))}
+            </ul>
+            {fresh.length > 6 ? <p className="small muted">and {fresh.length - 6} more.</p> : null}
+            <div className="row">
+              <a className="btn2" href="#/to-review">
+                Look at the {fresh.length} new openings
+              </a>
+            </div>
+          </article>
+        ) : (
+          <article className="card" aria-labelledby="scan-h">
+            <h3 id="scan-h">{inbox.data?.lastScan?.timestamp ? `Last checked for new openings ${shortDate(inbox.data.lastScan.timestamp)}` : 'You haven’t checked for new openings yet'}</h3>
+            <p className="muted">Checks the {plural(workspace.data.counts.companies, 'company', 'companies')} you follow. Takes a few seconds; no AI involved.</p>
+            <div className="row">
+              <button
+                type="button"
+                className="btn2"
+                onClick={async () => {
+                  const run = await start('scan', {});
+                  announce(`Started: ${runTitle(run)}`);
+                }}
+              >
+                Check for new openings
+              </button>
+            </div>
+          </article>
+        )}
+      </section>
+
+      {waiting.replied.length || waiting.reviewed.length ? (
+        <section aria-labelledby="wait-h" className="stack">
+          <h2 id="wait-h" className="group-title">
+            Waiting for you
+          </h2>
+          {waiting.replied.length ? (
+            <article className="card" aria-labelledby="replied-h">
+              <h3 id="replied-h">
+                {plural(waiting.replied.length, 'job')} that replied or {waiting.replied.length === 1 ? 'is' : 'are'} interviewing without a tailored CV or letter
+              </h3>
+              <ul>
+                {waiting.replied.map((r) => (
+                  <li key={r.id}>
+                    <a href={`#/applications/${r.id}#documents`}>{jobName(r)}</a> — {statusLabel(r.statusId ?? r.status)} · {!r.pdf && !r.cover ? 'no CV or letter' : !r.pdf ? 'no tailored CV' : 'no cover letter'}
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ) : null}
+          {waiting.reviewed.length ? (
+            <article className="card" aria-labelledby="reviewed-h">
+              <h3 id="reviewed-h">{plural(waiting.reviewed.length, 'job')} reviewed but not applied</h3>
+              <p>
+                Best:{' '}
+                {waiting.reviewed.slice(0, 3).map((r, i) => (
+                  <span key={r.id}>
+                    {i ? ' · ' : ''}
+                    <a href={`#/applications/${r.id}`}>{jobName(r)}</a> (fit {fit(r.score)})
+                  </span>
+                ))}
+              </p>
+              <div className="row">
+                <a className="btn2" href="#/applications?status=evaluated">
+                  Review them
+                </a>
+              </div>
+            </article>
+          ) : null}
+        </section>
+      ) : null}
+    </>
+  );
 }

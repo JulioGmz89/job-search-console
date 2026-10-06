@@ -260,11 +260,11 @@ iframe.doc { width: 100%; height: 70vh; border: var(--border-width) solid var(--
 
 /* ── search (combobox in the dark top bar) ── */
 .search { display: flex; }
-.search-input { font: inherit; font-size: var(--text-sm); width: 15rem; min-height: var(--control-height-sm); padding: var(--space-1) var(--space-3); border-radius: var(--radius-md); border: var(--border-width) solid #a1a1aa; background: #27272a; color: #fafafa; }
-.search-input::placeholder { color: #d4d4d8; }
+.search .search-input { font: inherit; font-size: var(--text-sm); width: 15rem; min-height: var(--control-height-sm); padding: var(--space-1) var(--space-3); border-radius: var(--radius-md); border: var(--border-width) solid #a1a1aa; background: #27272a; color: #fafafa; }
+.search .search-input::placeholder { color: #d4d4d8; }
 .search-popover { min-width: 22rem; }
 .search-kind { font-size: var(--text-xs); color: var(--text-muted); min-width: 4.5rem; }
-@media (max-width: 960px) { .search-input { width: 10rem; } .search-popover { min-width: min(22rem, 90vw); } }
+@media (max-width: 960px) { .search .search-input { width: 10rem; } .search-popover { min-width: min(22rem, 90vw); } }
 
 /* ── modal dialog ──────────────────────────── */
 .modal-overlay { position: fixed; inset: 0; background: var(--scrim); display: flex; align-items: center; justify-content: center; z-index: 80; padding: var(--space-4); }
@@ -278,3 +278,5 @@ iframe.doc { width: 100%; height: 70vh; border: var(--border-width) solid var(--
 .undo-bar .btn-link { color: var(--bg); }
 .undo-bar :focus-visible { outline-color: var(--bg); }
 @media (max-width: 600px) { .panel { width: 100vw; } }
+.big { font-size: var(--text-lg); }
+ul.plain { list-style: none; margin: 0; padding: 0; }

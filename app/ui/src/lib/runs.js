@@ -40,6 +40,7 @@ export const FOLLOW_UP_KINDS = new Set(['merge-tracker', 'reconcile-auto', 'skil
 export function runTitle(run) {
   const name = RUN_NAMES[run?.kind] ?? run?.label ?? 'Activity';
   if (run?.subject) return `${name} · ${run.subject}`;
+  if (run?.result?.company) return `${name} · ${[run.result.company, run.result.role].filter(Boolean).join(' — ')}`;
   if (run?.kind === 'scan') return name;
   if (run?.kind === 'cv-render' && run.meta?.documentId) return `${name} · ${run.meta.documentId}`;
   return name;
