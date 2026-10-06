@@ -28,7 +28,7 @@ function readFilters() {
   } catch {
     saved = {};
   }
-  return { status: fromUrl ?? saved.status ?? 'all', fit: saved.fit ?? 'any', text: saved.text ?? '', sort: saved.sort ?? { column: 'checked', direction: 'descending' } };
+  return { status: fromUrl ?? saved.status ?? 'all', fit: saved.fit ?? 'any', text: saved.text ?? '', sort: saved.sort ?? { column: 'fit', direction: 'descending' } };
 }
 function writeFilters(filters) {
   try {
@@ -84,7 +84,7 @@ export function ApplicationsPage() {
   const shown = rows
     .filter((r) => matches(r) || moved[r.id])
     .sort((a, b) => {
-      const key = SORTS[filters.sort.column] ?? SORTS.checked;
+      const key = SORTS[filters.sort.column] ?? SORTS.fit;
       const [x, y] = [key(a), key(b)];
       const order = x < y ? -1 : x > y ? 1 : a.id - b.id;
       return filters.sort.direction === 'ascending' ? order : -order;
@@ -134,12 +134,12 @@ export function ApplicationsPage() {
         </Notice>
       ) : null}
 
-      <details className="card add-job" open={rows.length === 0}>
-        <summary>
-          <span className="card-title">Add a job</span>
-        </summary>
-        <AddJob idPrefix="apps" />
-      </details>
+      <section className="card add-job" aria-labelledby="add-job-h">
+        <h2 id="add-job-h" className="card-title">
+          Add a job
+        </h2>
+        <AddJob idPrefix="apps" headingId="add-job-h" />
+      </section>
 
       {rows.length === 0 && pipeline.data ? (
         <EmptyState title="No applications yet">
