@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A · First run — set-up checklist</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#f6f7f9;color:#0f172a;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px}
+a{color:#1d4ed8}a:hover{color:#1e3a8a}
+:focus-visible{outline:3px solid #1d4ed8;outline-offset:2px}
+.nav a{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:6px;color:#e2e8f0;text-decoration:none;min-height:24px}
+.nav a:hover{background:#1e293b;color:#fff}
+.nav a[aria-current=page]{background:#1e293b;color:#fff;box-shadow:inset 3px 0 0 #93c5fd}
+.nav a:focus-visible{outline-color:#93c5fd}
+.count{font-size:12px;color:#94a3b8}
+.btn{font:inherit;font-weight:600;padding:8px 14px;border-radius:6px;border:1px solid #1d4ed8;background:#1d4ed8;color:#fff;cursor:pointer;min-height:36px}
+.btn:hover{background:#1e40af}
+.btn2{font:inherit;padding:8px 14px;border-radius:6px;border:1px solid #64748b;background:#fff;color:#0f172a;cursor:pointer;min-height:36px}
+.btn2:hover{border-color:#0f172a}
+.field{font:inherit;padding:8px 10px;border:1px solid #64748b;border-radius:6px;background:#fff;color:#0f172a;width:100%;box-sizing:border-box}
+label{font-weight:600;display:block;margin-bottom:4px}
+.hint{color:#475569;font-size:13px;margin:4px 0 0}
+.step{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:16px 20px;display:flex;gap:16px;align-items:flex-start}
+.num{flex:none;width:28px;height:28px;border-radius:14px;border:2px solid #64748b;display:flex;align-items:center;justify-content:center;font-weight:700;color:#334155}
+.done{border-color:#15803d;background:#15803d;color:#fff}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 860px">
+  <a href="#main" style="position: absolute; left: -9999px">Skip to content</a>
+  <aside style="flex: 1 1 220px; max-width: 240px; background: #0f172a; color: #e2e8f0; padding: 20px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px">
+    <div style="padding: 0 12px; font-weight: 700; font-size: 15px; color: #fff">Job Search Console</div>
+    <nav class="nav" aria-label="Main" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="#main" aria-current="page"><span>Applications</span><span class="count">0</span></a>
+      <a href="#main"><span>To review</span><span class="count">0</span></a>
+      <a href="#main"><span>Companies you follow</span><span class="count">{{companyCount}}</span></a>
+      <a href="#main"><span>Skills</span></a>
+      <a href="#main"><span>My CV</span><span class="count">{{cvMark}}</span></a>
+    </nav>
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding: 0 12px">
+      <div style="font-size: 12px; color: #94a3b8">Workspace folder</div>
+      <div style="font-size: 13px; color: #e2e8f0; word-break: break-all">~/job-search</div>
+      <button class="btn2" style="background: #1e293b; color: #e2e8f0; border-color: #475569; text-align: left">Activity · nothing running</button>
+    </div>
+  </aside>
+
+  <main id="main" style="flex: 999 1 560px; min-width: 0; padding: 32px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+    <header style="display: flex; flex-direction: column; gap: 6px">
+      <h1 style="margin: 0; font-size: 24px">Applications</h1>
+      <p style="margin: 0; color: #475569">Your job applications will be listed here once the app has checked a job for you.</p>
+    </header>
+
+    <section aria-labelledby="setup" style="display: flex; flex-direction: column; gap: 12px; max-width: 760px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap">
+        <h2 id="setup" style="margin: 0; font-size: 18px">Get set up</h2>
+        <p role="status" style="margin: 0; color: #334155; font-weight: 600">{{progress}}</p>
+      </div>
+
+      <div class="step">
+        <span class="num {{cvNumClass}}" aria-hidden="true">{{cvNum}}</span>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+          <h3 style="margin: 0; font-size: 16px">Add your CV</h3>
+          <sc-if value="{{cvTodo}}" hint-placeholder-val="{{ true }}">
+            <p style="margin: 0; color: #475569">Every check and every tailored CV starts from it. Paste it or pick a file — Markdown or plain text.</p>
+            <div style="display: flex; flex-direction: column">
+              <label for="cvtext">Your CV</label>
+              <textarea id="cvtext" class="field" rows="6" placeholder="# Alex Rivera&#10;Austin, TX (remote) · alex.rivera@example.com&#10;&#10;## Experience&#10;### Senior Backend Engineer — Northwind Payments (2022–present)"></textarea>
+              <p class="hint">Saved in your workspace folder as cv.md, so the command-line tools see it too. You can edit it any time in My CV.</p>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap">
+              <button class="btn" onClick="{{saveCv}}">Save my CV</button>
+              <button class="btn2">Choose a file…</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{cvDone}}" hint-placeholder-val="{{ false }}">
+            <p style="margin: 0">Saved: <b>Alex Rivera</b> · Summary, Experience (2 roles), Education, Skills. <a href="#main">Edit in My CV</a></p>
+          </sc-if>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="num {{coNumClass}}" aria-hidden="true">{{coNum}}</span>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+          <h3 style="margin: 0; font-size: 16px">Follow a company</h3>
+          <sc-if value="{{coTodo}}" hint-placeholder-val="{{ true }}">
+            <p style="margin: 0; color: #475569">The app checks the companies you follow for new openings. Start with one; add more later.</p>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+              <div><label for="coname">Company name</label><input id="coname" class="field" placeholder="Kestrel Media"></div>
+              <div><label for="courl">Careers page link</label><input id="courl" class="field" placeholder="https://job-boards.greenhouse.io/kestrelmedia"></div>
+            </div>
+            <p class="hint" style="margin: 0">Greenhouse, Lever, Ashby and most other job boards are recognised from the link.</p>
+            <div><button class="btn" onClick="{{saveCo}}">Follow company</button></div>
+          </sc-if>
+          <sc-if value="{{coDone}}" hint-placeholder-val="{{ false }}">
+            <p style="margin: 0">Following <b>Kestrel Media</b> · Greenhouse job board found, 6 open roles. <a href="#main">Check for new openings now</a></p>
+          </sc-if>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="num done" aria-hidden="true">✓</span>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+          <h3 style="margin: 0; font-size: 16px">AI assistant ready</h3>
+          <p style="margin: 0">Claude Code is installed and signed in. Each check uses your Claude plan and takes 2–5 minutes.</p>
+        </div>
+      </div>
+
+      <sc-if value="{{allDone}}" hint-placeholder-val="{{ false }}">
+        <div style="background: #eff6ff; border: 1px solid #1d4ed8; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px">
+          <h3 style="margin: 0; font-size: 16px">You're set up. Check your first job?</h3>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end">
+            <div style="flex: 1 1 320px"><label for="joburl">Job posting link</label><input id="joburl" class="field" placeholder="https://job-boards.greenhouse.io/kestrelmedia/jobs/4134913"></div>
+            <button class="btn">Check fit now</button>
+            <button class="btn2">Save for later</button>
+          </div>
+          <p class="hint" style="margin: 0">"Check fit now" asks the AI assistant for a fit report (2–5 minutes, uses your Claude plan). "Save for later" puts the link in To review.</p>
+        </div>
+      </sc-if>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cv: false, co: false };
+  }
+  renderVals() {
+    const { cv, co } = this.state;
+    const n = (cv ? 1 : 0) + (co ? 1 : 0) + 1;
+    return {
+      cvTodo: !cv, cvDone: cv, coTodo: !co, coDone: co, allDone: cv && co,
+      cvNum: cv ? '✓' : '1', cvNumClass: cv ? 'done' : '',
+      coNum: co ? '✓' : '2', coNumClass: co ? 'done' : '',
+      progress: n + ' of 3 done',
+      companyCount: co ? '1' : '0',
+      cvMark: cv ? '✓' : 'missing',
+      saveCv: () => this.setState({ cv: true }),
+      saveCo: () => this.setState({ co: true }),
+    };
+  }
+}
+</script>
+</body>
+</html>

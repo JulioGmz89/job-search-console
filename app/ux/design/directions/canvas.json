@@ -1,0 +1,37 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-10-06T15:00:00Z" },
+  "title": "Job Search Console — M7 directions",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 1280, "h": 760, "title": "Overview — three directions", "expand": "fill", "is_interactive": true },
+    "A-T1-first-run.dc.html": { "x": 0, "y": 1240, "w": 1280, "h": 860, "title": "A · T1 First run", "expand": "fill", "is_interactive": true },
+    "A-T8-recover.dc.html": { "x": 1360, "y": 1240, "w": 1280, "h": 860, "title": "A · T8 Failed check → try again", "expand": "fill", "is_interactive": true },
+    "A-T5-documents.dc.html": { "x": 2720, "y": 1240, "w": 1280, "h": 860, "title": "A · T5 Applications list → CV and letter", "expand": "fill", "is_interactive": true },
+    "B-T1-first-run.dc.html": { "x": 0, "y": 2563, "w": 1280, "h": 860, "title": "B · T1 First run", "expand": "fill", "is_interactive": true },
+    "B-T8-recover.dc.html": { "x": 1360, "y": 2563, "w": 1280, "h": 860, "title": "B · T8 Failed check → try again", "expand": "fill", "is_interactive": true },
+    "B-T5-documents.dc.html": { "x": 2720, "y": 2563, "w": 1280, "h": 860, "title": "B · T5 Applications list → CV and letter", "expand": "fill", "is_interactive": true },
+    "C-T1-first-run.dc.html": { "x": 0, "y": 3886, "w": 1280, "h": 860, "title": "C · T1 First run", "expand": "fill", "is_interactive": true },
+    "C-T8-recover.dc.html": { "x": 1360, "y": 3886, "w": 1280, "h": 860, "title": "C · T8 Failed check → try again", "expand": "fill", "is_interactive": true },
+    "C-T5-documents.dc.html": { "x": 2720, "y": 3886, "w": 1280, "h": 860, "title": "C · T5 Applications list → CV and letter", "expand": "fill", "is_interactive": true }
+  },
+  "order": [
+    "Main.dc.html",
+    "A-T1-first-run.dc.html",
+    "A-T8-recover.dc.html",
+    "A-T5-documents.dc.html",
+    "B-T1-first-run.dc.html",
+    "B-T8-recover.dc.html",
+    "B-T5-documents.dc.html",
+    "C-T1-first-run.dc.html",
+    "C-T8-recover.dc.html",
+    "C-T5-documents.dc.html"
+  ],
+  "notes": {
+    "rowA": { "x": 0, "y": 1000, "text": "A · Workbench — organised by object", "kind": "title1", "maxW": 4000 },
+    "rowB": { "x": 0, "y": 2323, "text": "B · Stages — organised by workflow", "kind": "title1", "maxW": 4000 },
+    "rowC": { "x": 0, "y": 3646, "text": "C · Today — organised around next actions", "kind": "title1", "maxW": 4000 }
+  },
+  "designSystems": []
+}

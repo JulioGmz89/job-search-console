@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>B · Track → Apply — tailored CV and cover letter</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#fbfaf7;color:#1f1d1a;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px}
+a{color:#0f766e}a:hover{color:#134e4a}
+:focus-visible{outline:3px solid #0f766e;outline-offset:2px}
+h1,h2,h3{font-family:Charter,"Iowan Old Style","Palatino Linotype",Georgia,serif}
+.stage{font:inherit;display:flex;flex-direction:column;align-items:flex-start;padding:8px 16px;border-radius:10px;color:#44403c;background:none;border:1px solid transparent;cursor:pointer;min-width:110px}
+.stage:hover{border-color:#a8a29e;color:#1f1d1a}
+.stage[aria-current=page]{background:#0f766e;color:#fff}
+.stage b{font-size:15px}
+.btn{font:inherit;font-weight:600;padding:10px 18px;border-radius:10px;border:1px solid #0f766e;background:#0f766e;color:#fff;cursor:pointer;min-height:44px;text-decoration:none;display:inline-flex;align-items:center}
+.btn:hover{background:#115e59;color:#fff}
+.btn2{font:inherit;padding:10px 18px;border-radius:10px;border:1px solid #78716c;background:#fff;color:#1f1d1a;cursor:pointer;min-height:44px;text-decoration:none;display:inline-flex;align-items:center}
+.btn2:hover{border-color:#1f1d1a;color:#1f1d1a}
+.tool{color:#1f1d1a;text-decoration:none;padding:8px 10px;border-radius:8px}.tool:hover{background:#e7e5e4;color:#1f1d1a}
+.field{font:inherit;padding:10px 12px;border:1px solid #78716c;border-radius:10px;background:#fff;color:#1f1d1a;width:100%;box-sizing:border-box}
+label{font-weight:600;display:block;margin-bottom:6px}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #e7e5e4;white-space:nowrap}
+th{font-size:13px;color:#57534e;font-weight:600}
+.step{background:#fff;border:1px solid #d6d3cd;border-radius:14px;padding:20px;display:flex;gap:16px}
+.num{flex:none;width:34px;height:34px;border-radius:17px;border:2px solid #a8a29e;display:flex;align-items:center;justify-content:center;font-weight:700}
+.num.ok{background:#0f766e;border-color:#0f766e;color:#fff}
+</style>
+</helmet>
+<div style="min-height: 860px; display: flex; flex-direction: column">
+  <header style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; padding: 12px 32px; background: #f1efe9; border-bottom: 1px solid #d6d3cd">
+    <div style="font-weight: 700; font-family: Charter, Georgia, serif; font-size: 19px">Job Search Console</div>
+    <nav aria-label="Stages" style="display: flex; gap: 4px; flex-wrap: wrap">
+      <button class="stage"><b>1 · Find</b><span style="font-size: 13px">13 to look at</span></button>
+      <button class="stage"><b>2 · Decide</b><span style="font-size: 13px">9 to decide</span></button>
+      <button class="stage" aria-current="{{applyCur}}" onClick="{{goApply}}"><b>3 · Apply</b><span style="font-size: 13px">2 in progress</span></button>
+      <button class="stage" aria-current="{{trackCur}}" onClick="{{goTrack}}"><b>4 · Track</b><span style="font-size: 13px">29 applications</span></button>
+    </nav>
+    <nav aria-label="Tools" style="display: flex; gap: 4px; flex-wrap: wrap"><a class="tool" href="#main">My CV</a><a class="tool" href="#main">Skills</a><a class="tool" href="#main">Companies</a><a class="tool" href="#main">{{actLabel}}</a></nav>
+  </header>
+
+  <main id="main" style="flex: 1; width: 100%; max-width: 1120px; margin: 0 auto; padding: 28px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+    <sc-if value="{{track}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-end">
+        <div><h1 style="margin: 0; font-size: 32px">Track</h1><p style="margin: 4px 0 0; color: #44403c">Everything you've applied to, and where it stands.</p></div>
+        <div style="width: 260px"><label for="q">Search</label><input id="q" class="field" placeholder="Company or role"></div>
+      </div>
+      <div style="background: #fff; border: 1px solid #d6d3cd; border-radius: 14px; overflow-x: auto">
+        <table>
+          <caption style="text-align: left; padding: 12px; color: #57534e">29 applications · grouped by where they stand</caption>
+          <thead><tr><th scope="col">Company and role</th><th scope="col">Fit</th><th scope="col">Where it stands</th><th scope="col">Next step</th></tr></thead>
+          <tbody>
+            <tr><td><b>Cobalt Freight</b> — Site Reliability Engineer</td><td>4.5</td><td>Offer</td><td>Negotiating equity</td></tr>
+            <tr><td><b>Ember Payments</b> — Backend Engineer (Go)</td><td>4.2</td><td>Interviewing</td><td>System design round</td></tr>
+            <tr><td><b>Driftwood Analytics</b> — Infrastructure Engineer</td><td>4.4</td><td>Interviewing</td><td>System design round</td></tr>
+            <tr style="background: #f0fdfa"><td><b>Granite Cloud</b> — Software Engineer, Payments</td><td>4.1</td><td>Recruiter screen booked</td><td><button class="btn" onClick="{{goApply}}">Get CV and letter ready</button></td></tr>
+            <tr><td><b>Harbor Learning</b> — Data Engineer</td><td>3.6</td><td>Recruiter screen booked</td><td><button class="btn2">Get CV and letter ready</button></td></tr>
+            <tr><td><b>Ironleaf Security</b> — Site Reliability Engineer</td><td>4.3</td><td>Applied</td><td>Waiting to hear</td></tr>
+            <tr><td><b>Lumen Grid</b> — Backend Engineer (Go)</td><td>4.0</td><td>Applied</td><td>Waiting to hear</td></tr>
+            <tr><td><b>Mosaic Retail</b> — Infrastructure Engineer</td><td>3.8</td><td>Applied</td><td>Waiting to hear</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{apply}}" hint-placeholder-val="{{ false }}">
+      <div><p style="margin: 0; color: #57534e">Apply · Granite Cloud</p><h1 style="margin: 0; font-size: 32px">Software Engineer, Payments</h1><p style="margin: 6px 0 0; color: #44403c">Fit 4.1 / 5 · Recruiter screen booked · <a href="#main">Read the fit report</a></p></div>
+      <p role="status" style="margin: 0; min-height: 22px">{{announce}}</p>
+      <div class="step">
+        <span class="num {{cvNum}}" aria-hidden="true">{{cvMark}}</span>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px">
+          <h2 style="margin: 0; font-size: 22px">Tailored CV</h2>
+          <sc-if value="{{cvNone}}" hint-placeholder-val="{{ true }}"><p style="margin: 0; color: #44403c">Your CV, rewritten for this role in your default design. About 3 minutes; uses your Claude plan.</p><div><button class="btn" onClick="{{makeCv}}">Make my tailored CV</button></div></sc-if>
+          <sc-if value="{{cvWorking}}" hint-placeholder-val="{{ false }}"><div role="progressbar" aria-label="Making tailored CV" style="height: 8px; background: #e7e5e4; border-radius: 4px; overflow: hidden"><div style="width: 50%; height: 8px; background: #0f766e"></div></div><p style="margin: 0; color: #44403c">Writing… you can start the letter meanwhile.</p></sc-if>
+          <sc-if value="{{cvReady}}" hint-placeholder-val="{{ false }}"><p style="margin: 0">Made today 10:42 · Executive design · <b style="color: #3f6212">readable by screening systems</b></p><div style="display: flex; gap: 10px"><a class="btn" href="#main">Open PDF</a><a class="btn2" href="#main">Download</a></div></sc-if>
+        </div>
+      </div>
+      <div class="step">
+        <span class="num {{clNum}}" aria-hidden="true">{{clMark}}</span>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px">
+          <h2 style="margin: 0; font-size: 22px">Cover letter</h2>
+          <sc-if value="{{clNone}}" hint-placeholder-val="{{ true }}">
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+              <div><label for="a">Why this role?</label><textarea id="a" class="field" rows="3" placeholder="Payments at a scale I haven't worked at yet"></textarea></div>
+              <div><label for="b">What would you fix?</label><textarea id="b" class="field" rows="3" placeholder="Late or failed settlements"></textarea></div>
+              <div><label for="c">How would you start?</label><textarea id="c" class="field" rows="3" placeholder="Trace the path; add safe retries"></textarea></div>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap"><div style="width: 200px"><label for="t">Tone</label><select id="t" class="field"><option>Direct</option><option>Warm</option><option>Formal</option></select></div><button class="btn" onClick="{{makeCl}}">Write my letter</button></div>
+          </sc-if>
+          <sc-if value="{{clWorking}}" hint-placeholder-val="{{ false }}"><div role="progressbar" aria-label="Writing cover letter" style="height: 8px; background: #e7e5e4; border-radius: 4px; overflow: hidden"><div style="width: 30%; height: 8px; background: #0f766e"></div></div></sc-if>
+          <sc-if value="{{clReady}}" hint-placeholder-val="{{ false }}"><p style="margin: 0">Made today 10:44 · direct tone · one page</p><div style="display: flex; gap: 10px"><a class="btn" href="#main">Open PDF</a><a class="btn2" href="#main">Download</a></div></sc-if>
+        </div>
+      </div>
+      <div class="step">
+        <span class="num" aria-hidden="true">3</span>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px">
+          <h2 style="margin: 0; font-size: 22px">Send them yourself</h2>
+          <p style="margin: 0; color: #44403c">The app never sends or applies for you. Attach the two PDFs to your reply to the recruiter, then mark it here.</p>
+          <div><button class="btn2">I've sent them</button></div>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { view: 'track', cv: 'none', cl: 'none' };
+  }
+  renderVals() {
+    const { view, cv, cl } = this.state;
+    const later = (k) => setTimeout(() => this.setState({ [k]: 'ready' }), 2500);
+    const w = (cv === 'working' ? 1 : 0) + (cl === 'working' ? 1 : 0);
+    let announce = '';
+    if (w) announce = w + ' document' + (w > 1 ? 's' : '') + ' being written for Granite Cloud.';
+    else if (cv === 'ready' && cl === 'ready') announce = 'Your tailored CV and cover letter for Granite Cloud are ready.';
+    else if (cv === 'ready') announce = 'Tailored CV for Granite Cloud is ready.';
+    return {
+      track: view === 'track', apply: view === 'apply',
+      trackCur: view === 'track' ? 'page' : 'false', applyCur: view === 'apply' ? 'page' : 'false',
+      actLabel: w ? 'Activity · ' + w + ' working' : 'Activity',
+      cvNone: cv === 'none', cvWorking: cv === 'working', cvReady: cv === 'ready', cvNum: cv === 'ready' ? 'ok' : '', cvMark: cv === 'ready' ? '✓' : '1',
+      clNone: cl === 'none', clWorking: cl === 'working', clReady: cl === 'ready', clNum: cl === 'ready' ? 'ok' : '', clMark: cl === 'ready' ? '✓' : '2',
+      announce,
+      goApply: () => this.setState({ view: 'apply' }),
+      goTrack: () => this.setState({ view: 'track' }),
+      makeCv: () => { this.setState({ cv: 'working' }); later('cv'); },
+      makeCl: () => { this.setState({ cl: 'working' }); later('cl'); },
+    };
+  }
+}
+</script>
+</body>
+</html>

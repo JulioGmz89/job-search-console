@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>C · Today — first run</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#fafafa;color:#18181b;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px}
+a{color:#6d28d9}a:hover{color:#4c1d95}
+:focus-visible{outline:3px solid #6d28d9;outline-offset:3px}
+.top a{color:#e4e4e7;text-decoration:none;padding:8px 12px;border-radius:10px;font-size:15px}
+.top a:hover{background:#3f3f46;color:#fff}
+.top a[aria-current=page]{background:#fff;color:#18181b;font-weight:600}
+.top a:focus-visible{outline-color:#c4b5fd}
+.btn{font:inherit;font-weight:700;padding:12px 20px;border-radius:14px;border:0;background:#6d28d9;color:#fff;cursor:pointer;min-height:48px}
+.btn:hover{background:#5b21b6}
+.btn2{font:inherit;font-weight:600;padding:12px 20px;border-radius:14px;border:2px solid #52525b;background:#fff;color:#18181b;cursor:pointer;min-height:48px}
+.btn2:hover{border-color:#18181b}
+.tile{font:inherit;text-align:left;background:#fff;border:2px solid #d4d4d8;border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:8px;cursor:pointer;color:#18181b;min-height:150px}
+.tile:hover{border-color:#6d28d9}
+.tile[aria-expanded=true]{border-color:#6d28d9;box-shadow:0 0 0 4px #ede9fe}
+.field{font:inherit;padding:12px 14px;border:2px solid #71717a;border-radius:12px;background:#fff;color:#18181b;width:100%;box-sizing:border-box}
+label{font-weight:700;display:block;margin-bottom:6px}
+</style>
+</helmet>
+<div style="min-height: 860px; display: flex; flex-direction: column">
+  <header class="top" style="background: #18181b; color: #fff; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 12px 28px">
+    <div style="font-weight: 800; font-size: 18px; margin-right: 8px">Job Search Console</div>
+    <nav aria-label="Main" style="display: flex; gap: 2px; flex-wrap: wrap"><a href="#main" aria-current="page">Today</a><a href="#main">Applications</a><a href="#main">Openings</a><a href="#main">My CV</a><a href="#main">Skills</a><a href="#main">Companies</a></nav>
+    <div style="margin-left: auto; display: flex; gap: 10px; align-items: center"><label for="s" style="position: absolute; left: -9999px">Search</label><input id="s" placeholder="Find a job, company or document" style="font: inherit; font-size: 15px; padding: 8px 12px; border-radius: 10px; border: 1px solid #71717a; background: #27272a; color: #fff; width: 260px"><a href="#main">Activity</a></div>
+  </header>
+
+  <main id="main" style="flex: 1; width: 100%; max-width: 1040px; margin: 0 auto; padding: 40px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px">
+    <div>
+      <h1 style="margin: 0; font-size: 38px; letter-spacing: -0.01em">{{heading}}</h1>
+      <p style="margin: 8px 0 0; color: #52525b; font-size: 19px">{{sub}}</p>
+    </div>
+    <p role="status" style="position: absolute; left: -9999px">{{announce}}</p>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px">
+      <button class="tile" aria-expanded="{{cvOpen}}" aria-controls="sheet" onClick="{{openCv}}" style="border-color: {{cvBorder}}">
+        <span style="font-size: 14px; font-weight: 700; color: {{cvTagColor}}">{{cvTag}}</span>
+        <span style="font-size: 22px; font-weight: 800">Add your CV</span>
+        <span style="color: #52525b">Everything the app writes for you starts here.</span>
+      </button>
+      <button class="tile" aria-expanded="{{coOpen}}" aria-controls="sheet" onClick="{{openCo}}" style="border-color: {{coBorder}}">
+        <span style="font-size: 14px; font-weight: 700; color: {{coTagColor}}">{{coTag}}</span>
+        <span style="font-size: 22px; font-weight: 800">Follow a company</span>
+        <span style="color: #52525b">We'll watch it for new openings.</span>
+      </button>
+      <div class="tile" style="cursor: default; border-color: #166534">
+        <span style="font-size: 14px; font-weight: 700; color: #166534">✓ DONE</span>
+        <span style="font-size: 22px; font-weight: 800">AI assistant</span>
+        <span style="color: #52525b">Claude Code is ready. Checks take 2–5 minutes and use your Claude plan.</span>
+      </div>
+    </div>
+
+    <sc-if value="{{cvOpen}}" hint-placeholder-val="{{ false }}">
+      <section id="sheet" aria-labelledby="sh1" style="background: #fff; border: 2px solid #6d28d9; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <h2 id="sh1" style="margin: 0; font-size: 24px">Add your CV</h2>
+        <div><label for="cv">Paste your CV (Markdown or plain text)</label><textarea id="cv" class="field" rows="7" placeholder="# Alex Rivera&#10;Backend engineer with seven years building payment and data platforms."></textarea><p style="margin: 6px 0 0; color: #52525b; font-size: 15px">Saved as cv.md in your workspace folder. Edit it any time in My CV.</p></div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap"><button class="btn" onClick="{{saveCv}}">Save my CV</button><button class="btn2">Choose a file…</button></div>
+      </section>
+    </sc-if>
+    <sc-if value="{{coOpen}}" hint-placeholder-val="{{ false }}">
+      <section id="sheet" aria-labelledby="sh2" style="background: #fff; border: 2px solid #6d28d9; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <h2 id="sh2" style="margin: 0; font-size: 24px">Follow a company</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+          <div><label for="n">Company name</label><input id="n" class="field" placeholder="Kestrel Media"></div>
+          <div><label for="u">Careers page link</label><input id="u" class="field" placeholder="https://job-boards.greenhouse.io/kestrelmedia"></div>
+        </div>
+        <div><button class="btn" onClick="{{saveCo}}">Follow</button></div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{allDone}}" hint-placeholder-val="{{ false }}">
+      <section aria-labelledby="nx" style="background: #f5f3ff; border: 2px solid #6d28d9; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+        <h2 id="nx" style="margin: 0; font-size: 24px">Next: 6 openings at Kestrel Media</h2>
+        <p style="margin: 0; color: #3f3f46">We found them on Kestrel Media's job board just now. Pick the ones that look right and the assistant will check your fit.</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap"><button class="btn">Look at the 6 openings</button><button class="btn2">Paste a job link instead</button></div>
+      </section>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cv: false, co: false, open: '' };
+  }
+  renderVals() {
+    const { cv, co, open } = this.state;
+    const left = (cv ? 0 : 1) + (co ? 0 : 1);
+    return {
+      heading: left ? "Welcome, Alex. Let's get you set up." : "You're set up.",
+      sub: left ? left + ' of 3 steps left · about 5 minutes' : 'Today will show what needs you each time you open the app.',
+      announce: left ? left + ' set-up steps left' : 'Set-up complete',
+      cvOpen: open === 'cv', coOpen: open === 'co', allDone: !left,
+      cvTag: cv ? '✓ DONE' : 'STEP 1', cvTagColor: cv ? '#166534' : '#6d28d9', cvBorder: cv ? '#166534' : '#d4d4d8',
+      coTag: co ? '✓ DONE' : 'STEP 2', coTagColor: co ? '#166534' : '#6d28d9', coBorder: co ? '#166534' : '#d4d4d8',
+      openCv: () => this.setState({ open: open === 'cv' ? '' : 'cv' }),
+      openCo: () => this.setState({ open: open === 'co' ? '' : 'co' }),
+      saveCv: () => this.setState({ cv: true, open: co ? '' : 'co' }),
+      saveCo: () => this.setState({ co: true, open: cv ? '' : 'cv' }),
+    };
+  }
+}
+</script>
+</body>
+</html>

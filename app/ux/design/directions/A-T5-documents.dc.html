@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A · Applications — tailored CV and cover letter</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#f6f7f9;color:#0f172a;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px}
+a{color:#1d4ed8}a:hover{color:#1e3a8a}
+:focus-visible{outline:3px solid #1d4ed8;outline-offset:2px}
+.nav a{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:6px;color:#e2e8f0;text-decoration:none}
+.nav a:hover{background:#1e293b;color:#fff}
+.nav a[aria-current=page]{background:#1e293b;color:#fff;box-shadow:inset 3px 0 0 #93c5fd}
+.nav a:focus-visible{outline-color:#93c5fd}
+.count{font-size:12px;color:#94a3b8}
+.btn{font:inherit;font-weight:600;padding:8px 14px;border-radius:6px;border:1px solid #1d4ed8;background:#1d4ed8;color:#fff;cursor:pointer;min-height:36px;text-decoration:none;display:inline-flex;align-items:center}
+.btn:hover{background:#1e40af;color:#fff}
+.btn2{font:inherit;padding:8px 14px;border-radius:6px;border:1px solid #64748b;background:#fff;color:#0f172a;cursor:pointer;min-height:36px;text-decoration:none;display:inline-flex;align-items:center}
+.btn2:hover{border-color:#0f172a;color:#0f172a}
+.chip{font:inherit;padding:4px 12px;border-radius:14px;border:1px solid #64748b;background:#fff;color:#0f172a;cursor:pointer;min-height:28px}
+.chip[aria-pressed=true]{background:#0f172a;color:#fff;border-color:#0f172a}
+.field{font:inherit;padding:8px 10px;border:1px solid #64748b;border-radius:6px;background:#fff;color:#0f172a;width:100%;box-sizing:border-box}
+label{font-weight:600;display:block;margin-bottom:4px}
+table{border-collapse:collapse;width:100%;background:#fff}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid #e2e8f0;white-space:nowrap}
+th{font-size:12px;color:#475569;font-weight:600}
+td .open{font:inherit;color:#0f172a;font-weight:600;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+td .open:hover{color:#1d4ed8;text-decoration:underline}
+.sel td{background:#eff6ff}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600}
+.doc{border:1px solid #cbd5e1;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:#fff}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 860px">
+  <aside style="flex: 1 1 200px; max-width: 220px; background: #0f172a; color: #e2e8f0; padding: 20px 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px">
+    <div style="padding: 0 12px; font-weight: 700; font-size: 15px; color: #fff">Job Search Console</div>
+    <nav class="nav" aria-label="Main" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="#main" aria-current="page"><span>Applications</span><span class="count">40</span></a>
+      <a href="#main"><span>To review</span><span class="count">13</span></a>
+      <a href="#main"><span>Companies you follow</span><span class="count">12</span></a>
+      <a href="#main"><span>Skills</span></a>
+      <a href="#main"><span>My CV</span></a>
+    </nav>
+    <div style="margin-top: auto; padding: 0 12px"><button style="font: inherit; width: 100%; text-align: left; padding: 10px 12px; border-radius: 6px; border: 1px solid #475569; background: #1e293b; color: #fff; font-weight: 600">{{trayLabel}}</button></div>
+  </aside>
+
+  <main id="main" style="flex: 999 1 520px; min-width: 0; padding: 24px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+      <h1 style="margin: 0; font-size: 24px">Applications</h1>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+        <label for="add" style="position: absolute; left: -9999px">Job posting link</label>
+        <input id="add" class="field" style="width: 280px" placeholder="Paste a job posting link">
+        <button class="btn">Check fit now</button><button class="btn2">Save for later</button>
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+      <div role="group" aria-label="Status" style="display: flex; gap: 6px; flex-wrap: wrap">
+        <button class="chip" aria-pressed="true">All 40</button><button class="chip" aria-pressed="false">Reviewed — not applied 9</button><button class="chip" aria-pressed="false">Applied 8</button><button class="chip" aria-pressed="false">Interviewing 3</button><button class="chip" aria-pressed="false">Offer 1</button><button class="chip" aria-pressed="false">Closed 19</button>
+      </div>
+      <label for="q" style="position: absolute; left: -9999px">Search applications</label>
+      <input id="q" class="field" style="width: 220px; margin-left: auto" placeholder="Search company or role">
+    </div>
+    <div style="overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px">
+      <table>
+        <caption style="text-align: left; padding: 8px 10px; color: #475569">40 applications · sorted by fit, best first · select a row to open it beside the list</caption>
+        <thead><tr><th scope="col"><button class="open" style="font-weight: 600; font-size: 12px; color: #475569">Company and role</button></th><th scope="col"><button class="open" style="font-weight: 600; font-size: 12px; color: #475569" aria-label="Fit, sorted best first">Fit ↓</button></th><th scope="col">Status</th><th scope="col">Documents</th></tr></thead>
+        <tbody>
+          <tr><td><button class="open">Cobalt Freight — Site Reliability Engineer</button></td><td>4.5</td><td>Offer</td><td>CV</td></tr>
+          <tr><td><button class="open">Ironleaf Security — Site Reliability Engineer</button></td><td>4.3</td><td>Applied</td><td>CV</td></tr>
+          <tr><td><button class="open">Cobalt Freight — Staff Software Engineer</button></td><td>4.2</td><td>Reviewed — not applied</td><td>CV</td></tr>
+          <tr><td><button class="open">Ember Payments — Backend Engineer (Go)</button></td><td>4.2</td><td>Interviewing</td><td>CV</td></tr>
+          <tr class="{{rowClass}}"><td><button class="open" onClick="{{open}}" aria-current="{{rowCurrent}}">Granite Cloud — Software Engineer, Payments</button></td><td>4.1</td><td>Responded</td><td>{{docsCell}}</td></tr>
+          <tr><td><button class="open">Lumen Grid — Backend Engineer (Go)</button></td><td>4.0</td><td>Applied</td><td>—</td></tr>
+          <tr><td><button class="open">Driftwood Analytics — Backend Engineer (Go)</button></td><td>3.9</td><td>Reviewed — not applied</td><td>—</td></tr>
+          <tr><td><button class="open">Fernhill Robotics — Backend Engineer (Go)</button></td><td>3.9</td><td>Interviewing</td><td>—</td></tr>
+          <tr><td><button class="open">Mosaic Retail — Infrastructure Engineer</button></td><td>3.8</td><td>Applied</td><td>—</td></tr>
+          <tr><td><button class="open">Brightwater Health — Backend Engineer (Go)</button></td><td>3.7</td><td>Applied</td><td>—</td></tr>
+          <tr><td><button class="open">Harbor Learning — Data Engineer</button></td><td>3.6</td><td>Responded</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <sc-if value="{{sel}}" hint-placeholder-val="{{ true }}">
+    <section aria-labelledby="jobh" style="flex: 1 1 380px; max-width: 440px; background: #ffffff; border-left: 1px solid #cbd5e1; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start">
+        <div><p style="margin: 0; color: #475569">Granite Cloud</p><h2 id="jobh" style="margin: 0; font-size: 20px">Software Engineer, Payments</h2></div>
+        <button class="btn2" onClick="{{close}}" aria-label="Close Granite Cloud — Software Engineer, Payments">Close</button>
+      </div>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center">
+        <p style="margin: 0; font-size: 16px"><b>Fit 4.1 / 5</b> · Recommendation: <b>Apply</b></p>
+        <a href="#main">Read the fit report</a> <a href="#main">Open the posting</a>
+      </div>
+      <div><label for="st">Status</label><select id="st" class="field" style="width: 240px"><option>Responded</option><option>Applied</option><option>Interviewing</option></select></div>
+      <p role="status" style="margin: 0; color: #334155; min-height: 20px">{{announce}}</p>
+
+      <h3 style="margin: 4px 0 0; font-size: 16px">Documents</h3>
+      <div class="doc">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><b>Tailored CV</b><span class="badge" style="background: {{cvBadgeBg}}; color: {{cvBadgeFg}}">{{cvBadge}}</span></div>
+        <sc-if value="{{cvNone}}" hint-placeholder-val="{{ true }}">
+          <p style="margin: 0; color: #334155">Your CV rewritten for this role, in your default design (Executive). Uses your Claude plan, about 3 minutes.</p>
+          <div><button class="btn" onClick="{{makeCv}}">Make tailored CV</button></div>
+        </sc-if>
+        <sc-if value="{{cvWorking}}" hint-placeholder-val="{{ false }}">
+          <div role="progressbar" aria-label="Making tailored CV for Granite Cloud" style="height: 6px; background: #dbeafe; border-radius: 3px; overflow: hidden"><div style="width: 55%; height: 6px; background: #1d4ed8"></div></div>
+          <p style="margin: 0; color: #334155">Writing… you can leave this page; it will appear here and in Activity.</p>
+        </sc-if>
+        <sc-if value="{{cvReady}}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 0">cv-alex-rivera-granitecloud-006.pdf · made today 10:42 · Executive design · your current writing rules</p>
+          <p style="margin: 0; color: #14532d; font-weight: 600">✓ Screening check: readable by applicant-tracking systems</p>
+          <div style="display: flex; gap: 8px"><a class="btn" href="#main">Open</a><a class="btn2" href="#main">Download</a></div>
+        </sc-if>
+      </div>
+
+      <div class="doc">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><b>Cover letter</b><span class="badge" style="background: {{clBadgeBg}}; color: {{clBadgeFg}}">{{clBadge}}</span></div>
+        <sc-if value="{{clNone}}" hint-placeholder-val="{{ true }}">
+          <p style="margin: 0; color: #334155">Answer three short questions and the assistant drafts a one-page letter. About 2 minutes.</p>
+          <div><button class="btn2" onClick="{{startCl}}">Write cover letter</button></div>
+        </sc-if>
+        <sc-if value="{{clForm}}" hint-placeholder-val="{{ false }}">
+          <div><label for="q1">Why this role? <span style="font-weight: 400; color: #475569">(required)</span></label><textarea id="q1" class="field" rows="2" placeholder="Granite Cloud runs payments at a scale I have not worked at yet."></textarea></div>
+          <div><label for="q2">What problem would you solve? <span style="font-weight: 400; color: #475569">(required)</span></label><textarea id="q2" class="field" rows="2" placeholder="Settlements that arrive late or fail."></textarea></div>
+          <div><label for="q3">How would you start? <span style="font-weight: 400; color: #475569">(required)</span></label><textarea id="q3" class="field" rows="2" placeholder="Trace the settlement path end to end; add safe retries."></textarea></div>
+          <div><label for="tone">Tone</label><select id="tone" class="field"><option>Direct</option><option>Warm</option><option>Formal</option></select></div>
+          <div style="display: flex; gap: 8px"><button class="btn" onClick="{{makeCl}}">Write the letter</button><button class="btn2" onClick="{{cancelCl}}">Cancel</button></div>
+        </sc-if>
+        <sc-if value="{{clWorking}}" hint-placeholder-val="{{ false }}">
+          <div role="progressbar" aria-label="Writing cover letter for Granite Cloud" style="height: 6px; background: #dbeafe; border-radius: 3px; overflow: hidden"><div style="width: 35%; height: 6px; background: #1d4ed8"></div></div>
+          <p style="margin: 0; color: #334155">Writing in a direct tone…</p>
+        </sc-if>
+        <sc-if value="{{clReady}}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 0">cover-granitecloud-006.pdf · made today 10:44 · direct tone</p>
+          <div style="display: flex; gap: 8px"><a class="btn" href="#main">Open</a><a class="btn2" href="#main">Download</a></div>
+        </sc-if>
+      </div>
+      <p style="margin: 0; color: #475569; font-size: 13px">You send these yourself — the app never applies or emails for you.</p>
+    </section>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: false, cv: 'none', cl: 'none' };
+  }
+  renderVals() {
+    const { sel, cv, cl } = this.state;
+    const badge = (s) => s === 'ready' ? ['Ready', '#dcfce7', '#14532d'] : s === 'working' ? ['Working', '#dbeafe', '#1e3a8a'] : ['Not made yet', '#f1f5f9', '#334155'];
+    const [cvBadge, cvBadgeBg, cvBadgeFg] = badge(cv);
+    const [clBadge, clBadgeBg, clBadgeFg] = badge(cl);
+    const working = (cv === 'working' ? 1 : 0) + (cl === 'working' ? 1 : 0);
+    let announce = '';
+    if (cv === 'working') announce = 'Making the tailored CV for Granite Cloud.';
+    if (cl === 'working') announce = 'Writing the cover letter for Granite Cloud.';
+    if (cv === 'ready' && cl === 'ready') announce = 'Both documents for Granite Cloud are ready.';
+    else if (cv === 'ready' && cl !== 'working') announce = 'Tailored CV for Granite Cloud is ready.';
+    const later = (k) => setTimeout(() => this.setState({ [k]: 'ready' }), 2500);
+    return {
+      sel, rowClass: sel ? 'sel' : '', rowCurrent: sel ? 'true' : 'false',
+      docsCell: cv === 'ready' && cl === 'ready' ? 'CV, letter' : cv === 'ready' ? 'CV' : '—',
+      trayLabel: working ? 'Activity · ' + working + ' working' : 'Activity · all done',
+      cvNone: cv === 'none', cvWorking: cv === 'working', cvReady: cv === 'ready', cvBadge, cvBadgeBg, cvBadgeFg,
+      clNone: cl === 'none', clForm: cl === 'form', clWorking: cl === 'working', clReady: cl === 'ready', clBadge, clBadgeBg, clBadgeFg,
+      announce,
+      open: () => this.setState({ sel: true }),
+      close: () => this.setState({ sel: false }),
+      makeCv: () => { this.setState({ cv: 'working' }); later('cv'); },
+      startCl: () => this.setState({ cl: 'form' }),
+      cancelCl: () => this.setState({ cl: 'none' }),
+      makeCl: () => { this.setState({ cl: 'working' }); later('cl'); },
+    };
+  }
+}
+</script>
+</body>
+</html>

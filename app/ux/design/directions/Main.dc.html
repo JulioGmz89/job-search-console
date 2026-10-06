@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Three directions — overview</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#f4f4f2;color:#1c1b19;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:#1d4ed8}a:hover{color:#1e3a8a}
+a:focus-visible,button:focus-visible{outline:3px solid #1d4ed8;outline-offset:2px}
+.flow{display:block;padding:10px 12px;border:1px solid #8a8780;border-radius:8px;text-decoration:none;color:#1c1b19;background:#fff;font-size:14px;line-height:1.35}
+.flow:hover{border-color:#1c1b19;color:#1c1b19}
+.flow b{display:block;font-size:15px}
+</style>
+</helmet>
+<main style="max-width: 1240px; margin: 0 auto; padding: 48px 24px 64px; box-sizing: border-box; display: flex; flex-direction: column; gap: 32px">
+  <header style="display: flex; flex-direction: column; gap: 8px">
+    <p style="margin: 0; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: #57534e">Job Search Console · M7 design directions</p>
+    <h1 style="margin: 0; font-size: 40px; line-height: 1.1; font-weight: 700">Three ways to organise the console</h1>
+    <p style="margin: 0; max-width: 760px; font-size: 17px; line-height: 1.5; color: #44403c">Each direction draws the same three hard flows from the M6 study — first run (T1), recovering a failed check (T8), and getting a tailored CV and cover letter (T5, which starts from the applications list). All data is fictional (Alex Rivera). Press Play on any flow to click through it.</p>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+
+    <section aria-labelledby="dirA" style="background: #ffffff; border: 1px solid #d6d3cd; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+      <h2 id="dirA" style="margin: 0; font-size: 22px">A · Workbench</h2>
+      <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #44403c">Organised by <b>object</b>. A side menu lists the things you own — Applications, To review, Companies you follow, Skills, My CV — and an Activity tray stays docked on every page. Opening a job shows it in a side panel next to the list.</p>
+      <div aria-hidden="true" style="height: 120px; border: 1px solid #cbd5e1; border-radius: 6px; display: flex; overflow: hidden; background: #f6f7f9">
+        <div style="width: 26%; background: #0f172a"></div>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 6px; padding: 10px">
+          <div style="height: 10px; width: 60%; background: #cbd5e1; border-radius: 3px"></div>
+          <div style="flex: 1; display: flex; gap: 6px"><div style="flex: 3; background: #ffffff; border: 1px solid #e2e8f0"></div><div style="flex: 2; background: #ffffff; border: 2px solid #1d4ed8"></div></div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 6px" aria-label="Palette: navy, blue, slate, red, green">
+        <span style="width: 28px; height: 28px; border-radius: 6px; background: #0f172a"></span><span style="width: 28px; height: 28px; border-radius: 6px; background: #1d4ed8"></span><span style="width: 28px; height: 28px; border-radius: 6px; background: #475569"></span><span style="width: 28px; height: 28px; border-radius: 6px; background: #b91c1c"></span><span style="width: 28px; height: 28px; border-radius: 6px; background: #15803d"></span>
+      </div>
+      <p style="margin: 0; font-size: 14px; color: #57534e">Compact, neutral, system sans. Dense tables for the career-ops user.</p>
+      <nav aria-label="Direction A flows" style="display: flex; flex-direction: column; gap: 8px">
+        <a class="flow" href="A-T1-first-run.dc.html"><b>T1 · First run</b>Set-up checklist on the empty Applications page</a>
+        <a class="flow" href="A-T8-recover.dc.html"><b>T8 · Failed check</b>Activity tray → plain cause → Try again</a>
+        <a class="flow" href="A-T5-documents.dc.html"><b>T5 · CV and letter</b>Applications list → side panel → Documents</a>
+      </nav>
+    </section>
+
+    <section aria-labelledby="dirB" style="background: #fbfaf7; border: 1px solid #d6d3cd; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+      <h2 id="dirB" style="margin: 0; font-size: 22px; font-family: Charter, 'Iowan Old Style', Georgia, serif">B · Stages</h2>
+      <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #44403c">Organised by <b>workflow stage</b>. The top bar is the job hunt itself — Find → Decide → Apply → Track — with your tools (My CV, Skills, Companies) on the right. Each job moves through the stages; each stage shows only what you do there.</p>
+      <div aria-hidden="true" style="height: 120px; border: 1px solid #d6d3cd; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; background: #ffffff">
+        <div style="height: 28px; display: flex; gap: 4px; padding: 6px; background: #f1efe9"><div style="flex: 1; background: #0f766e; border-radius: 4px"></div><div style="flex: 1; background: #d6d3cd; border-radius: 4px"></div><div style="flex: 1; background: #d6d3cd; border-radius: 4px"></div><div style="flex: 1; background: #d6d3cd; border-radius: 4px"></div></div>
+        <div style="flex: 1; display: flex; gap: 6px; padding: 8px"><div style="flex: 1; background: #fbfaf7; border: 1px solid #e7e5e4; border-radius: 6px"></div><div style="flex: 1; background: #fbfaf7; border: 1px solid #e7e5e4; border-radius: 6px"></div><div style="flex: 1; background: #fbfaf7; border: 1px solid #e7e5e4; border-radius: 6px"></div></div>
+      </div>
+      <div style="display: flex; gap: 6px" aria-label="Palette: ink, teal, sand, rust, moss">
+        <span style="width: 28px; height: 28px; border-radius: 14px; background: #1f1d1a"></span><span style="width: 28px; height: 28px; border-radius: 14px; background: #0f766e"></span><span style="width: 28px; height: 28px; border-radius: 14px; background: #e7e5e4"></span><span style="width: 28px; height: 28px; border-radius: 14px; background: #c2410c"></span><span style="width: 28px; height: 28px; border-radius: 14px; background: #3f6212"></span>
+      </div>
+      <p style="margin: 0; font-size: 14px; color: #57534e">Warm paper, serif headings, roomy cards. Reads like a guided process.</p>
+      <nav aria-label="Direction B flows" style="display: flex; flex-direction: column; gap: 8px">
+        <a class="flow" href="B-T1-first-run.dc.html"><b>T1 · First run</b>Three-step set-up before the stages open</a>
+        <a class="flow" href="B-T8-recover.dc.html"><b>T8 · Failed check</b>Failure shown in the Decide stage, retried in place</a>
+        <a class="flow" href="B-T5-documents.dc.html"><b>T5 · CV and letter</b>Track list → Apply stage checklist</a>
+      </nav>
+    </section>
+
+    <section aria-labelledby="dirC" style="background: #ffffff; border: 1px solid #d6d3cd; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+      <h2 id="dirC" style="margin: 0; font-size: 22px">C · Today</h2>
+      <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #44403c">Organised around <b>next actions</b>. You land on Today: a short list of what needs you (a failed check, new openings, a recruiter screen coming up), each with its one action. Full workspaces — Applications, Openings, My CV, Skills, Companies — open from there and from search.</p>
+      <div aria-hidden="true" style="height: 120px; border: 1px solid #d4d4d8; border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; background: #ffffff">
+        <div style="height: 22px; background: #18181b"></div>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 6px; padding: 10px"><div style="height: 22px; border-radius: 8px; background: #ede9fe; border: 1px solid #6d28d9"></div><div style="height: 22px; border-radius: 8px; background: #f4f4f5"></div><div style="height: 22px; border-radius: 8px; background: #f4f4f5"></div></div>
+      </div>
+      <div style="display: flex; gap: 6px" aria-label="Palette: graphite, violet, zinc, red, green">
+        <span style="width: 28px; height: 28px; border-radius: 10px; background: #18181b"></span><span style="width: 28px; height: 28px; border-radius: 10px; background: #6d28d9"></span><span style="width: 28px; height: 28px; border-radius: 10px; background: #d4d4d8"></span><span style="width: 28px; height: 28px; border-radius: 10px; background: #b91c1c"></span><span style="width: 28px; height: 28px; border-radius: 10px; background: #166534"></span>
+      </div>
+      <p style="margin: 0; font-size: 14px; color: #57534e">Bold, high-contrast, larger type. One thing at a time for the first-timer.</p>
+      <nav aria-label="Direction C flows" style="display: flex; flex-direction: column; gap: 8px">
+        <a class="flow" href="C-T1-first-run.dc.html"><b>T1 · First run</b>Today becomes a set-up list on day one</a>
+        <a class="flow" href="C-T8-recover.dc.html"><b>T8 · Failed check</b>The failure is the first card on Today</a>
+        <a class="flow" href="C-T5-documents.dc.html"><b>T5 · CV and letter</b>Applications workspace → job → documents</a>
+      </nav>
+    </section>
+
+  </div>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":760}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
