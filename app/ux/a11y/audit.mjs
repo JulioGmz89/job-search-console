@@ -16,8 +16,9 @@
  *                      views it fails on
  *   shots/             one screenshot per view, for evidence
  *
- * M8 re-runs this unchanged; the keyboard, focus and screen-reader passes are
- * the a11y-auditor agent's, not this script's.
+ * M8 re-runs it over the rebuilt UI's routes (the views below, each naming the
+ * M6 view it replaces) with --out app/ux/m8/a11y; the keyboard, focus and
+ * screen-reader passes are the a11y-auditor agent's, not this script's.
  */
 
 import { spawn } from 'node:child_process';
@@ -49,47 +50,59 @@ const ZOOMS = [
 ];
 
 /**
- * The views per sandbox state. `open` drives the page into the state; a view
- * whose control is missing is recorded as skipped rather than failing the run.
+ * The views per sandbox state, for the M8 UI (app/ux/design/ia.md routes).
+ * `open` drives the page into the state; a view whose control is missing is
+ * recorded as skipped rather than failing the run. `m6` names the baseline view
+ * it replaces, so app/ux/m8/scorecard.md can compare like with like.
  */
+const button = (name) => (page) => page.getByRole('button', { name }).first().click();
 const VIEWS = {
   populated: [
-    { id: 'pipeline', hash: '#/pipeline' },
-    { id: 'report-detail', hash: '#/pipeline', open: async (page) => page.locator('tbody tr').first().click() },
-    {
-      id: 'report-pdf-tab',
-      hash: '#/pipeline',
-      open: async (page) => {
-        await page.locator('tbody tr').first().click();
-        await page.getByRole('tab', { name: /PDF/ }).click();
-      },
-    },
-    {
-      id: 'cover-dialog',
-      hash: '#/pipeline',
-      open: async (page) => {
-        await page.locator('tbody tr').first().click();
-        await page.getByRole('button', { name: /^Cover letter$/ }).first().click();
-      },
-    },
-    { id: 'sources', hash: '#/sources' },
-    { id: 'sources-add-form', hash: '#/sources', open: async (page) => page.getByRole('button', { name: /^Add$/ }).first().click() },
-    { id: 'skills', hash: '#/skills' },
-    { id: 'skills-expanded', hash: '#/skills', open: async (page) => page.locator('button[aria-expanded]').first().click() },
-    { id: 'runs', hash: '#/runs' },
-    { id: 'cv-studio', hash: '#/cv' },
+    { id: 'today', hash: '#/today', m6: null },
+    { id: 'applications', hash: '#/applications', m6: 'pipeline' },
+    { id: 'applications-row-menu', hash: '#/applications', open: button(/^Actions for /), m6: null },
+    { id: 'applications-status-select', hash: '#/applications', open: button(/Status for /), m6: null },
+    { id: 'job', hash: '#/applications/12', m6: 'report-detail' },
+    { id: 'job-cover-form', hash: '#/applications/6', open: button(/^Write cover letter$/), m6: 'cover-dialog' },
+    { id: 'job-applied-dialog', hash: '#/applications/12', open: async (page) => {
+      await page.getByRole('button', { name: /Status for / }).first().click();
+      await page.getByRole('option', { name: 'Applied', exact: true }).click();
+    }, m6: null },
+    { id: 'to-review', hash: '#/to-review', m6: 'sources' },
+    { id: 'companies', hash: '#/companies', m6: 'sources' },
+    { id: 'companies-follow-form', hash: '#/companies', open: button(/^Follow a company$/), m6: 'sources-add-form' },
+    { id: 'skills', hash: '#/skills/learn', m6: 'skills' },
+    { id: 'skills-evidence', hash: '#/skills/learn', open: (page) => page.locator('.skill-row details summary').first().click(), m6: 'skills-expanded' },
+    { id: 'my-cv-content', hash: '#/my-cv/content', m6: null },
+    { id: 'my-cv-profile', hash: '#/my-cv/profile', m6: null },
+    { id: 'my-cv-design', hash: '#/my-cv/design', m6: 'cv-studio' },
+    { id: 'my-cv-writing', hash: '#/my-cv/writing', m6: 'cv-studio' },
+    { id: 'activity', hash: '#/activity', m6: 'runs' },
+    { id: 'activity-panel', hash: '#/today', open: button(/^Activity/), m6: null },
+    { id: 'workspace', hash: '#/workspace', m6: null },
+    { id: 'help', hash: '#/help/fit', m6: null },
+    { id: 'search-results', hash: '#/today', open: async (page) => {
+      await page.getByRole('combobox', { name: /Find a job/ }).fill('Granite');
+      await page.waitForTimeout(200);
+    }, m6: null },
   ],
   empty: [
-    { id: 'pipeline', hash: '#/pipeline' },
-    { id: 'sources', hash: '#/sources' },
-    { id: 'skills', hash: '#/skills' },
-    { id: 'runs', hash: '#/runs' },
-    { id: 'cv-studio', hash: '#/cv' },
+    { id: 'today-setup', hash: '#/today', m6: null },
+    { id: 'applications', hash: '#/applications', m6: 'pipeline' },
+    { id: 'to-review', hash: '#/to-review', m6: 'sources' },
+    { id: 'companies', hash: '#/companies', m6: 'sources' },
+    { id: 'skills', hash: '#/skills/learn', m6: 'skills' },
+    { id: 'my-cv-content', hash: '#/my-cv/content', m6: 'cv-studio' },
+    { id: 'my-cv-profile', hash: '#/my-cv/profile', m6: null },
+    { id: 'activity', hash: '#/activity', m6: 'runs' },
+    { id: 'workspace', hash: '#/workspace', m6: null },
   ],
   broken: [
-    { id: 'pipeline-issues', hash: '#/pipeline' },
-    { id: 'runs-failed', hash: '#/runs', open: async (page) => page.locator('tbody tr').first().click() },
-    { id: 'cv-studio-ats-fail', hash: '#/cv' },
+    { id: 'today-needs-you', hash: '#/today', m6: null },
+    { id: 'applications-unreadable', hash: '#/applications', m6: 'pipeline-issues' },
+    { id: 'activity-failed', hash: '#/activity', open: (page) => page.locator('.act.failed a').first().click(), m6: 'runs-failed' },
+    { id: 'my-cv-design-ats-fail', hash: '#/my-cv/design', m6: 'cv-studio-ats-fail' },
+    { id: 'workspace-health', hash: '#/workspace', m6: null },
   ],
 };
 
@@ -122,8 +135,11 @@ function stopSandbox(child) {
 
 /** Let the SPA finish its first loads: network idle, then a beat for the event stream's first render. */
 async function settle(page) {
-  await page.waitForLoadState('networkidle').catch(() => {});
-  await page.waitForTimeout(400);
+  // Not "networkidle": the app keeps one event stream open for as long as it runs.
+  await page.waitForLoadState('load').catch(() => {});
+  await page.locator('main h1').first().waitFor({ timeout: 10_000 }).catch(() => {});
+  await page.locator('main', { hasText: 'Loading…' }).waitFor({ state: 'detached', timeout: 15_000 }).catch(() => {});
+  await page.waitForTimeout(600);
 }
 
 const results = [];
@@ -141,14 +157,15 @@ try {
           const page = await context.newPage();
           for (const view of views) {
             const key = `${state}/${view.id}/${scheme}/${zoom.id}`;
-            await page.goto(`${info.url}${view.hash}`);
+            // A full load per view (the query differs), so nothing one view opened leaks into the next.
+            await page.goto(`${info.url}?view=${view.id}${view.hash}`);
             await settle(page);
             if (view.open) {
               try {
                 await view.open(page);
                 await settle(page);
               } catch (error) {
-                results.push({ key, state, view: view.id, scheme, zoom: zoom.id, skipped: `could not open: ${error.message.split('\n')[0]}` });
+                results.push({ key, state, view: view.id, m6: view.m6, scheme, zoom: zoom.id, skipped: `could not open: ${error.message.split('\n')[0]}` });
                 console.log(`  ${key}: skipped`);
                 continue;
               }
@@ -165,7 +182,7 @@ try {
               targets: v.nodes.slice(0, 6).map((n) => n.target.join(' ')),
               summary: v.nodes[0]?.failureSummary ?? null,
             }));
-            results.push({ key, state, view: view.id, scheme, zoom: zoom.id, screenshot: relative(out, shot).replace(/\\/g, '/'), violations });
+            results.push({ key, state, view: view.id, m6: view.m6, scheme, zoom: zoom.id, screenshot: relative(out, shot).replace(/\\/g, '/'), violations });
             console.log(`  ${key}: ${violations.length} rule(s) violated`);
           }
           await context.close();
