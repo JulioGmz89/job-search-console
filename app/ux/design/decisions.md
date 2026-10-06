@@ -91,5 +91,15 @@ checkpoint 1.
 
 ## Approval (checkpoint 2)
 
-_Pending. Recorded here when the maintainer approves the prototypes and the IA: date,
-direction, conditions._
+Approved by the maintainer on 2026-10-06, at checkpoint 2, after reviewing the T1–T9
+prototypes and the walkthrough re-run.
+
+- **Direction:** "C + A patterns", as specified in `ia.md`, `sitemap.md` and `tokens.css`,
+  with React Aria Components plus plain CSS tokens (D-2).
+- **Conditions:** none.
+- **Basis:** the walkthrough re-run (`walkthroughs/T1.md`–`T9.md`) found no severity-3 or
+  -4 issue on any top task. Two that came up during the re-run, WP-T6-01 and WP-T9-01,
+  were fixed and re-walked. The axe pass over the prototypes found 0 violations in both
+  schemes.
+- **Carried into M8 as build notes:** the remaining walkthrough findings, all severity 2
+  or lower, with the most common being focus after an action completes.
