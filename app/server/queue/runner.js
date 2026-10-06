@@ -368,6 +368,14 @@ export function createRunner({ repoRoot, root, spawnFn = spawn, maxAgents = maxA
     // still refine a success into a failure (exit 0 but no report written).
     const status = provisional.status === 'cancelled' ? 'cancelled' : (outcome.status ?? provisional.status);
     if (outcome.result !== undefined) run.result = outcome.result;
+    // A pasted link names nothing until the report is written; name it now.
+    if (!run.subject && describe) {
+      try {
+        run.subject = describe(run) ?? null;
+      } catch {
+        // Still unnamed; the UI falls back to the kind.
+      }
+    }
     finish(run, status, {
       exitCode: provisional.exitCode ?? null,
       signal: provisional.signal ?? null,
