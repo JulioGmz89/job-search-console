@@ -53,7 +53,7 @@ test('a written report becomes one debounced event with a forward-slash path; ig
   const events = [];
   const watcher = createWatcher({ root, onChange: (e) => events.push(e), debounceMs: 100 });
   try {
-    assert.deepEqual(watcher.watching().sort(), ['data', 'reports']);
+    assert.deepEqual(watcher.watching().sort(), ['.', 'data', 'reports']);
     // Two writes inside the window coalesce; the sentinel is dropped.
     writeFileSync(join(root, 'reports', '009-RESERVED.md'), '');
     writeFileSync(join(root, 'reports', '009-acme-2026-09-15.md'), '# a');
@@ -65,6 +65,20 @@ test('a written report becomes one debounced event with a forward-slash path; ig
     // Nothing else was queued.
     await new Promise((r) => setTimeout(r, 200));
     assert.equal(events.length, 0);
+  } finally {
+    watcher.close();
+  }
+});
+
+test('the CV and portals.yml at the root are watched; nothing else at the root is', async () => {
+  const events = [];
+  const watcher = createWatcher({ root, onChange: (e) => events.push(e), debounceMs: 100 });
+  try {
+    writeFileSync(join(root, 'package.json'), '{}');
+    writeFileSync(join(root, 'cv.md'), '# Ada');
+    writeFileSync(join(root, 'portals.yml'), 'tracked_companies: []\n');
+    const event = await nextChange(events);
+    assert.deepEqual(event.paths, ['cv.md', 'portals.yml']);
   } finally {
     watcher.close();
   }

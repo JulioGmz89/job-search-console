@@ -18,7 +18,15 @@
 import { existsSync, watch as fsWatchDefault } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 
-export const WATCHED_DIRS = Object.freeze(['reports', 'output', 'data']);
+export const WATCHED_DIRS = Object.freeze(['reports', 'output', 'data', 'config', 'writing-samples']);
+
+/**
+ * User files at the top of the data root (M8: My CV, Companies and Writing
+ * rules refresh when they are edited outside the app). The root itself is the
+ * repository in production, so it is watched without recursion and filtered to
+ * these names rather than watched whole.
+ */
+export const WATCHED_FILES = Object.freeze(['cv.md', 'portals.yml', 'voice-dna.md', 'article-digest.md']);
 
 /** Files that change constantly during a run and mean nothing to the dashboard. */
 const IGNORED = [
@@ -42,13 +50,14 @@ export function isIgnored(relativePath) {
  * @param {string} options.root - The data root.
  * @param {(event: {paths: string[], at: number}) => void} options.onChange
  * @param {string[]} [options.dirs]
+ * @param {string[]} [options.files] - Names at the top of the root, watched without recursion.
  * @param {number} [options.debounceMs]
  * @param {number} [options.retryMs] - How often to look for a watched directory that does not exist yet.
  * @param {Function} [options.fsWatch] - Injectable for tests.
  * @param {(message: string) => void} [options.log]
  * @returns {{close(): void, watching(): string[]}}
  */
-export function createWatcher({ root, onChange, dirs = WATCHED_DIRS, debounceMs = 300, retryMs = 10_000, fsWatch = fsWatchDefault, log = () => {} }) {
+export function createWatcher({ root, onChange, dirs = WATCHED_DIRS, files = WATCHED_FILES, debounceMs = 300, retryMs = 10_000, fsWatch = fsWatchDefault, log = () => {} }) {
   const watchers = new Map();
   const pending = new Set();
   let timer = null;
@@ -102,6 +111,19 @@ export function createWatcher({ root, onChange, dirs = WATCHED_DIRS, debounceMs 
       log(`could not watch ${dir}/: ${error.message}`);
     }
   };
+
+  if (files.length) {
+    try {
+      const w = fsWatch(root, { recursive: false }, (eventType, filename) => {
+        if (filename && files.includes(String(filename))) noticed('.', filename);
+      });
+      w.unref?.();
+      w.on?.('error', (error) => log(`watcher on the data root stopped: ${error.message}`));
+      watchers.set('.', w);
+    } catch (error) {
+      log(`could not watch the data root: ${error.message}`);
+    }
+  }
 
   for (const dir of dirs) arm(dir);
   // A fresh checkout has no reports/ yet; keep looking until it appears.
