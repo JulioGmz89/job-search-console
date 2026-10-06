@@ -167,11 +167,18 @@ T5 gets a budget of 50 (two documents, a four-question form, and two agent waits
 - **Start state:** `populated`.
 - **Success criterion:** checked against `GET /api/skills` at the end of the run (the data
   can change if the tester starts a reading run):
-  1. The named skill is one of the first three ids of `lists.learn` (whether or not the
-     tester narrowed to strong matches).
-  2. The answer cites evidence that matches that skill's entry: its `demand` count (±1),
-     or at least one company among its `postings` (via `postings[id].company`) or
-     `gapReports`.
+  1. The named skill is one of the top three in any of these rankings:
+     - the first three ids of `lists.learn`;
+     - the Learn next view as the page ranks it (by postings asking for it);
+     - the same view with **Only jobs I'd apply to (fit 4 and up)** on, which re-ranks
+       by good-fit postings (M7 decision D-3, after WP-T6-01).
+
+     The page's two rankings come from `rankSkills()` in `app/ui/src/lib/skills.js`,
+     which the checker imports, so it accepts exactly the order the tester saw.
+  2. The answer cites evidence that matches that skill in the same ranking: its count
+     (±1), or at least one company among the postings counted. For the filtered ranking
+     that means the good-fit postings only. The unfiltered `demand` and `gapReports`
+     companies are also accepted.
 - **Step budget:** 40.
 - **Personas:** P1, P2, P3.
 
@@ -236,6 +243,58 @@ T5 gets a budget of 50 (two documents, a four-question form, and two agent waits
 - **Personas:** P1, P2, P3.
 
 ---
+
+## first-job — From an empty workspace to a first evaluated job (M8 acceptance)
+
+Added in M8 for the acceptance criterion in PROJECT_PLAN.md §8 M8: "in a fresh sandbox,
+a simulated first-time persona gets from an empty workspace to a first evaluated job
+without leaving the app". It chains T1 and T2 in one run and one context, so nothing
+carries over between them except what the app itself shows.
+
+- **Goal (give verbatim):**
+  > You have just installed this app and opened it for the first time. Get it ready for
+  > your job search: it needs your CV (below), and it should keep an eye on one company
+  > for new openings, Kestrel Media, whose careers page is
+  > https://job-boards.greenhouse.io/kestrelmedia
+  >
+  > Then use the app to find out whether this job is a good fit for you:
+  > https://job-boards.greenhouse.io/kestrelmedia/jobs/4134913
+  > Tell me what the app concluded. Do everything inside the app; do not open a
+  > terminal or edit files.
+  >
+  > Your CV:
+  >
+  > ```
+  > # Alex Rivera
+  > Austin, TX (remote) · alex.rivera@example.com · +1 555 010 0199
+  >
+  > ## Summary
+  > Backend engineer with seven years building payment and data platforms in
+  > TypeScript and Go.
+  >
+  > ## Experience
+  > ### Senior Backend Engineer — Northwind Payments (2022–present, remote)
+  > - Rebuilt the settlement pipeline as an event-driven Go service; reconciliation
+  >   went from 4 hours to 25 minutes.
+  > - Moved cron jobs to a queue-backed scheduler with idempotent retries; payment
+  >   incidents fell 60% in two quarters.
+  > ### Backend Engineer — Contoso Analytics (2019–2022, Austin)
+  > - Designed the public REST API (TypeScript, PostgreSQL) used by 3,000 integrations.
+  >
+  > ## Education
+  > B.S. Computer Science, University of Texas at Austin (2017)
+  >
+  > ## Skills
+  > Go, TypeScript, SQL, Python, Kubernetes, Docker, Terraform, AWS, PostgreSQL, Kafka
+  > ```
+- **Start state:** `empty` (default `--delay 8000`).
+- **Success criterion:** all hold (`check-task.mjs --task first-job`):
+  1. `GET /api/agent/status` → `cvPresent: true`.
+  2. `GET /api/portals` → `exists: true` with at least one enabled company.
+  3. `GET /api/runs` → a succeeded `evaluate` run.
+  4. `GET /api/pipeline` → at least one row with a report.
+- **Step budget:** 60.
+- **Personas:** P2 (the first-timer) for acceptance; P1 and P3 optional.
 
 ## Expected paths (never shown to testers)
 
