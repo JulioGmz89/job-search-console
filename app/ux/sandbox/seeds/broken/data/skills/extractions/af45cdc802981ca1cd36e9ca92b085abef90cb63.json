@@ -1,0 +1,58 @@
+{
+  "textHash": "af45cdc802981ca1cd36e9ca92b085abef90cb63",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:06:00.000Z",
+  "skills": [
+    {
+      "skill": "AWS",
+      "canonical": "AWS",
+      "id": "aws",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Java",
+      "canonical": "Java",
+      "id": "java",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "Python",
+      "canonical": "Python",
+      "id": "python",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "Redis",
+      "canonical": "Redis",
+      "id": "redis",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "Rust",
+      "canonical": "Rust",
+      "id": "rust",
+      "category": "language",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Terraform",
+      "canonical": "Terraform",
+      "id": "terraform",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "TypeScript",
+      "canonical": "TypeScript",
+      "id": "typescript",
+      "category": "language",
+      "level": "required"
+    }
+  ]
+}

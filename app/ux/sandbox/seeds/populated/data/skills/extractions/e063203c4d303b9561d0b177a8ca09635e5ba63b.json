@@ -1,0 +1,51 @@
+{
+  "textHash": "e063203c4d303b9561d0b177a8ca09635e5ba63b",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:11:00.000Z",
+  "skills": [
+    {
+      "skill": "Docker",
+      "canonical": "Docker",
+      "id": "docker",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Go",
+      "canonical": "Go",
+      "id": "go",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "gRPC",
+      "canonical": "gRPC",
+      "id": "grpc",
+      "category": "framework",
+      "level": "required"
+    },
+    {
+      "skill": "Python",
+      "canonical": "Python",
+      "id": "python",
+      "category": "language",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Terraform",
+      "canonical": "Terraform",
+      "id": "terraform",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "TypeScript",
+      "canonical": "TypeScript",
+      "id": "typescript",
+      "category": "language",
+      "level": "nice-to-have"
+    }
+  ]
+}

@@ -13,11 +13,20 @@
  *                         pdf-ok | cover-ok | skills-ok | skills-partial |
  *                         skills-no-output | skills-cv-ok
  *   FAKE_CLAUDE_SCORE     score for evaluate-ok (default 4.1)
+ *   FAKE_CLAUDE_DELAY_MS  stream progress lines for this long before acting (default 0), so
+ *                         the UX sandbox can show what waiting on a real session is like
  *   FAKE_CLAUDE_ARGV      when set, the argv is written to this file for inspection
  *   CAREER_OPS_ROOT       the data root (set by the runner's confineTo)
+ *
+ * Scenario queue: when `<root>/data/jsc/fake-scenarios` exists, each session
+ * takes its first non-empty line as the scenario and removes it, falling back
+ * to FAKE_CLAUDE_SCENARIO once the file is empty. The UX sandbox uses it to
+ * script "this run fails, the retry succeeds" without restarting the server.
+ * Two sessions starting at the same instant could read the same line; the
+ * sandbox never needs that.
  */
 
-import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join } from 'node:path';
 
 const args = process.argv.slice(2);
@@ -29,14 +38,62 @@ const flag = (name) => {
 if (process.env.FAKE_CLAUDE_ARGV) writeFileSync(process.env.FAKE_CLAUDE_ARGV, JSON.stringify(args));
 
 const root = process.env.CAREER_OPS_ROOT ?? process.cwd();
-const scenario = process.env.FAKE_CLAUDE_SCENARIO ?? 'evaluate-ok';
+
+/** The next scripted scenario, removed from the queue file; null when there is none. */
+function nextQueuedScenario() {
+  const file = join(root, 'data', 'jsc', 'fake-scenarios');
+  if (!existsSync(file)) return null;
+  const lines = readFileSync(file, 'utf-8').split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  if (lines.length === 0) return null;
+  writeFileSync(file, lines.slice(1).map((l) => `${l}\n`).join(''), 'utf-8');
+  return lines[0];
+}
+
+const requested = nextQueuedScenario() ?? process.env.FAKE_CLAUDE_SCENARIO ?? 'evaluate-ok';
+const delayMs = Math.max(0, Number.parseInt(process.env.FAKE_CLAUDE_DELAY_MS ?? '', 10) || 0);
 const systemPrompt = flag('--append-system-prompt-file') ? readFileSync(flag('--append-system-prompt-file'), 'utf-8') : '';
 const userPrompt = flag('-p') ?? '';
+
+/**
+ * `auto` (the UX sandbox's default) succeeds at whatever the session was
+ * assembled for, read from the overlay's own markers, so one server can run
+ * every agent flow the console offers.
+ */
+function autoScenario() {
+  if (/exactly \*\*`output\/cover-/.test(systemPrompt)) return 'cover-ok';
+  if (/\*\*Input file:\*\*/.test(systemPrompt)) return 'skills-ok';
+  if (/\*\*Step 17\*\* \(payload\)/.test(systemPrompt)) return 'pdf-ok';
+  return 'evaluate-ok';
+}
+const scenario = requested === 'auto' ? autoScenario() : requested;
 
 const grab = (re, text = systemPrompt) => re.exec(text)?.[1] ?? null;
 const reportNum = grab(/\*\*Report number:\*\* `(\d{3,})`/) ?? grab(/report number `(\d{3,})`/);
 const date = grab(/\*\*Date:\*\* (\d{4}-\d{2}-\d{2})/) ?? new Date().toISOString().slice(0, 10);
 const url = grab(/\*\*Job URL:\*\* (\S+)/) ?? 'https://example.invalid/';
+
+/**
+ * FAKE_CLAUDE_MARKET names the UX sandbox's fake job boards; when the URL is one
+ * of their postings, the report is about that company and role rather than the
+ * fixture's "Fake Co", so a sandbox user sees the job they asked about.
+ */
+function lookUpPosting() {
+  if (!process.env.FAKE_CLAUDE_MARKET) return null;
+  try {
+    const boards = JSON.parse(readFileSync(process.env.FAKE_CLAUDE_MARKET, 'utf-8'));
+    for (const board of Object.values(boards)) {
+      const job = board.jobs.find((j) => j.absolute_url === url);
+      if (job) return { company: board.name, role: job.title };
+    }
+  } catch {
+    // An unreadable market file falls back to the fixture's names.
+  }
+  return null;
+}
+const posting = lookUpPosting();
+const company = posting?.company ?? 'Fake Co';
+const role = posting?.role ?? 'Test Engineer';
+const companySlug = company.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 const emit = (obj) => process.stdout.write(`${JSON.stringify(obj)}\n`);
 const say = (text) => emit({ type: 'stream_event', event: { type: 'content_block_delta', delta: { type: 'text_delta', text } } });
@@ -64,20 +121,21 @@ const write = (relative, text) => {
   return path;
 };
 
-emit({ type: 'system', subtype: 'init', model: 'fake-claude', tools: ['Read', 'Write', 'Bash'] });
+// In the UX sandbox the log names a plausible model, so testers do not judge the stand-in.
+emit({ type: 'system', subtype: 'init', model: process.env.FAKE_CLAUDE_MARKET ? 'claude-sonnet-5-5' : 'fake-claude', tools: ['Read', 'Write', 'Bash'] });
 say(`Received: ${userPrompt.slice(0, 60)}\n`);
 
 const writeReport = (num, score) => {
-  const file = `reports/${num}-fake-co-${date}.md`;
+  const file = `reports/${num}-${companySlug}-${date}.md`;
   write(
     file,
     [
-      '# Evaluation: Fake Co — Test Engineer',
+      `# Evaluation: ${company} — ${role}`,
       '',
       `**Date:** ${date}`,
       `**URL:** ${url}`,
       '**Via:** —',
-      '**Archetype:** Test Engineer',
+      `**Archetype:** ${role}`,
       `**Score:** ${score}/5`,
       '**Legitimacy:** High Confidence',
       '**Verification:** unconfirmed (headless)',
@@ -88,8 +146,8 @@ const writeReport = (num, score) => {
       '## Machine Summary',
       '',
       '```yaml',
-      'company: "Fake Co"',
-      'role: "Test Engineer"',
+      `company: "${company}"`,
+      `role: "${role}"`,
       `score: ${score}`,
       'legitimacy_tier: "High Confidence"',
       'final_decision: "Apply"',
@@ -101,19 +159,51 @@ const writeReport = (num, score) => {
       'next_action: "Apply"',
       '```',
       '',
-      '## A) Role Summary',
-      '',
-      'A fixture report written by fake-claude.js.',
-      '',
-      '## Cover Letter Draft',
-      '',
-      'Dear Fake Co, I am the fixture.',
-      '',
+      ...(posting
+        ? [
+            // The UX sandbox: a report that reads like one, so testers judge the
+            // console rather than a placeholder.
+            '## A) Role Summary',
+            '',
+            `${company} is hiring a ${role}: a small remote team that owns its services end to end, on call included.`,
+            '',
+            '## B) CV Match',
+            '',
+            '| JD Requirement | CV Match | Source |',
+            '|----------------|----------|--------|',
+            '| Production backend services | Settlement pipeline rebuilt as an event-driven Go service | cv.md: Northwind Payments |',
+            '| Reliability and on-call ownership | Queue-backed scheduler with idempotent retries; incidents down 60% | cv.md: Northwind Payments |',
+            '| PostgreSQL | Public REST API on PostgreSQL | cv.md: Contoso Analytics |',
+            '',
+            '### Gaps',
+            '',
+            '| Gap | Severity | Mitigation |',
+            '|-----|----------|------------|',
+            '| gRPC | Medium | Name the internal service APIs; plan a small side project |',
+            '',
+            '## C) Level and Strategy',
+            '',
+            'Senior level matches. Lead with the settlement pipeline and the incident reduction.',
+            '',
+            '## D) Comp and Demand',
+            '',
+            'Advertised: not stated. Target: $165K-190K.',
+            '',
+            '## E) Personalization Plan',
+            '',
+            "Move Go and event-driven work to the top of the summary; mirror the posting's wording.",
+            '',
+            '## F) Interview Plan',
+            '',
+            'Settlement pipeline rebuild (STAR), queue-backed scheduler (STAR), tracing rollout (STAR).',
+            '',
+          ]
+        : ['## A) Role Summary', '', 'A fixture report written by fake-claude.js.', '', '## Cover Letter Draft', '', `Dear ${company}, I am the fixture.`, '']),
     ].join('\n'),
   );
   write(
-    `batch/tracker-additions/${num}-fake-co.tsv`,
-    `${num}\t${date}\tFake Co\tTest Engineer\tEvaluated\t${score}/5\t❌\t[${num}](reports/${num}-fake-co-${date}.md)\tFixture evaluation\t${url}\n`,
+    `batch/tracker-additions/${num}-${companySlug}.tsv`,
+    `${num}\t${date}\t${company}\t${role}\tEvaluated\t${score}/5\t❌\t[${num}](reports/${num}-${companySlug}-${date}.md)\tFixture evaluation\t${url}\n`,
   );
   return file;
 };
@@ -121,6 +211,18 @@ const writeReport = (num, score) => {
 /** The skills-cv session: a fixed list with a duplicate and an alias, for the validator to fold. */
 const writeCvSkills = () => {
   const output = resolveFromCwd(grab(/\*\*Output file:\*\* `([^`]+)`/));
+  if (process.env.FAKE_CLAUDE_MARKET) {
+    // The UX sandbox: read the CV's "- **Category:** a, b" skill lines, so the
+    // Skills page shows the sandbox candidate's skills, not the fixture's.
+    const input = JSON.parse(readFileSync(resolveFromCwd(grab(/\*\*Input file:\*\* `([^`]+)`/)), 'utf-8'));
+    const skills = [...String(input.cv ?? '').matchAll(/^- \*\*[^*]+:\*\* (.+)$/gm)]
+      .flatMap((m) => m[1].split(',').map((s) => s.trim()).filter(Boolean))
+      .map((skill) => ({ skill, category: 'other', depth: 'solid' }));
+    writeFileSync(output, JSON.stringify({ skills }));
+    tool('Write', { file_path: output });
+    finish({ text: 'done' });
+    return;
+  }
   writeFileSync(output, JSON.stringify({ skills: [
     { skill: 'Python', category: 'language', depth: 'expert' },
     { skill: 'Postgres', category: 'data', depth: 'solid' },
@@ -131,11 +233,20 @@ const writeCvSkills = () => {
   finish({ text: 'done' });
 };
 
+if (delayMs > 0) {
+  // What a real session prints while it works, one line every two seconds.
+  const progress = ['Reading the instructions…', 'Looking at the posting…', 'Comparing it with the CV…', 'Weighing the gaps…', 'Drafting the output…'];
+  let step = 0;
+  const ticker = setInterval(() => say(`${progress[step++ % progress.length]}\n`), Math.min(2000, delayMs));
+  await new Promise((resolve) => setTimeout(resolve, delayMs));
+  clearInterval(ticker);
+}
+
 switch (scenario) {
   case 'evaluate-ok': {
     const score = process.env.FAKE_CLAUDE_SCORE ?? '4.1';
     tool('WebFetch', { url });
-    toolResult('Fake Co is hiring a Test Engineer.');
+    toolResult(`${company} is hiring a ${role}.`);
     const file = writeReport(reportNum, score);
     tool('Write', { file_path: file });
     say('Report written.\n');
@@ -165,6 +276,14 @@ switch (scenario) {
   case 'pdf-ok': {
     // A structured run (M5) stops at the payload; the console renders it.
     const payload = grab(/write the JSON payload to exactly \*\*`(output\/[^`]+\.json)`\*\*/);
+    if (payload && process.env.FAKE_CLAUDE_MARKET) {
+      // The UX sandbox's candidate is the bundled sample CV; tailor nothing, but
+      // write their payload rather than the fixture's, so CV Studio stays truthful.
+      write(payload, readFileSync(new URL('../../../../cv/sample-payload.json', import.meta.url), 'utf-8'));
+      tool('Write', { file_path: payload });
+      finish({ text: `Payload at ${payload}` });
+      break;
+    }
     if (payload) {
       write(payload, JSON.stringify({
         lang: 'en',
@@ -190,7 +309,16 @@ switch (scenario) {
   }
   case 'cover-ok': {
     const cover = grab(/exactly \*\*`(output\/cover-[^`]+\.pdf)`\*\*/);
-    write(cover, '%PDF-1.4 fake cover');
+    if (process.env.FAKE_CLAUDE_MARKET) {
+      // The UX sandbox shows the letter in a PDF viewer, so it must be a real
+      // PDF: one of the seed's rendered letters stands in for the new one.
+      const seedLetter = new URL('../../../../ux/sandbox/seeds/populated/output/cover-alex-rivera-cobaltfreight-2026-08-13.pdf', import.meta.url);
+      const path = join(root, cover);
+      mkdirSync(dirname(path), { recursive: true });
+      writeFileSync(path, readFileSync(seedLetter));
+    } else {
+      write(cover, '%PDF-1.4 fake cover');
+    }
     finish({ text: `Cover letter at ${cover}` });
     break;
   }
@@ -210,9 +338,15 @@ switch (scenario) {
     const output = resolveFromCwd(grab(/\*\*Output file:\*\* `([^`]+)`/));
     const postings = JSON.parse(readFileSync(input, 'utf-8'));
     tool('Read', { file_path: input });
+    // In the UX sandbox the postings are the generator's, which phrase every
+    // requirement the same way; read them back so the Skills page stays truthful.
+    const fromMarket = (p) => [
+      ...[...p.text.matchAll(/experience with (.+)$/gm)].map((m) => ({ skill: m[1].trim(), category: 'other', level: 'required' })),
+      ...[...p.text.matchAll(/Exposure to (.+)$/gm)].map((m) => ({ skill: m[1].trim(), category: 'other', level: 'nice-to-have' })),
+    ];
     const items = postings.map((p) => ({
       id: p.id,
-      skills: [
+      skills: process.env.FAKE_CLAUDE_MARKET ? fromMarket(p) : [
         { skill: 'k8s', category: 'cloud-infra', level: 'required' },
         { skill: 'Kubernetes', category: 'cloud-infra', level: 'nice-to-have' },
         ...(/\bGo\b/.test(p.text) ? [{ skill: 'Go', category: 'language', level: 'nice-to-have' }] : []),

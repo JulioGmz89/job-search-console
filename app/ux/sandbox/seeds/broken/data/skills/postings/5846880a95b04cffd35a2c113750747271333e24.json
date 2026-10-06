@@ -1,0 +1,10 @@
+{
+  "id": "5846880a95b04cffd35a2c113750747271333e24",
+  "url": "https://job-boards.greenhouse.io/lumengrid/jobs/4139114",
+  "fetchedAt": "2026-09-25T15:28:00.000Z",
+  "source": "greenhouse-api",
+  "title": "Site Reliability Engineer",
+  "text": "About Lumen Grid\nLumen Grid forecasts demand for utilities moving to renewables. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.\nThe role\nAs a Site Reliability Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.\nWhat you will need\n- 3+ years of hands-on experience with Helm\n- 4+ years of hands-on experience with Kubernetes\n- 5+ years of hands-on experience with Kafka\n- 2+ years of hands-on experience with gRPC\n- several years of hands-on experience with Redis\n- Clear written communication; we decide things in documents\nNice to have\n- Exposure to Elasticsearch\n- Exposure to Terraform\n- Exposure to Distributed Systems\nBenefits\nCompetitive salary and equity, a learning budget, and four weeks of vacation that people actually take.",
+  "textHash": "99b3148c95eac68bc5a6c91f992c82bcbca67a06",
+  "error": null
+}

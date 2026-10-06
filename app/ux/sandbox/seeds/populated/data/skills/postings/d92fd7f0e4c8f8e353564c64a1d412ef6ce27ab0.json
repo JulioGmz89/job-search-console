@@ -1,0 +1,10 @@
+{
+  "id": "d92fd7f0e4c8f8e353564c64a1d412ef6ce27ab0",
+  "url": "https://job-boards.greenhouse.io/brightwaterhealth/jobs/4102518",
+  "fetchedAt": "2026-09-25T15:00:00.000Z",
+  "source": "greenhouse-api",
+  "title": "Data Engineer",
+  "text": "About Brightwater Health\nBrightwater Health builds the scheduling and records platform behind 300 community clinics. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.\nThe role\nAs a Data Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.\nWhat you will need\n- 3+ years of hands-on experience with Observability\n- 4+ years of hands-on experience with Kubernetes\n- 5+ years of hands-on experience with Helm\n- 2+ years of hands-on experience with TypeScript\n- several years of hands-on experience with Docker\n- Clear written communication; we decide things in documents\nNice to have\n- Exposure to gRPC\n- Exposure to Python\n- Exposure to Datadog\nBenefits\nCompetitive salary and equity, a learning budget, and four weeks of vacation that people actually take.",
+  "textHash": "7ba603419de88609df1d417b58339fba3cbb9f5a",
+  "error": null
+}

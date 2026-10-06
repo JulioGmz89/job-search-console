@@ -1,0 +1,10 @@
+{
+  "id": "dcd7803aa69a209cea81ca4d0726a2cfb420a1fa",
+  "url": "https://job-boards.greenhouse.io/mosaicretail/jobs/4144301",
+  "fetchedAt": "2026-09-25T15:59:00.000Z",
+  "source": "greenhouse-api",
+  "title": "Data Engineer",
+  "text": "About Mosaic Retail\nMosaic Retail powers checkout and inventory for 900 independent stores. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.\nThe role\nAs a Data Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.\nWhat you will need\n- 3+ years of hands-on experience with Spark\n- 4+ years of hands-on experience with TypeScript\n- 5+ years of hands-on experience with Kafka\n- 2+ years of hands-on experience with AWS\n- Clear written communication; we decide things in documents\nNice to have\n- Exposure to Machine Learning\n- Exposure to Snowflake\n- Exposure to Terraform\nBenefits\nCompetitive salary and equity, a learning budget, and four weeks of vacation that people actually take.",
+  "textHash": "8945ae8ef787b67707786b41d56e6ec5b4f10fac",
+  "error": null
+}

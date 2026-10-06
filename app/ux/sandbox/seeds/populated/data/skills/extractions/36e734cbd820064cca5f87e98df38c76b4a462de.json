@@ -1,0 +1,65 @@
+{
+  "textHash": "36e734cbd820064cca5f87e98df38c76b4a462de",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:22:00.000Z",
+  "skills": [
+    {
+      "skill": "AWS",
+      "canonical": "AWS",
+      "id": "aws",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Distributed Systems",
+      "canonical": "Distributed Systems",
+      "id": "distributed-systems",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Go",
+      "canonical": "Go",
+      "id": "go",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "gRPC",
+      "canonical": "gRPC",
+      "id": "grpc",
+      "category": "framework",
+      "level": "required"
+    },
+    {
+      "skill": "PostgreSQL",
+      "canonical": "PostgreSQL",
+      "id": "postgresql",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "Python",
+      "canonical": "Python",
+      "id": "python",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "React",
+      "canonical": "React",
+      "id": "react",
+      "category": "framework",
+      "level": "required"
+    },
+    {
+      "skill": "Terraform",
+      "canonical": "Terraform",
+      "id": "terraform",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    }
+  ]
+}

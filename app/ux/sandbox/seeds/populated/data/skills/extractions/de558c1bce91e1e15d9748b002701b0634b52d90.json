@@ -1,0 +1,65 @@
+{
+  "textHash": "de558c1bce91e1e15d9748b002701b0634b52d90",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:16:00.000Z",
+  "skills": [
+    {
+      "skill": "AWS",
+      "canonical": "AWS",
+      "id": "aws",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Datadog",
+      "canonical": "Datadog",
+      "id": "datadog",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Go",
+      "canonical": "Go",
+      "id": "go",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "gRPC",
+      "canonical": "gRPC",
+      "id": "grpc",
+      "category": "framework",
+      "level": "required"
+    },
+    {
+      "skill": "Machine Learning",
+      "canonical": "Machine Learning",
+      "id": "machine-learning",
+      "category": "ai-ml",
+      "level": "required"
+    },
+    {
+      "skill": "Observability",
+      "canonical": "Observability",
+      "id": "observability",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Rust",
+      "canonical": "Rust",
+      "id": "rust",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "TypeScript",
+      "canonical": "TypeScript",
+      "id": "typescript",
+      "category": "language",
+      "level": "required"
+    }
+  ]
+}

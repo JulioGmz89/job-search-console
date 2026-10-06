@@ -1,0 +1,58 @@
+{
+  "textHash": "1ad6cdec3241f78e8682598a727f1e7f8f90cb56",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:26:00.000Z",
+  "skills": [
+    {
+      "skill": "GCP",
+      "canonical": "GCP",
+      "id": "gcp",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "GraphQL",
+      "canonical": "GraphQL",
+      "id": "graphql",
+      "category": "framework",
+      "level": "required"
+    },
+    {
+      "skill": "Kotlin",
+      "canonical": "Kotlin",
+      "id": "kotlin",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "Machine Learning",
+      "canonical": "Machine Learning",
+      "id": "machine-learning",
+      "category": "ai-ml",
+      "level": "required"
+    },
+    {
+      "skill": "Observability",
+      "canonical": "Observability",
+      "id": "observability",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "PostgreSQL",
+      "canonical": "PostgreSQL",
+      "id": "postgresql",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "Python",
+      "canonical": "Python",
+      "id": "python",
+      "category": "language",
+      "level": "required"
+    }
+  ]
+}

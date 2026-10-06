@@ -63,6 +63,8 @@ function skillsFetchArgs(options = {}) {
  * @property {boolean} [internal] - Queued by the server after another run; never from a request.
  * @property {Function} [build] - Agent kinds: `(options, ctx) => spec`, replacing `script`/`args`.
  * @property {string} [page] - The UI page that owns this kind's button; unset means the Maintenance bar.
+ * @property {boolean} [cwdAtRoot] - Launch in the data root when the app is confined to one
+ *   (`buildApp({ root })`); unconfined, every script runs in the repository as before.
  */
 export const RUN_KINDS = Object.freeze({
   scan: {
@@ -80,6 +82,11 @@ export const RUN_KINDS = Object.freeze({
     // New postings mean new text to read for the skills analysis (M4). Only a
     // real scan chains it: a dry run added nothing to the inbox.
     after: (run) => (run.dryRun ? {} : { next: ['skills-fetch-auto'] }),
+    // scan.mjs writes data/scan-runs.tsv, data/portal-health.tsv and reads
+    // data/blacklist.md as bare relative paths, so they follow the cwd, not
+    // CAREER_OPS_ROOT. A confined app (tests, the UX sandbox) must launch it
+    // inside its own root or those files land in the repository's data/.
+    cwdAtRoot: true,
   },
   dedup: {
     script: 'dedup-tracker.mjs',
@@ -362,6 +369,7 @@ export function buildSpec(kind, options = {}, ctx = {}) {
     lane: def.lane ?? 'script',
     exclusive: def.exclusive === true,
     parseProgress: def.parseProgress,
+    ...(def.cwdAtRoot && ctx.root ? { cwd: ctx.root } : {}),
     ...(def.after
       ? {
           hooks: {

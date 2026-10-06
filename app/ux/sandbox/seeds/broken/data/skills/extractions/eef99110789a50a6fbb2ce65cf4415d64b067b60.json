@@ -1,0 +1,65 @@
+{
+  "textHash": "eef99110789a50a6fbb2ce65cf4415d64b067b60",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:00:00.000Z",
+  "skills": [
+    {
+      "skill": "CI/CD",
+      "canonical": "CI/CD",
+      "id": "ci-cd",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Distributed Systems",
+      "canonical": "Distributed Systems",
+      "id": "distributed-systems",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Elasticsearch",
+      "canonical": "Elasticsearch",
+      "id": "elasticsearch",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "Go",
+      "canonical": "Go",
+      "id": "go",
+      "category": "language",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "gRPC",
+      "canonical": "gRPC",
+      "id": "grpc",
+      "category": "framework",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Python",
+      "canonical": "Python",
+      "id": "python",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "Terraform",
+      "canonical": "Terraform",
+      "id": "terraform",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "TypeScript",
+      "canonical": "TypeScript",
+      "id": "typescript",
+      "category": "language",
+      "level": "required"
+    }
+  ]
+}

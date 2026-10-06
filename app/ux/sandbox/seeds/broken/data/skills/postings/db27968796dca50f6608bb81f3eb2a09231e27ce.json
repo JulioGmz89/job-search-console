@@ -1,0 +1,10 @@
+{
+  "id": "db27968796dca50f6608bb81f3eb2a09231e27ce",
+  "url": "https://job-boards.greenhouse.io/lumengrid/jobs/4138296",
+  "fetchedAt": "2026-09-25T15:08:00.000Z",
+  "source": "greenhouse-api",
+  "title": "Backend Engineer (Go)",
+  "text": "About Lumen Grid\nLumen Grid forecasts demand for utilities moving to renewables. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.\nThe role\nAs a Backend Engineer (Go) you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.\nWhat you will need\n- 3+ years of hands-on experience with PostgreSQL\n- 4+ years of hands-on experience with Go\n- 5+ years of hands-on experience with Distributed Systems\n- 2+ years of hands-on experience with gRPC\n- several years of hands-on experience with GraphQL\n- 3+ years of hands-on experience with Terraform\n- Clear written communication; we decide things in documents\nNice to have\n- Exposure to OpenTelemetry\n- Exposure to CI/CD\n- Exposure to Prometheus\nBenefits\nCompetitive salary and equity, a learning budget, and four weeks of vacation that people actually take.",
+  "textHash": "0538542dbb866432654b0319bfbac61e41bcbf8e",
+  "error": null
+}

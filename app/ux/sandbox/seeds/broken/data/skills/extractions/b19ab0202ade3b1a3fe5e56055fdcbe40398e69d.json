@@ -1,0 +1,65 @@
+{
+  "textHash": "b19ab0202ade3b1a3fe5e56055fdcbe40398e69d",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:24:00.000Z",
+  "skills": [
+    {
+      "skill": "Docker",
+      "canonical": "Docker",
+      "id": "docker",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Go",
+      "canonical": "Go",
+      "id": "go",
+      "category": "language",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "gRPC",
+      "canonical": "gRPC",
+      "id": "grpc",
+      "category": "framework",
+      "level": "required"
+    },
+    {
+      "skill": "Kafka",
+      "canonical": "Kafka",
+      "id": "kafka",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "Kotlin",
+      "canonical": "Kotlin",
+      "id": "kotlin",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "Kubernetes",
+      "canonical": "Kubernetes",
+      "id": "kubernetes",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "PostgreSQL",
+      "canonical": "PostgreSQL",
+      "id": "postgresql",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "Prometheus",
+      "canonical": "Prometheus",
+      "id": "prometheus",
+      "category": "cloud-infra",
+      "level": "required"
+    }
+  ]
+}

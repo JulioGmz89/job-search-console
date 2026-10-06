@@ -1,0 +1,10 @@
+{
+  "id": "bf563e852f6191f8c959708837dec6c6cda8355d",
+  "url": "https://job-boards.greenhouse.io/ironleafsecurity/jobs/4128318",
+  "fetchedAt": "2026-09-25T15:37:00.000Z",
+  "source": "greenhouse-api",
+  "title": "Site Reliability Engineer",
+  "text": "About Ironleaf Security\nIronleaf Security detects account takeover for consumer apps. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.\nThe role\nAs a Site Reliability Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.\nWhat you will need\n- 3+ years of hands-on experience with Terraform\n- 4+ years of hands-on experience with Observability\n- 5+ years of hands-on experience with Kubernetes\n- 2+ years of hands-on experience with Java\n- several years of hands-on experience with AWS\n- 3+ years of hands-on experience with Docker\n- Clear written communication; we decide things in documents\nNice to have\n- Exposure to Redis\n- Exposure to Python\n- Exposure to PostgreSQL\nBenefits\nCompetitive salary and equity, a learning budget, and four weeks of vacation that people actually take.",
+  "textHash": "939f40735f1b917ce6b59469842bab25b62590e9",
+  "error": null
+}

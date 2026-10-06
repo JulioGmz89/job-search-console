@@ -1,0 +1,51 @@
+{
+  "textHash": "a8a72617e022fcda4ffffb10d07a60fdab5458f9",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:19:00.000Z",
+  "skills": [
+    {
+      "skill": "AWS",
+      "canonical": "AWS",
+      "id": "aws",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Distributed Systems",
+      "canonical": "Distributed Systems",
+      "id": "distributed-systems",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "GCP",
+      "canonical": "GCP",
+      "id": "gcp",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Kafka",
+      "canonical": "Kafka",
+      "id": "kafka",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "React",
+      "canonical": "React",
+      "id": "react",
+      "category": "framework",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "TypeScript",
+      "canonical": "TypeScript",
+      "id": "typescript",
+      "category": "language",
+      "level": "required"
+    }
+  ]
+}

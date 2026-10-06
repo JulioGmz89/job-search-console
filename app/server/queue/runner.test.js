@@ -288,6 +288,20 @@ test('a run whose dependency failed is cancelled, and `next` chains follow-ups',
   assert.equal(r.get(followUp.id).status, 'succeeded');
 });
 
+test('a script spec with a cwd is spawned there; without one, in the repository', async () => {
+  const cwds = [];
+  const r = createRunner({
+    repoRoot: BIN,
+    spawnFn: (file, args, options) => {
+      cwds.push(options.cwd);
+      return spawn(file, args, options);
+    },
+  });
+  await settled(r, r.start(spec(['--lines', '1'], { cwd: here })).id);
+  await settled(r, r.start(spec(['--lines', '1'])).id);
+  assert.deepEqual(cwds, [here, BIN]);
+});
+
 test('`before` prepares the command and a failure there never spawns', async () => {
   let spawned = 0;
   const r = createRunner({

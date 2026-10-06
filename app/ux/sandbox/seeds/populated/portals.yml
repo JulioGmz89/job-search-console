@@ -1,0 +1,87 @@
+# Sources for the UX sandbox. Every company here is fictional; the sandbox
+# serves their boards from app/ux/sandbox/net/ and never touches the network.
+
+title_filter:
+  positive:
+    - Engineer
+    - SRE
+    - Developer
+  negative:
+    - Intern
+    - Recruiter
+    - Account Executive
+
+tracked_companies:
+
+  - name: Brightwater Health
+    careers_url: https://job-boards.greenhouse.io/brightwaterhealth
+    api: https://boards-api.greenhouse.io/v1/boards/brightwaterhealth/jobs
+    provider: greenhouse
+    enabled: true
+
+  - name: Cobalt Freight
+    careers_url: https://job-boards.greenhouse.io/cobaltfreight
+    api: https://boards-api.greenhouse.io/v1/boards/cobaltfreight/jobs
+    provider: greenhouse
+    enabled: true
+
+  - name: Driftwood Analytics
+    careers_url: https://job-boards.greenhouse.io/driftwoodanalytics
+    api: https://boards-api.greenhouse.io/v1/boards/driftwoodanalytics/jobs
+    provider: greenhouse
+    enabled: true
+
+  - name: Ember Payments
+    careers_url: https://job-boards.greenhouse.io/emberpayments
+    api: https://boards-api.greenhouse.io/v1/boards/emberpayments/jobs
+    provider: greenhouse
+    enabled: true
+
+  - name: Fernhill Robotics
+    careers_url: https://job-boards.greenhouse.io/fernhillrobotics
+    api: https://boards-api.greenhouse.io/v1/boards/fernhillrobotics/jobs
+    provider: greenhouse
+    enabled: true
+
+  - name: Granite Cloud
+    careers_url: https://job-boards.greenhouse.io/granitecloud
+    api: https://boards-api.greenhouse.io/v1/boards/granitecloud/jobs
+    provider: greenhouse
+    enabled: true
+
+  - name: Harbor Learning
+    careers_url: https://job-boards.greenhouse.io/harborlearning
+    api: https://boards-api.greenhouse.io/v1/boards/harborlearning/jobs
+    provider: greenhouse
+    enabled: true
+
+  - name: Ironleaf Security
+    careers_url: https://job-boards.greenhouse.io/ironleafsecurity
+    api: https://boards-api.greenhouse.io/v1/boards/ironleafsecurity/jobs
+    provider: greenhouse
+    enabled: true
+
+  - name: Juniper Mobility
+    careers_url: https://job-boards.greenhouse.io/junipermobility
+    api: https://boards-api.greenhouse.io/v1/boards/junipermobility/jobs
+    provider: greenhouse
+    enabled: true
+
+  - name: Kestrel Media
+    careers_url: https://job-boards.greenhouse.io/kestrelmedia
+    api: https://boards-api.greenhouse.io/v1/boards/kestrelmedia/jobs
+    provider: greenhouse
+    notes: "Paused: hiring freeze until January"
+    enabled: false
+
+  - name: Lumen Grid
+    careers_url: https://job-boards.greenhouse.io/lumengrid
+    api: https://boards-api.greenhouse.io/v1/boards/lumengrid/jobs
+    provider: greenhouse
+    enabled: true
+
+  - name: Mosaic Retail
+    careers_url: https://job-boards.greenhouse.io/mosaicretail
+    api: https://boards-api.greenhouse.io/v1/boards/mosaicretail/jobs
+    provider: greenhouse
+    enabled: true

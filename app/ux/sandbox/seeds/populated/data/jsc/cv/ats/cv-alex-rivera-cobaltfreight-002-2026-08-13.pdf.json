@@ -1,0 +1,70 @@
+{
+  "verdict": "pass",
+  "score": 85,
+  "grade": "B",
+  "pages": 2,
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Found 1 non-photo image(s). Ensure no CV text (skills, headings, contact) is baked into images — ATS cannot read image text. (Advisory: the PDF text check measures this directly.)",
+      "source": "structure"
+    },
+    {
+      "severity": "info",
+      "message": "Non-standard font(s): var(--font-family), var(--font-family, sans-serif), apple sd gothic neo, malgun gothic, noto sans cjk kr, noto sans kr, nanum gothic, pingfang tc, microsoft jhenghei, noto sans cjk tc, noto sans tc, source han sans tc, dm sans, space grotesk. Prefer widely-supported, embeddable fonts (Arial, Helvetica, Calibri, Times New Roman, Georgia) for reliable ATS text extraction. (Advisory: the PDF text check measures this directly.)",
+      "source": "structure"
+    }
+  ],
+  "keywords": {
+    "total": 15,
+    "found": 15,
+    "percent": 100,
+    "missing": []
+  },
+  "sections": [
+    {
+      "key": "summary",
+      "title": "Professional Summary",
+      "found": true,
+      "position": 120
+    },
+    {
+      "key": "competencies",
+      "title": "Core Competencies",
+      "found": true,
+      "position": 329
+    },
+    {
+      "key": "experience",
+      "title": "Work Experience",
+      "found": true,
+      "position": 441
+    },
+    {
+      "key": "projects",
+      "title": "Projects",
+      "found": true,
+      "position": 1356
+    },
+    {
+      "key": "education",
+      "title": "Education",
+      "found": true,
+      "position": 1658
+    },
+    {
+      "key": "certifications",
+      "title": "Certifications",
+      "found": true,
+      "position": 1597
+    },
+    {
+      "key": "skills",
+      "title": "Skills",
+      "found": true,
+      "position": 1484
+    }
+  ],
+  "pdf": "cv-alex-rivera-cobaltfreight-002-2026-08-13.pdf",
+  "checkedAt": "2026-10-04T08:40:46.341Z"
+}

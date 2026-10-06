@@ -1,0 +1,65 @@
+{
+  "textHash": "bedfba27a101e1523a8d70c858f936dd14a10feb",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:09:00.000Z",
+  "skills": [
+    {
+      "skill": "CI/CD",
+      "canonical": "CI/CD",
+      "id": "ci-cd",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "GCP",
+      "canonical": "GCP",
+      "id": "gcp",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Go",
+      "canonical": "Go",
+      "id": "go",
+      "category": "language",
+      "level": "required"
+    },
+    {
+      "skill": "Kubernetes",
+      "canonical": "Kubernetes",
+      "id": "kubernetes",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Observability",
+      "canonical": "Observability",
+      "id": "observability",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "OpenTelemetry",
+      "canonical": "OpenTelemetry",
+      "id": "opentelemetry",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Rust",
+      "canonical": "Rust",
+      "id": "rust",
+      "category": "language",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Terraform",
+      "canonical": "Terraform",
+      "id": "terraform",
+      "category": "cloud-infra",
+      "level": "required"
+    }
+  ]
+}

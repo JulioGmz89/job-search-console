@@ -1,0 +1,51 @@
+{
+  "textHash": "0d82c5e6e2009f1bbe425f5771e29b1ee70b056e",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:01:00.000Z",
+  "skills": [
+    {
+      "skill": "Docker",
+      "canonical": "Docker",
+      "id": "docker",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Helm",
+      "canonical": "Helm",
+      "id": "helm",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Kubernetes",
+      "canonical": "Kubernetes",
+      "id": "kubernetes",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Machine Learning",
+      "canonical": "Machine Learning",
+      "id": "machine-learning",
+      "category": "ai-ml",
+      "level": "required"
+    },
+    {
+      "skill": "Observability",
+      "canonical": "Observability",
+      "id": "observability",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "PostgreSQL",
+      "canonical": "PostgreSQL",
+      "id": "postgresql",
+      "category": "data",
+      "level": "required"
+    }
+  ]
+}

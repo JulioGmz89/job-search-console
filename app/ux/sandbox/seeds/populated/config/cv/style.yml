@@ -1,0 +1,9 @@
+# CV Studio settings for the UX sandbox.
+accent_color: "#1f6f5c"
+font_family: "DM Sans, Arial, sans-serif"
+heading_font_family: "Space Grotesk, sans-serif"
+font_size: "10.5pt"
+margin: "0.6in"
+density: normal
+template: standard
+sections: [summary, experience, projects, skills, education]

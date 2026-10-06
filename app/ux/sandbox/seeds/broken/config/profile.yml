@@ -1,0 +1,44 @@
+# Fictional UX-sandbox profile. Not a real person.
+candidate:
+  full_name: "Alex Rivera"
+  email: "alex.rivera@example.com"
+  phone: "+1 555 010 0199"
+  location: "Austin, TX (remote)"
+  linkedin: "linkedin.com/in/alex-rivera-example"
+  github: "github.com/alex-rivera-example"
+
+target_roles:
+  primary:
+    - "Senior Backend Engineer"
+    - "Platform Engineer"
+  archetypes:
+    - name: "Backend / Platform Engineer"
+      level: "Senior"
+      fit: "primary"
+    - name: "Site Reliability Engineer"
+      level: "Senior"
+      fit: "secondary"
+
+narrative:
+  headline: "Backend engineer who makes payment and data platforms boring to operate"
+  superpowers:
+    - "Event-driven services in Go"
+    - "Turning incidents into runbooks"
+
+compensation:
+  target_range: "$165K-190K"
+  currency: "USD"
+  minimum: "$150K"
+  location_flexibility: "Remote in the US; a week a quarter on site is fine"
+
+location:
+  country: "United States"
+  city: "Austin"
+  timezone: "CST"
+  visa_status: "No sponsorship needed"
+
+language: en
+spend_tier: standard
+
+cv:
+  auto_pdf_score_threshold: 3.5

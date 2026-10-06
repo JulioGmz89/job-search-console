@@ -1,0 +1,10 @@
+{
+  "id": "ec64450b55772f73911354ee4c55167a775dd487",
+  "url": "https://job-boards.greenhouse.io/brightwaterhealth/jobs/4101307",
+  "fetchedAt": "2026-09-25T15:30:00.000Z",
+  "source": "greenhouse-api",
+  "title": "Infrastructure Engineer",
+  "text": "About Brightwater Health\nBrightwater Health builds the scheduling and records platform behind 300 community clinics. We are a small, remote-first engineering team that ships every day and keeps on-call quiet.\nThe role\nAs a Infrastructure Engineer you will own services end to end: design reviews, the code, the dashboards and the pager. You will work closely with product and with the other engineers on the team.\nWhat you will need\n- 3+ years of hands-on experience with GCP\n- 4+ years of hands-on experience with AWS\n- 5+ years of hands-on experience with Go\n- 2+ years of hands-on experience with Terraform\n- several years of hands-on experience with TypeScript\n- 3+ years of hands-on experience with Kubernetes\n- Clear written communication; we decide things in documents\nNice to have\n- Exposure to PostgreSQL\n- Exposure to GraphQL\n- Exposure to OpenTelemetry\nBenefits\nCompetitive salary and equity, a learning budget, and four weeks of vacation that people actually take.",
+  "textHash": "2605f6b4ebe0a603553c0fcef86ad33cb9da86a7",
+  "error": null
+}

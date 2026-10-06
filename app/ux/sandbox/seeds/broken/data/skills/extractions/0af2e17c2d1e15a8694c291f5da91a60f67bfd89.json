@@ -1,0 +1,65 @@
+{
+  "textHash": "0af2e17c2d1e15a8694c291f5da91a60f67bfd89",
+  "engine": "llm",
+  "model": "claude-sonnet-5-5",
+  "runId": null,
+  "extractedAt": "2026-09-25T15:27:00.000Z",
+  "skills": [
+    {
+      "skill": "Airflow",
+      "canonical": "Airflow",
+      "id": "airflow",
+      "category": "data",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "AWS",
+      "canonical": "AWS",
+      "id": "aws",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Elasticsearch",
+      "canonical": "Elasticsearch",
+      "id": "elasticsearch",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "Kubernetes",
+      "canonical": "Kubernetes",
+      "id": "kubernetes",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "Observability",
+      "canonical": "Observability",
+      "id": "observability",
+      "category": "cloud-infra",
+      "level": "required"
+    },
+    {
+      "skill": "OpenTelemetry",
+      "canonical": "OpenTelemetry",
+      "id": "opentelemetry",
+      "category": "cloud-infra",
+      "level": "nice-to-have"
+    },
+    {
+      "skill": "Redis",
+      "canonical": "Redis",
+      "id": "redis",
+      "category": "data",
+      "level": "required"
+    },
+    {
+      "skill": "Terraform",
+      "canonical": "Terraform",
+      "id": "terraform",
+      "category": "cloud-infra",
+      "level": "required"
+    }
+  ]
+}

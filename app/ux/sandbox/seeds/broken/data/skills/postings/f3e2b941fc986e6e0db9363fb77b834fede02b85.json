@@ -1,0 +1,14 @@
+{
+  "id": "f3e2b941fc986e6e0db9363fb77b834fede02b85",
+  "url": "https://job-boards.greenhouse.io/junipermobility/jobs/4130325",
+  "fetchedAt": "2026-09-25T15:06:00.000Z",
+  "source": null,
+  "title": null,
+  "text": null,
+  "textHash": null,
+  "error": {
+    "code": "gone",
+    "message": "greenhouse API says the posting is gone (404)",
+    "at": "2026-09-25T15:06:00.000Z"
+  }
+}

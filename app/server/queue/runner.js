@@ -556,7 +556,9 @@ export function createRunner({ repoRoot, root, spawnFn = spawn, maxAgents = maxA
         hooks: spec.hooks ?? null,
         // A `script` spec is the M2 shape: a Node script at the repository root.
         command: spec.command
-          ?? (spec.script ? { file: process.execPath, args: [join(repoRoot, spec.script), ...(spec.args ?? [])] } : null),
+          ?? (spec.script
+            ? { file: process.execPath, args: [join(repoRoot, spec.script), ...(spec.args ?? [])], ...(spec.cwd ? { cwd: spec.cwd } : {}) }
+            : null),
         child: null,
         pid: null,
         cancelling: false,
