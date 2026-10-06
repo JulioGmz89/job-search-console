@@ -172,3 +172,52 @@ test('today: last seen and dismissed cards are remembered, with Undo', async () 
   assert.deepEqual((await call('PUT', '/api/today', { undismiss: 'run-1' })).body.dismissed, []);
   assert.equal((await call('PUT', '/api/today', { lastSeen: 'yesterday' })).status, 400);
 });
+
+test('to review: Remove takes the line out, Undo puts the same line back', async () => {
+  const { root, call } = await emptyWorkspace();
+  const url = 'https://job-boards.greenhouse.io/kestrelmedia/jobs/4134913';
+  await call('POST', '/api/inbox/urls', { url, company: 'Kestrel Media', title: 'Senior Backend Engineer' });
+  const before = readFileSync(join(root, 'data', 'pipeline.md'), 'utf-8');
+
+  const removed = await call('DELETE', '/api/inbox/urls', { url });
+  assert.equal(removed.status, 200, JSON.stringify(removed.body));
+  assert.equal(removed.body.line, `- [ ] ${url} | Kestrel Media | Senior Backend Engineer`);
+  assert.equal((await call('GET', '/api/inbox')).body.pending.length, 0);
+  assert.equal((await call('DELETE', '/api/inbox/urls', { url })).status, 404);
+
+  const restored = await call('POST', '/api/inbox/urls/restore', { line: removed.body.line });
+  assert.equal(restored.body.restored, true);
+  assert.equal(readFileSync(join(root, 'data', 'pipeline.md'), 'utf-8'), before);
+  assert.equal((await call('POST', '/api/inbox/urls/restore', { line: '- [x] #1 | done' })).status, 400);
+  assert.equal((await call('POST', '/api/inbox/urls/restore', { line: removed.body.line })).body.restored, false, 'not added twice');
+});
+
+test('writing rules: one word in or out, nothing else rewritten, and Undo restores', async () => {
+  const { root, call } = await emptyWorkspace();
+  const { writeFileSync } = await import('node:fs');
+  const rules = '# Voice\n\n## Tone\nPlain.\n\n## Never write\n- spearheaded\n- leveraged\n\n## Bullets\nShort.\n';
+  writeFileSync(join(root, 'voice-dna.md'), rules);
+
+  assert.deepEqual((await call('GET', '/api/cv/voice')).body.words, ['spearheaded', 'leveraged']);
+  const added = await call('POST', '/api/cv/voice/words', { word: 'seamless' });
+  assert.deepEqual(added.body.words, ['spearheaded', 'leveraged', 'seamless']);
+  assert.equal(readFileSync(join(root, 'voice-dna.md'), 'utf-8'), rules.replace('- leveraged\n', '- leveraged\n- seamless\n'));
+  assert.equal((await call('POST', '/api/cv/voice/words', { word: 'Seamless' })).body.added, false);
+
+  const removed = await call('DELETE', '/api/cv/voice/words', { word: 'leveraged' });
+  assert.deepEqual(removed.body.words, ['spearheaded', 'seamless']);
+  assert.equal((await call('POST', '/api/cv/voice/words', { word: '' })).status, 400);
+
+  await call('PUT', '/api/cv/voice', { text: '# Example rules\n' });
+  const undone = await call('POST', '/api/cv/voice/restore');
+  assert.deepEqual(undone.body.words, ['spearheaded', 'seamless']);
+});
+
+test('writing rules: a file without the section gets one at the end', async () => {
+  const { root, call } = await emptyWorkspace();
+  const { writeFileSync } = await import('node:fs');
+  writeFileSync(join(root, 'voice-dna.md'), '# Voice\n\n## Tone\nPlain.\n');
+  await call('POST', '/api/cv/voice/words', { word: 'robust' });
+  assert.equal(readFileSync(join(root, 'voice-dna.md'), 'utf-8'), '# Voice\n\n## Tone\nPlain.\n\n## Never write\n- robust\n');
+  assert.equal((await call('POST', '/api/cv/voice/restore')).status, 200);
+});

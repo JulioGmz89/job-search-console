@@ -41,8 +41,8 @@ import { readAtsRecord } from './services/ats.js';
 import { createBrowserPool } from './services/browser.js';
 import { listCvDocuments } from './services/cvdocs.js';
 import { getPreview, listThemes, renderPreview, thumbPath } from './services/cvrender.js';
-import { listCvTemplates, listWritingSamples, readStyle, readVoice, writeStyle, writeVoice } from './services/cvstyle.js';
-import { appendInboxUrl, readInbox } from './services/inbox.js';
+import { addAvoidWord, listCvTemplates, listWritingSamples, readStyle, readVoice, removeAvoidWord, restoreVoice, writeStyle, writeVoice } from './services/cvstyle.js';
+import { appendInboxUrl, readInbox, removeInboxUrl, restoreInboxLine } from './services/inbox.js';
 import { repoRoot, resolveDataRoot } from './services/paths.js';
 import { readPipeline, SCORE_BANDS } from './services/pipeline.js';
 import { readCvContent, readProfileForm, writeCvContent, writeProfileForm } from './services/profile.js';
@@ -423,6 +423,32 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     }
   });
 
+  /** Words to avoid: one bullet under `## Never write` added or removed, nothing else rewritten. */
+  app.post('/api/cv/voice/words', async (request, reply) => {
+    try {
+      return { ok: true, ...addAvoidWord({ root, word: body(request).word }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.delete('/api/cv/voice/words', async (request, reply) => {
+    try {
+      return { ok: true, ...removeAvoidWord({ root, word: body(request).word }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  /** Undo for the rules: swap voice-dna.md with the .bak its last save kept. */
+  app.post('/api/cv/voice/restore', async (request, reply) => {
+    try {
+      return { ok: true, ...restoreVoice({ root }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
   app.get('/api/cv/templates', async () => listCvTemplates({ root }));
 
   app.get('/api/cv/writing-samples', async () => listWritingSamples({ root }));
@@ -625,6 +651,23 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
         run = runner.start({ ...buildSpec(asked.kind, asked.options, specContext), request: asked });
       }
       return reply.code(201).send({ ok: true, ...added, run });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  /** To review › Remove. The removed line comes back so Undo can restore it exactly. */
+  app.delete('/api/inbox/urls', async (request, reply) => {
+    try {
+      return { ok: true, ...(await removeInboxUrl({ root, url: body(request).url })) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.post('/api/inbox/urls/restore', async (request, reply) => {
+    try {
+      return { ok: true, ...(await restoreInboxLine({ root, line: body(request).line })) };
     } catch (error) {
       return fail(reply, error);
     }

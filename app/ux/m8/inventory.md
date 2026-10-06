@@ -19,3 +19,8 @@ direction. The `ux-researcher` agent rewrites it in full during the re-measure
 | `GET /api/workspace` | Which user files exist, the set-up steps, counts and data problems | Today › Get set up; Workspace |
 | `GET /api/today` | When the user last looked at Today, and dismissed cards | Today |
 | `PUT /api/today` | Records "last looked" and dismissing or restoring a card | Today › Dismiss / Undo |
+| `DELETE /api/inbox/urls` | Removes one link from To review, returning the line for Undo | To review › Remove |
+| `POST /api/inbox/urls/restore` | Puts a removed To review line back | To review › Undo |
+| `POST /api/cv/voice/words` | Adds one word under `## Never write` | My CV › Writing rules › Words to avoid |
+| `DELETE /api/cv/voice/words` | Removes one word from `## Never write` | My CV › Writing rules › Words to avoid |
+| `POST /api/cv/voice/restore` | Swaps `voice-dna.md` with its `.bak` (Undo) | My CV › Writing rules › Undo |
