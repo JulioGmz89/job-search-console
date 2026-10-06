@@ -330,7 +330,7 @@
     cv(r) {
       const a = appById(r.appId);
       const d = designOf(S.design.saved);
-      a.pdf = { file: `cv-alex-rivera-${slug(a.company)}-${String(a.id).padStart(3, '0')}-${TODAY}.pdf`, date: TODAY, time: clock(Date.now()), design: d.name, rules: TODAY, rulesNote: S.voiceChanged ? 'your writing rules of today (3 words added)' : null, verdict: d.verdict };
+      a.pdf = { file: `cv-alex-rivera-${slug(a.company)}-${String(a.id).padStart(3, '0')}-${TODAY}.pdf`, date: TODAY, time: clock(Date.now()), design: d.name, rules: TODAY, rulesNote: S.voiceChanged ? `your writing rules of today (${S.voiceAdded ? `${plural(S.voiceAdded, 'word')} added` : 'edited'})` : null, verdict: d.verdict };
       r.outcomeText = `Tailored CV for ${jobName(a)} is ready · ${VERDICT_TEXT[d.verdict]}`;
       r.nested.push(`then: laid out in ${d.name} · screening check: ${VERDICT_TEXT[d.verdict].toLowerCase()}`);
       (S.history[a.id] ||= []).push(`${fmtDate(TODAY)} ${clock(Date.now())} · tailored CV made`);
@@ -617,7 +617,7 @@ ${list.length ? `<div class="table-wrap"><table class="stackable"><caption>Your 
     const errs = (k) => S.errors[`cl-${k}-${a.id}`];
     const field = (k, label) => `<div><label for="cl-${k}-${a.id}">${label} <span class="req">(required)</span></label><textarea id="cl-${k}-${a.id}" rows="2" data-draft ${errs(k) ? `aria-invalid="true" aria-describedby="cl-${k}-${a.id}-err"` : ''}>${esc(S.drafts[`cl-${k}-${a.id}`] || '')}</textarea>${errs(k) ? `<p class="error" id="cl-${k}-${a.id}-err">${esc(errs(k))}</p>` : ''}</div>`;
     const d = designOf(S.design.saved);
-    const cvCard = `<section class="card" aria-labelledby="doc-cv-h"><div class="row between"><h3 id="doc-cv-h">Tailored CV</h3>${a.pdf ? (a.pdf.verdict === 'fail' ? '<span class="badge fail">Fails screening</span>' : '<span class="badge ok">Ready</span>') : cvRun ? '<span class="badge new">Working</span>' : '<span class="badge neutral">Not made yet</span>'}</div>
+    const cvCard = `<section class="card" aria-labelledby="doc-cv-h"><div class="row between"><h3 id="doc-cv-h">Tailored CV</h3>${cvRun || layRun ? '<span class="badge new">Working</span>' : a.pdf ? (a.pdf.verdict === 'fail' ? '<span class="badge fail">Fails screening</span>' : '<span class="badge ok">Ready</span>') : '<span class="badge neutral">Not made yet</span>'}</div>
 ${cvRun || layRun
   ? `${progress(`Making the tailored CV for ${jobName(a)}`)}<p class="small" id="cv-working" tabindex="-1">${cvRun ? 'Writing your CV for this role… usually about 3 minutes.' : 'Laying out the PDF again in your design… a few seconds, no AI.'} You can leave this page; it appears here and in Activity.</p>`
   : a.pdf
@@ -626,7 +626,7 @@ ${cvRun || layRun
 <p class="small muted"><b>Make it again</b> rewrites the CV for this role with your current CV and writing rules (AI, about 3 min). ${a.pdf.design !== d.name ? `<b>Update the layout</b> only re-draws it in ${esc(d.name)} (no AI, wording unchanged).` : ''}</p>`
     : `<p>Your CV rewritten for this role, in your design (${esc(d.name)}).</p><p>${costLine('3')}</p><div class="row"><button class="btn" data-action="make-cv" data-arg="${a.id}" id="make-cv-${a.id}">Make tailored CV</button></div>`}
 </section>`;
-    const clCard = `<section class="card" aria-labelledby="doc-cl-h"><div class="row between"><h3 id="doc-cl-h">Cover letter</h3>${a.cover ? '<span class="badge ok">Ready</span>' : clRun ? '<span class="badge new">Working</span>' : '<span class="badge neutral">Not made yet</span>'}</div>
+    const clCard = `<section class="card" aria-labelledby="doc-cl-h"><div class="row between"><h3 id="doc-cl-h">Cover letter</h3>${clRun ? '<span class="badge new">Working</span>' : a.cover ? '<span class="badge ok">Ready</span>' : '<span class="badge neutral">Not made yet</span>'}</div>
 ${clRun
   ? `${progress(`Writing the cover letter for ${jobName(a)}`)}<p class="small" id="cl-working" tabindex="-1">Writing in a ${esc(clRun.tone.toLowerCase())} tone… usually about 2 minutes.</p>`
   : coverForm
@@ -842,14 +842,14 @@ ${prevApp && prevApp.pdf && prevApp.pdf.relaid && prevApp.pdf.design === saved.n
   function writingSection() {
     const words = voiceWords();
     const err = S.errors['add-word'];
-    const withPdf = S.apps.filter((a) => a.pdf || ['Responded', 'Interview'].includes(a.status));
+    const withPdf = S.apps.filter((a) => a.pdf).sort((x, y) => (y.score ?? 0) - (x.score ?? 0));
     return `<section class="card" aria-labelledby="avoid-h"><h2 id="avoid-h" style="font-size:var(--text-lg)">Words to avoid</h2><p class="muted">The assistant never uses these in your tailored CVs and letters.</p>
 <ul class="chips" style="list-style:none;margin:0;padding:0" aria-label="Words to avoid">${words.map((w) => `<li class="wordchip">${esc(w)}<button data-action="remove-word" data-arg="${esc(w)}" aria-label="Remove “${esc(w)}”">×</button></li>`).join('')}</ul>
 <form class="row" data-form="add-word" novalidate style="align-items:flex-end"><div style="width:18rem"><label for="add-word">Add a word or phrase</label><input id="add-word" type="text" data-draft value="${esc(S.drafts['add-word'] || '')}" placeholder="e.g. game-changing" ${err ? 'aria-invalid="true" aria-describedby="add-word-err"' : ''}>${err ? `<p class="error" id="add-word-err">${esc(err)}</p>` : ''}</div><button class="btn" type="submit">Add</button></form>
 <p class="small muted">Added words are appended to your rules; nothing else in them changes.</p></section>
 <section class="card" aria-labelledby="apply-h"><h2 id="apply-h" style="font-size:var(--text-lg)">When do new rules apply?</h2><p>To the <b>next</b> tailored CV or cover letter. Documents you already made keep their wording. To get a fresh CV under the new rules, make it again:</p>
-<ul>${withPdf.slice(0, 8).map((a) => `<li class="row between" style="padding:var(--space-1) 0">${esc(jobName(a))}${a.pdf ? ` <span class="small muted">· CV made ${fmtDate(a.pdf.date)}</span>` : ''} ${S.runs.find((r) => r.kind === 'cv' && r.appId === a.id && r.status === 'working') ? '<span class="badge new">Writing…</span>' : `<button class="btn2 btn-sm" data-action="make-cv" data-arg="${a.id}">${a.pdf ? 'Make it again' : 'Make tailored CV'}<span class="visually-hidden"> for ${esc(jobName(a))}</span></button>`}</li>`).join('')}</ul><p class="small muted">Each uses the AI assistant, about 3 min, and your Claude plan. <a href="#/applications">All applications</a></p></section>
-<details class="card"><summary>All rules (advanced)</summary><form class="stack-sm" data-form="voice-edit" novalidate><label for="voice-edit">Your writing rules (Markdown)</label><textarea id="voice-edit" rows="12" data-draft>${esc(S.drafts['voice-edit'] ?? S.voiceText ?? '')}</textarea><div class="row"><button class="btn" type="submit">Save rules</button></div></form></details>
+<p><b>Your ${plural(withPdf.length, 'tailored CV')}</b>, best fit first:</p><ul style="list-style:none;margin:0;padding:0">${withPdf.map((a) => { const busy = S.runs.find((r) => r.kind === 'cv' && r.appId === a.id && r.status === 'working'); const fresh = a.pdf.rulesNote && a.pdf.date === TODAY; return `<li class="row between" style="padding:var(--space-2) 0;border-top:1px solid var(--border)"><span><a href="#/applications/${a.id}/documents">${esc(jobName(a))}</a><br><span class="small ${fresh ? '' : 'muted'}">${fresh ? `✓ Made today under your current rules (${esc(a.pdf.rulesNote.replace(/^your writing rules of today ((.*))$/, '$1'))})` : `CV made ${fmtDate(a.pdf.date)} · ${esc(a.pdf.rulesNote || `your writing rules of ${fmtDate(a.pdf.rules || a.pdf.date)}`)}`}</span></span><span class="row">${busy ? `<span class="badge new">Writing…</span>` : `${fresh ? `<a class="btn btn-sm" href="#/document/cv/${a.id}">Open<span class="visually-hidden"> the CV for ${esc(jobName(a))}</span></a>` : ''}<button class="btn2 btn-sm" data-action="make-cv" data-arg="${a.id}">Make it again<span class="visually-hidden"> for ${esc(jobName(a))}</span></button>`}</span></li>`; }).join('')}</ul><p class="small muted">Each uses the AI assistant, about 3 min, and your Claude plan. Jobs without a tailored CV: make one from the job’s page in <a href="#/applications">Applications</a>.</p></section>
+<details class="card" data-toggle="rulesOpen"${S.ui.rulesOpen ? ' open' : ''}><summary>All rules (advanced)</summary><form class="stack-sm" data-form="voice-edit" novalidate><label for="voice-edit">Your writing rules (Markdown)</label><textarea id="voice-edit" rows="12" data-draft>${esc(S.drafts['voice-edit'] ?? S.voiceText ?? '')}</textarea><div class="row"><button class="btn" type="submit">Save rules</button></div>${S.ui.rulesSaved ? `<p class="notice ok" role="status" id="rules-saved" tabindex="-1">Writing rules saved at ${S.ui.rulesSaved}. They apply to the next tailored CV or letter.</p>` : ''}</form></details>
 <section class="card" aria-labelledby="samp-h"><h2 id="samp-h" style="font-size:var(--text-lg)">Writing samples</h2><p class="muted">Your own writing, used to match your tone.</p><ul><li>linkedin-about.md <a href="#/help/files">Open</a></li><li>blog-settlements.md <a href="#/help/files">Open</a></li></ul><p class="small muted">Add samples to the writing-samples folder in your workspace.</p></section>
 <section class="card" aria-labelledby="ex-h"><h2 id="ex-h" style="font-size:var(--text-lg)">Start from the example rules</h2><p class="muted">Replaces your rules with the example set that comes with the app. Your current rules are kept as a backup and you can undo.</p><div><button class="btn2" data-action="seed-confirm">Start from the example rules…</button></div></section>`;
   }
@@ -1491,6 +1491,7 @@ ${toolCard('boards', 'Find the right job board for a company', 'For a company wh
       } else {
         setWords([...words, w]);
         S.voiceChanged = true;
+        S.voiceAdded = (S.voiceAdded || 0) + 1;
         setNotice(`Added “${esc(w)}”. It applies to the next tailored CV or letter.`);
         announce(`Added ${w}. It applies to the next tailored CV or letter.`);
       }
@@ -1501,8 +1502,10 @@ ${toolCard('boards', 'Find the right job board for a company', 'For a company wh
       S.voiceText = S.drafts['voice-edit'] ?? S.voiceText;
       delete S.drafts['voice-edit'];
       S.voiceChanged = true;
-      setNotice('Writing rules saved. They apply to the next tailored CV or letter.');
-      announce('Writing rules saved.');
+      S.ui.rulesOpen = true;
+      S.ui.rulesSaved = clock(Date.now());
+      announce('Writing rules saved. They apply to the next tailored CV or letter.');
+      focusLater('#rules-saved');
     },
     profile: () => {
       ['name', 'location', 'targets', 'remote', 'comp', 'threshold', 'language', 'tier'].forEach((k) => {
@@ -1595,7 +1598,8 @@ ${toolCard('boards', 'Find the right job board for a company', 'For a company wh
   });
 
   document.addEventListener('toggle', (e) => {
-    if (e.target.dataset?.toggle === 'scanOpts') S.ui.scanOpts = e.target.open;
+    const key = e.target.dataset?.toggle;
+    if (key) S.ui[key] = e.target.open;
   }, true);
 
   document.addEventListener('keydown', (e) => {
