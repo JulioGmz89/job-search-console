@@ -120,7 +120,13 @@ function sweepOrphans() {
       }
     }
     // A copy younger than a minute without a pid file may be another sandbox still starting.
-    const young = Date.now() - statSync(dir).mtimeMs < 60_000;
+    let young;
+    try {
+      young = Date.now() - statSync(dir).mtimeMs < 60_000;
+    } catch {
+      // Another sandbox starting at the same moment removed it first.
+      continue;
+    }
     if (alive || (pid === null && young)) continue;
     try {
       rmSync(dir, { recursive: true, force: true, maxRetries: 3 });
