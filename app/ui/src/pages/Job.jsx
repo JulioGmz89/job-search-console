@@ -66,7 +66,7 @@ export function JobPage({ params }) {
   const { report, error } = useReport(row?.reportId, `${pipeline.data ? pipeline.at ?? '' : ''}-${finishedCount}-${pipeline.data?.rows?.length}`);
 
   useEffect(() => {
-    if (anchor && report) document.getElementById(anchor)?.scrollIntoView();
+    if (anchor && report) document.getElementById(anchor === 'cover' ? 'documents' : anchor)?.scrollIntoView();
   }, [anchor, report]);
 
   const back = <a href="#/applications">← Applications</a>;
@@ -176,7 +176,7 @@ export function JobPage({ params }) {
 
       <section aria-labelledby="docs-h" className="stack" id="documents">
         <h2 id="docs-h">Documents</h2>
-        {report ? <Documents row={row} report={report} /> : <p className="muted">{error ? `Could not load the report: ${error.message}` : 'Loading…'}</p>}
+        {report ? <Documents row={row} report={report} openCover={anchor === 'cover'} /> : <p className="muted">{error ? `Could not load the report: ${error.message}` : 'Loading…'}</p>}
         {statusId === 'evaluated' ? (
           <div className="row">
             <button type="button" className="btn2" onClick={sent}>

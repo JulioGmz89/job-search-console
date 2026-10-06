@@ -288,3 +288,28 @@ ul.plain { list-style: none; margin: 0; padding: 0; }
 .badge-line.ok { border-color: var(--success); color: var(--success-text); }
 .badge-line.warn { border-color: var(--warning); color: var(--warning-text); }
 .badge-line.fail { border-color: var(--danger); color: var(--danger-text); font-weight: var(--weight-bold); }
+
+/* ── applications table (React Aria Table) ── */
+.add-job > summary { list-style: none; }
+.add-job > summary::-webkit-details-marker { display: none; }
+.add-job > summary .card-title::before { content: "+ "; color: var(--accent-text); }
+.add-job[open] > summary .card-title::before { content: "– "; }
+.filters { align-items: flex-end; }
+.apps-table th[data-allows-sorting] { cursor: pointer; }
+.apps-table th[data-allows-sorting]::after { content: " ↕"; color: var(--text-muted); }
+.apps-table th[aria-sort="ascending"]::after { content: " ↑"; color: var(--text); }
+.apps-table th[aria-sort="descending"]::after { content: " ↓"; color: var(--text); }
+.apps-table th[data-focus-visible], .apps-table td[data-focus-visible], .apps-table tr[data-focus-visible] { outline: var(--focus-width) solid var(--focus); outline-offset: -3px; }
+.apps-table tr.moved td { opacity: 0.7; }
+@media (max-width: 600px) {
+  .apps-table thead { display: none; }
+  .apps-table, .apps-table tbody, .apps-table tr, .apps-table td { display: block; }
+  .apps-table tr { border-top: var(--border-width) solid var(--border); padding: var(--space-2) var(--space-3); }
+  .apps-table td { border: 0; padding: var(--space-1) 0; }
+  .apps-table td:nth-child(1)::before { content: "#"; }
+  .apps-table td:nth-child(3)::before { content: "Fit: "; color: var(--text-muted); font-weight: var(--weight-bold); }
+  .apps-table td:nth-child(4)::before { content: "Recommendation: "; color: var(--text-muted); font-weight: var(--weight-bold); }
+  .apps-table td:nth-child(6)::before { content: "Documents: "; color: var(--text-muted); font-weight: var(--weight-bold); }
+  .apps-table td:nth-child(7)::before { content: "Checked: "; color: var(--text-muted); font-weight: var(--weight-bold); }
+  .apps-table .hide-md { display: block; }
+}
