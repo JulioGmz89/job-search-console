@@ -35,6 +35,25 @@ export function subjectFor(spec, { root } = {}) {
     const report = listReports({ root }).reports.find((r) => r.url === meta.url);
     const named = job(report?.machine?.company, report?.machine?.role);
     if (named) return named;
+    return fromLink(meta.url);
   }
   return null;
+}
+
+/**
+ * A pasted link before anything names it: "greenhouse.io/kestrelmedia, job
+ * 4134913", so two checks running at once can still be told apart. The run
+ * is named again from its report when it finishes.
+ */
+export function fromLink(url) {
+  try {
+    const { hostname, pathname } = new URL(url);
+    const host = hostname.replace(/^(www|job-boards|boards|jobs|careers|apply)\./, '');
+    const parts = pathname.split('/').filter(Boolean);
+    const last = parts.at(-1);
+    const owner = parts.length > 1 && !/^(jobs?|careers?|positions?|o)$/i.test(parts[0]) ? `/${parts[0]}` : '';
+    return `${host}${owner}${last && last !== parts[0] ? `, job ${decodeURIComponent(last).slice(0, 40)}` : ''}`;
+  } catch {
+    return null;
+  }
 }

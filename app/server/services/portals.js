@@ -101,7 +101,8 @@ function scalarLine(key, value) {
 
 /** Locate a top-level key's line range: `[headerLine, endExclusive)`. */
 function sectionRange(lines, key) {
-  const header = new RegExp(`^${key}:\\s*(#.*)?$`);
+  // `key: []` is how a section emptied by the console is written (see deleteEntry).
+  const header = new RegExp(`^${key}:\\s*(\\[\\]\\s*)?(#.*)?$`);
   const start = lines.findIndex((line) => header.test(line));
   if (start === -1) return null;
   let end = lines.length;
@@ -613,6 +614,8 @@ export function createEntry({ root, kind, entry, etag }) {
   }
 
   const lines = [...state.lines];
+  // An emptied section reads `key: []`; it becomes a list header again.
+  lines[section.range.start] = lines[section.range.start].replace(/^(\w+):\s*\[\]/, '$1:');
   const last = section.items.at(-1);
   const at = last ? last.endLine : section.range.start + 1;
   lines.splice(at, 0, '', ...renderEntry(fields, section.indent));
@@ -695,6 +698,12 @@ export function deleteEntry({ root, kind, index, name, etag }) {
   let count = block.endLine - block.startLine;
   if (lines[block.startLine + count] === '') count += 1;
   lines.splice(block.startLine, count);
+  // A section with nothing left under it would read as null, which upstream's
+  // validator rejects; the last entry out leaves an explicit empty list.
+  if (state.sections[kind].items.length === 1) {
+    const at = state.sections[kind].range.start;
+    lines[at] = lines[at].replace(/^(\w+):\s*(#.*)?$/, (_, key, comment) => `${key}: []${comment ? ` ${comment}` : ''}`);
+  }
 
   const expected = expectedDoc(state.doc, kind, (list) => { list.splice(index, 1); });
   return commit(state, lines.join('\n'), expected, { etag });

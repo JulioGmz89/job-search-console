@@ -355,3 +355,15 @@ test('normalizeEntry maps the wire shape onto upstream keys', () => {
   // A partial patch touches only the keys it names.
   assert.deepEqual(normalizeEntry({ enabled: false }, { partial: true }), { enabled: false });
 });
+
+test('the last company can be removed, and a company followed again afterwards', () => {
+  const root = mkdtempSync(join(tmpdir(), 'jsc-portals-test-'));
+  scratches.push(root);
+  const first = createEntry({ root, kind: 'company', entry: { name: 'Kestrel Media', careersUrl: 'https://job-boards.greenhouse.io/kestrelmedia' }, etag: null });
+  const removed = deleteEntry({ root, kind: 'company', index: 0, name: 'Kestrel Media', etag: first.etag });
+  assert.match(read(root), /^tracked_companies: \[\]$/m);
+  assert.deepEqual(readPortals({ root }).companies, []);
+  createEntry({ root, kind: 'company', entry: { name: 'Granite Cloud', careersUrl: 'https://job-boards.greenhouse.io/granitecloud' }, etag: removed.etag });
+  assert.deepEqual(readPortals({ root }).companies.map((c) => c.name), ['Granite Cloud']);
+  assert.match(read(root), /^tracked_companies:\n\n {2}- name: Granite Cloud$/m);
+});
