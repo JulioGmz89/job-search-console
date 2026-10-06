@@ -12,6 +12,7 @@
   "dependencies": {
     "job-search-console-app": "file:..",
     "react": "^19.0.0",
+    "react-aria-components": "^1.21.1",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
