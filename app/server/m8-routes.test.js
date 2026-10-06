@@ -7,10 +7,13 @@
 import assert from 'node:assert/strict';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { after, test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import { buildApp } from './app.js';
+
+const FAKE_CLAUDE = join(dirname(fileURLToPath(import.meta.url)), 'services', '__fixtures__', 'bin', 'fake-claude.js');
 
 const scratches = [];
 const apps = [];
@@ -55,6 +58,28 @@ test('first run: the CV and the first company are saved from an empty folder', a
   assert.equal(followed.status, 201, JSON.stringify(followed.body));
   assert.ok(existsSync(join(root, 'portals.yml')));
   assert.equal((await call('GET', '/api/portals')).body.companies[0].name, 'Kestrel Media');
+});
+
+test('the assistant check runs --version, and Check again re-runs it', async () => {
+  const fake = { file: process.execPath, args: [FAKE_CLAUDE], found: true, shell: false, source: 'env', display: 'fake-claude' };
+  const { call } = await emptyWorkspace({ agent: fake });
+  const ready = await call('GET', '/api/agent/status');
+  assert.deepEqual([ready.body.check.ready, ready.body.check.version], [true, '2.1.0']);
+
+  process.env.FAKE_CLAUDE_VERSION = 'fail';
+  try {
+    const cached = await call('GET', '/api/agent/status');
+    assert.equal(cached.body.check.checkedAt, ready.body.check.checkedAt, 'not re-run on every read');
+    const again = await call('GET', '/api/agent/status?refresh=1');
+    assert.equal(again.body.check.ready, false);
+    assert.match(again.body.check.error, /cannot start/);
+  } finally {
+    delete process.env.FAKE_CLAUDE_VERSION;
+  }
+
+  const missing = await emptyWorkspace();
+  const none = await missing.call('GET', '/api/agent/status');
+  assert.deepEqual([none.body.check.ready, none.body.check.error], [false, 'not-found']);
 });
 
 test('profile: read with defaults, saved in place, refused with the field named', async () => {

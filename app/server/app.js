@@ -32,7 +32,7 @@ import { fileURLToPath } from 'node:url';
 import fastifyStatic from '@fastify/static';
 import Fastify from 'fastify';
 
-import { resolveClaudeCommand } from './agents/claude-bin.js';
+import { checkClaudeVersion, resolveClaudeCommand } from './agents/claude-bin.js';
 import { readProfile } from './agents/profile.js';
 import { createRunner } from './queue/runner.js';
 import { buildSpec, describeKinds, RUN_KINDS } from './queue/specs.js';
@@ -139,10 +139,23 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     eventSockets.clear();
   });
 
-  // Resolved once: the CLI does not move while the server runs, and an agent
-  // run refused because the CLI is missing should say so at request time.
-  const claude = agent ?? resolveClaudeCommand();
+  // Resolved at start, and again when the user asks the app to check (the
+  // first-run "Check again" after installing Claude Code), so installing the
+  // CLI never needs a server restart. Tests pin `agent` and it never changes.
+  let claude = agent ?? resolveClaudeCommand();
   const specContext = { root, repoRoot, agent: claude };
+  /** The last `--version` answer; checked once on first ask, then on request. */
+  let versionCheck = null;
+  const checkAgent = ({ refresh = false } = {}) => {
+    if (refresh && !agent) {
+      claude = resolveClaudeCommand();
+      specContext.agent = claude;
+    }
+    if (refresh || !versionCheck) {
+      versionCheck = checkClaudeVersion(claude).then((result) => ({ ...result, checkedAt: new Date().toISOString() }));
+    }
+    return versionCheck;
+  };
 
   // The built SPA is served by this same process, so M1's acceptance criterion
   // ("browse the pipeline without touching a terminal") is one command on one
@@ -561,11 +574,14 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
   // ── the agent ──────────────────────────────────────────────────────
 
   /** Whether agent runs can work at all, for the UI to enable its buttons honestly. */
-  app.get('/api/agent/status', async () => {
+  app.get('/api/agent/status', async (request) => {
     const dataRoot = resolveDataRoot(root);
     const profile = readProfile({ root: dataRoot });
+    const check = await checkAgent({ refresh: request.query?.refresh === '1' });
     return {
       bin: { display: claude.display, source: claude.source, found: claude.found, shell: claude.shell },
+      // ready: found and answered --version. Sign-in is only proven by a real run.
+      check: { ready: claude.found && check.ok, version: check.version, error: check.error, checkedAt: check.checkedAt },
       maxAgents: Number.parseInt(process.env.JSC_MAX_AGENTS ?? '', 10) || 2,
       profile: {
         exists: profile.exists,
