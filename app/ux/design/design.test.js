@@ -174,5 +174,5 @@ test('decisions.md records the maintainer approving one direction', () => {
   const approval = text.slice(text.indexOf('## Approval'));
   assert.doesNotMatch(approval, /_Pending/, 'approval is still pending');
   assert.match(approval, /Approved by the maintainer on \d{4}-\d{2}-\d{2}/);
-  assert.match(approval, /Direction: /);
+  assert.match(approval, /Direction:\**\s+\S/);
 });
