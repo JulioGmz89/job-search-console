@@ -12,7 +12,7 @@
  *   - Colours are defined once per scheme, under the same names.
  *   - Light is the default.
  *   - Dark follows prefers-color-scheme unless data-theme="light" pins light,
- *     and data-theme="dark" pins dark. This is the same structure as today's
+ *     and data-theme="dark" pins dark. This is the same structure as the old
  *     styles.css plus an explicit override.
  *   - Every pair a component uses is listed in CONTRAST PAIRS below and checked
  *     by design.test.js: text ≥ 4.5:1, UI boundaries and focus ≥ 3:1. This fixes
