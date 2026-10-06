@@ -1637,14 +1637,14 @@ ${toolCard('boards', 'Find the right job board for a company', 'For a company wh
     render();
   });
 
+  // Reset starts over in place. A reload here let automated clicks land on the reloaded page.
   document.getElementById('reset')?.addEventListener('click', () => {
-    try {
-      sessionStorage.removeItem(STORE);
-    } catch {
-      /* ignore */
-    }
-    location.hash = '#/today';
-    location.reload();
+    S = initialState();
+    save();
+    pendingFocus = '#page-title';
+    if (location.hash === '#/today') render();
+    else location.hash = '#/today';
+    announce('Prototype reset to its start state.');
   });
 
   // The skip link cannot use href="#main": the hash is the router. It moves focus instead.
