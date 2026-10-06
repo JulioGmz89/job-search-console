@@ -181,6 +181,11 @@ export function scanRunsPath(root) {
 }
 
 /** @param {string} [root] @returns {string} Absolute path to `data/portal-health.tsv`. */
+/** `data/scan-history.tsv`: every posting the scanner has seen, with the day it first saw it. */
+export function scanHistoryPath(root) {
+  return join(resolveDataRoot(root), 'data', 'scan-history.tsv');
+}
+
 export function portalHealthPath(root) {
   return join(scanBookkeepingDir(root), 'data', 'portal-health.tsv');
 }

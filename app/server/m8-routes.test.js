@@ -232,3 +232,15 @@ test('design check: the saved design is rendered once and its screening verdict 
   const again = await call('GET', '/api/cv/design-check');
   assert.equal(again.body.checkedAt, first.body.checkedAt, 'not rendered twice for the same style');
 });
+
+test('to review: each link says the day the scanner first saw it', async () => {
+  const { root, call } = await emptyWorkspace();
+  const { mkdirSync, writeFileSync } = await import('node:fs');
+  mkdirSync(join(root, 'data'), { recursive: true });
+  const url = 'https://job-boards.greenhouse.io/kestrelmedia/jobs/1';
+  writeFileSync(join(root, 'data', 'scan-history.tsv'), `url\tfirst_seen\tportal\ttitle\tcompany\tstatus\n${url}\t2026-10-05\tgreenhouse-api\tEngineer\tKestrel Media\tadded\n`);
+  await call('POST', '/api/inbox/urls', { url, company: 'Kestrel Media', title: 'Engineer' });
+  await call('POST', '/api/inbox/urls', { url: 'https://example.com/jobs/2' });
+  const pending = (await call('GET', '/api/inbox')).body.pending;
+  assert.deepEqual(pending.map((p) => p.firstSeen), ['2026-10-05', null]);
+});

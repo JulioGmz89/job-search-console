@@ -48,7 +48,7 @@ import { readPipeline, SCORE_BANDS } from './services/pipeline.js';
 import { readCvContent, readProfileForm, writeCvContent, writeProfileForm } from './services/profile.js';
 import { createEntry, deleteEntry, readPortals, updateEntry } from './services/portals.js';
 import { listReports, readReport, resolveReportPdf } from './services/reports.js';
-import { readLastScanRun, readPortalHealth } from './services/scanner.js';
+import { readFirstSeen, readLastScanRun, readPortalHealth } from './services/scanner.js';
 import { setStatus } from './services/status.js';
 import { subjectFor } from './services/subjects.js';
 import { readToday, writeToday } from './services/today.js';
@@ -659,7 +659,12 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
 
   app.get('/api/inbox', async () => {
     const inbox = readInbox({ root });
-    return { ...inbox, lastScan: readLastScanRun({ root }) };
+    const firstSeen = readFirstSeen({ root });
+    return {
+      ...inbox,
+      pending: inbox.pending.map((item) => ({ ...item, firstSeen: firstSeen.get(item.url) ?? null })),
+      lastScan: readLastScanRun({ root }),
+    };
   });
 
   /**

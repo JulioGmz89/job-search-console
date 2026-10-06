@@ -24,7 +24,7 @@
 
 import { readFileSync } from 'node:fs';
 
-import { portalHealthPath, scanRunsPath } from './paths.js';
+import { portalHealthPath, scanHistoryPath, scanRunsPath } from './paths.js';
 
 /** `Verifying liveness of 47 new offer(s) with Playwright (sequential)...` */
 const VERIFY_HEADER_RE = /^Verifying liveness of (\d+) new offer\(s\)/;
@@ -169,4 +169,19 @@ export function readPortalHealth({ root } = {}) {
     health[row.company] = { status: row.status, timestamp: row.timestamp };
   }
   return health;
+}
+
+/**
+ * URL → the day the scanner first saw it, from `data/scan-history.tsv`. Today's
+ * "New since you last looked" compares this with when the user last looked.
+ *
+ * @param {{root?: string}} [options]
+ * @returns {Map<string, string>}
+ */
+export function readFirstSeen({ root } = {}) {
+  const seen = new Map();
+  for (const row of readTsv(scanHistoryPath(root))) {
+    if (row.url && row.first_seen && !seen.has(row.url)) seen.set(row.url, row.first_seen);
+  }
+  return seen;
 }
