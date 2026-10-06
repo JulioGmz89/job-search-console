@@ -176,10 +176,14 @@ export function ToReviewPage() {
     await reload('inbox');
     setSelected([]);
     if (lines.length) {
-      offerUndo(items.length === 1 ? `Removed ${jobName(items[0])} from To review` : `Removed ${lines.length} links from To review`, async () => {
-        for (const line of lines) await restoreInboxLine(line);
-        await reload('inbox');
-      });
+      offerUndo(
+        items.length === 1 ? `Removed ${jobName(items[0])} from To review` : `Removed ${lines.length} links from To review`,
+        async () => {
+          for (const line of lines) await restoreInboxLine(line);
+          await reload('inbox');
+        },
+        { focus: true },
+      );
     }
   };
 

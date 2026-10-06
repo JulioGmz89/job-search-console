@@ -38,6 +38,8 @@ export function Search() {
   const [text, setText] = useState('');
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
+  // Below 960 px the field folds into a button (ia.md §1 "Reflow").
+  const [unfolded, setUnfolded] = useState(false);
   const input = useRef(null);
   const listId = useId();
 
@@ -68,7 +70,18 @@ export function Search() {
   const optionId = (i) => `${listId}-o${i}`;
 
   return (
-    <div className="search">
+    <div className="search" data-unfolded={unfolded}>
+      <button
+        type="button"
+        className="search-toggle"
+        aria-expanded={unfolded}
+        onClick={() => {
+          setUnfolded((u) => !u);
+          setTimeout(() => input.current?.focus(), 0);
+        }}
+      >
+        Search
+      </button>
       <label className="visually-hidden" htmlFor={`${listId}-input`}>
         Find a job, company or document
       </label>
@@ -104,7 +117,8 @@ export function Search() {
             choose(items[active]);
           } else if (e.key === 'Escape') {
             if (shown) setOpen(false);
-            else setText('');
+            else if (text) setText('');
+            else setUnfolded(false);
           }
         }}
       />

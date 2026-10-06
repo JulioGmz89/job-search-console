@@ -117,10 +117,11 @@ export function ConfirmDialog({ isOpen, title, children, confirmLabel, cancelLab
           </Heading>
           <div className="stack-sm">{children}</div>
           <div className="row dialog-actions">
-            <AriaButton className={danger ? 'btn-danger' : 'btn'} onPress={onConfirm} isDisabled={busy} autoFocus>
+            {/* A destructive choice is never the default: focus starts on Cancel. */}
+            <AriaButton className={danger ? 'btn-danger' : 'btn'} onPress={onConfirm} isDisabled={busy} autoFocus={!danger}>
               {confirmLabel}
             </AriaButton>
-            <AriaButton className="btn2" onPress={onCancel}>
+            <AriaButton className="btn2" onPress={onCancel} autoFocus={danger}>
               {cancelLabel}
             </AriaButton>
           </div>

@@ -41,6 +41,10 @@ export function AddJob({ idPrefix = 'add', headingId = null }) {
   useEffect(() => {
     if (finished) resultRef.current?.querySelector('a.btn, button.btn')?.focus();
   }, [finished]);
+  // The button the user pressed stays, but the news is below it: take focus there.
+  useEffect(() => {
+    if (runId) resultRef.current?.querySelector('.act-title a')?.focus();
+  }, [runId]);
 
   const submit = async (evaluate) => {
     setError(null);

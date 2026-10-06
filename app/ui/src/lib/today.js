@@ -4,7 +4,7 @@
  * health record, and every card has a permanent home elsewhere.
  */
 
-import { needsAttention } from './runs.js';
+import { isTopLevel, needsAttention } from './runs.js';
 
 /**
  * Board health values (data/portal-health.tsv) that need the user: the board
@@ -72,7 +72,7 @@ export function todayCards({ runs = [], dismissed = [], rows = [], issues = [], 
   const reviewed = rows
     .filter((r) => String(r.statusId ?? r.status).toLowerCase() === 'evaluated')
     .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
-  const working = runs.filter((r) => r.status === 'running' || r.status === 'queued');
+  const working = runs.filter((r) => isTopLevel(r) && (r.status === 'running' || r.status === 'queued'));
 
   return {
     needs: { failures, unreadable, boards, designFails, count: failures.length + (unreadable.length ? 1 : 0) + boards.length + (designFails ? 1 : 0) },

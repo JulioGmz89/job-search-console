@@ -63,6 +63,7 @@ export function dateTime(value, now = new Date()) {
 export function duration(ms) {
   if (typeof ms !== 'number' || ms < 0) return '';
   const s = Math.round(ms / 1000);
+  if (s < 1) return 'under a second';
   if (s < 60) return `${s} s`;
   const m = Math.round(s / 60);
   if (m < 60) return `${m} min`;

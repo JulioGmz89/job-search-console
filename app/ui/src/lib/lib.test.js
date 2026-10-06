@@ -71,7 +71,14 @@ test('outcomes say what came of a run and link to it', () => {
   assert.equal(got.text, 'Fit 4.1 / 5. The fit report is ready.');
   assert.deepEqual(got.open, { href: '#/applications/41', label: 'Open the job' });
   const children = [done, { id: 'm', kind: 'merge-tracker', parentId: 'e', status: 'succeeded' }, { id: 'p', kind: 'pdf', parentId: 'e', status: 'running' }];
-  assert.equal(followUps(done, children), 'then: added to Applications, made tailored CV (working)');
+  assert.equal(followUps(done, children), 'then: added to Applications, made the tailored CV (working)');
+  // Bookkeeping is not told; a layout that fails screening is, here and in the CV's outcome.
+  const pdf = { id: 'p', kind: 'pdf', status: 'succeeded', parentId: 'e', result: { reportId: 41 } };
+  const render = { id: 'r', kind: 'cv-render', status: 'succeeded', parentId: 'p', result: { ats: { verdict: 'fail' } } };
+  const ready = { id: 'm2', kind: 'mark-pdf-ready', status: 'succeeded', parentId: 'r' };
+  assert.equal(followUps(pdf, [pdf, render, ready]), 'then: laid out the PDF (it fails the screening check)');
+  assert.match(outcome(pdf, { all: [pdf, render] }).text, /fails the screening check/);
+  assert.equal(activitySummary([done, pdf, render], { lastOpened: 0 }).done, 0, 'chained runs are not counted on their own');
 });
 
 test('today: new openings are the ones first seen after the user last looked', async () => {

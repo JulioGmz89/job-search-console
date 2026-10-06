@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { fetchRun } from '../api.js';
 import { useResource } from '../data.js';
@@ -69,6 +69,12 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const retried = list.find((r) => r.retryOf === run.id) ?? null;
+  const retriedRef = useRef(null);
+  const [justRetried, setJustRetried] = useState(false);
+  // Try again replaces its own button; focus moves to what replaced it.
+  useEffect(() => {
+    if (justRetried && retried) retriedRef.current?.focus();
+  }, [justRetried, retried]);
   const title = runTitle(run);
   const H = `h${headingLevel}`;
   const [tone, badge] = state === 'failed' && retried ? ['neutral', 'Failed, tried again'] : BADGE[state];
@@ -79,6 +85,7 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
     setError(null);
     try {
       const again = await retry(run.id);
+      setJustRetried(true);
       announce(`Started again: ${title}`);
       onRetried?.(again);
     } catch (e) {
@@ -101,7 +108,7 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
   };
 
   const why = state === 'failed' ? explainFailure(run) : null;
-  const done = state === 'done' ? outcome(run, { rowForReport }) : null;
+  const done = state === 'done' ? outcome(run, { rowForReport, all: list }) : null;
   const then = followUps(run, list);
   const started = run.startedAt ?? run.queuedAt;
 
@@ -159,7 +166,8 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
       ) : null}
       {why && retried ? (
         <p className="small">
-          Tried again: <a href={`#/activity/${retried.id}`}>{runState(retried) === 'done' ? 'that worked' : runState(retried) === 'failed' ? 'that failed too' : 'still working'}</a>.
+          Tried again:{' '}
+          <a href={`#/activity/${retried.id}`} ref={retriedRef}>{runState(retried) === 'done' ? 'that worked' : runState(retried) === 'failed' ? 'that failed too' : 'still working'}</a>.
         </p>
       ) : null}
 

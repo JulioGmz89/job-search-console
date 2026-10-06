@@ -338,3 +338,21 @@ textarea.editor { font-family: var(--font-mono); font-size: var(--text-sm); min-
 .add-word { align-items: flex-start; }
 .add-word .btn { margin-top: 1.9rem; }
 @media (min-width: 1024px) { .design-preview { position: sticky; top: var(--space-4); } .design-preview iframe.doc { height: 60vh; } }
+
+/* ── review fixes (M8 gate) ────────────────── */
+main { padding-bottom: 6rem; }
+.search-toggle { display: none; font: inherit; font-size: var(--text-sm); min-height: var(--control-height-sm); padding: var(--space-1) var(--space-3); border-radius: var(--radius-md); border: var(--border-width) solid #a1a1aa; background: transparent; color: var(--topbar-text); cursor: pointer; }
+.search .search-input { width: 17.5rem; }
+.mainnav a { padding: var(--space-1) var(--space-2); }
+.topbar { flex-wrap: nowrap; }
+.topbar-tools { flex-wrap: nowrap; }
+@media (max-width: 1120px) { .search .search-input { width: 13rem; } }
+@media (max-width: 960px) {
+  .topbar { flex-wrap: wrap; }
+  .topbar-tools { flex-wrap: wrap; }
+  .search-toggle { display: inline-flex; }
+  .search[data-unfolded="false"] .search-input { display: none; }
+  .search[data-unfolded="true"] { flex-basis: 100%; order: 6; }
+  .search[data-unfolded="true"] .search-input { width: 100%; }
+}
+@media (max-width: 600px) { .panel { left: 0; right: 0; width: auto; } }

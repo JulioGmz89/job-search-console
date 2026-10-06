@@ -7,29 +7,12 @@ import { ConfirmDialog, EmptyState, HelpLink } from '../components/ui.jsx';
 import { reload, useResource } from '../data.js';
 import { plural, shortDate } from '../lib/labels.js';
 import { runState, runTitle } from '../lib/runs.js';
+import { boardType, PROVIDER_NAMES } from '../lib/boards.js';
 import { BOARD_HEALTH, brokenBoards } from '../lib/today.js';
 import { latest, useRuns } from '../runs.jsx';
 import { announce } from '../shell/announce.jsx';
 import { PageHead } from '../shell/router.jsx';
 import { offerUndo } from '../shell/undo.jsx';
-
-const PROVIDER_NAMES = { greenhouse: 'Greenhouse', lever: 'Lever', ashby: 'Ashby', workday: 'Workday', smartrecruiters: 'SmartRecruiters', recruitee: 'Recruitee', workable: 'Workable' };
-
-/** Which board system a company is on, in words. */
-function boardType(entry) {
-  if (entry.provider) return PROVIDER_NAMES[entry.provider] ?? entry.provider;
-  const host = (() => {
-    try {
-      return new URL(entry.careersUrl ?? entry.api ?? '').hostname;
-    } catch {
-      return '';
-    }
-  })();
-  const hit = Object.keys(PROVIDER_NAMES).find((p) => host.includes(p));
-  if (hit) return PROVIDER_NAMES[hit];
-  if (entry.scanMethod === 'websearch') return 'Web search';
-  return host ? `Careers page (${host})` : 'Careers page';
-}
 
 /** The fields an entry is saved with: only what the form owns. */
 const toEntry = (e) => ({
@@ -178,11 +161,15 @@ function EntryRow({ entry, kind, health, portals, onEdit, editing, children }) {
     try {
       await deletePortalEntry(kind, entry.index, entry.name, portals.etag);
       await reload('portals');
-      offerUndo(`Stopped following ${entry.name}`, async () => {
-        const fresh = await fetchPortals();
-        await createPortalEntry(kind, toEntry(entry), fresh.etag);
-        await reload('portals');
-      });
+      offerUndo(
+        `Stopped following ${entry.name}`,
+        async () => {
+          const fresh = await fetchPortals();
+          await createPortalEntry(kind, toEntry(entry), fresh.etag);
+          await reload('portals');
+        },
+        { focus: true },
+      );
     } catch (e) {
       setError(e.message);
     }

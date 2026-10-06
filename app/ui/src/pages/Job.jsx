@@ -74,7 +74,7 @@ export function JobPage({ params }) {
   if (!row) {
     return (
       <>
-        <PageHead title="Job not found" back={back} lead="It is not in your applications. It may have been merged into another row or removed from data/applications.md." />
+        <PageHead title="Job not found" back={back} lead="It is not in your applications. It may have been merged into another application or removed from your list." />
       </>
     );
   }

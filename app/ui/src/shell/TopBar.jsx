@@ -57,7 +57,7 @@ export function TopBar({ activity, onActivity, activityRef, panelOpen }) {
           className="activity-btn"
           data-state={activity.state}
           aria-expanded={panelOpen}
-          aria-controls="activity-panel"
+          aria-controls={panelOpen ? 'activity-panel' : undefined}
           onClick={onActivity}
         >
           {activity.label}

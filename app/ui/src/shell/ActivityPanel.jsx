@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 
 import { RunItem } from '../components/RunItem.jsx';
 import { useResource } from '../data.js';
-import { FOLLOW_UP_KINDS, needsAttention, runState } from '../lib/runs.js';
+import { isTopLevel, needsAttention, runState } from '../lib/runs.js';
 import { useRuns } from '../runs.jsx';
 import { UndoButton, useUndo } from './undo.jsx';
 
@@ -25,7 +25,7 @@ export function ActivityPanel({ open, onClose }) {
 
   if (!open) return null;
 
-  const top = list.filter((r) => !FOLLOW_UP_KINDS.has(r.kind));
+  const top = list.filter(isTopLevel);
   const now = top.filter((r) => ['waiting', 'working'].includes(runState(r)) || needsAttention(r, list, dismissed));
   const startOfDay = new Date().setHours(0, 0, 0, 0);
   const earlier = top.filter((r) => !now.includes(r) && (r.endedAt ?? r.queuedAt ?? 0) >= startOfDay).slice(0, 6);
@@ -56,7 +56,7 @@ export function ActivityPanel({ open, onClose }) {
         {undo ? (
           <div className="notice info row between">
             <span>{undo.message}</span>
-            <UndoButton entry={undo} />
+            <UndoButton entry={undo} onDone={() => heading.current?.focus()} />
           </div>
         ) : null}
         <h3 className="group-title">Now</h3>

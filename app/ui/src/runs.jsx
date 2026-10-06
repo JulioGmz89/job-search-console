@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 
 import { cancelRun, fetchRuns, retryRun, startRun } from './api.js';
 import { filesChanged, reload } from './data.js';
-import { explainFailure, FOLLOW_UP_KINDS, outcome, runState, runTitle } from './lib/runs.js';
+import { explainFailure, isTopLevel, outcome, runState, runTitle } from './lib/runs.js';
 import { announce } from './shell/announce.jsx';
 import { useServerEvents } from './useServerEvents.js';
 
@@ -41,10 +41,10 @@ export function RunsProvider({ children }) {
     known.current = { ...known.current, [run.id]: run };
     setRuns(known.current);
     // Say it once, when a run the user could see finishes.
-    if (TERMINAL.has(run.status) && before && !TERMINAL.has(before.status) && !FOLLOW_UP_KINDS.has(run.kind)) {
+    if (TERMINAL.has(run.status) && before && !TERMINAL.has(before.status) && isTopLevel(run)) {
       const title = runTitle(run);
       if (run.status === 'failed') announce(`${title} didn't finish. ${explainFailure(run).what}`, { assertive: true });
-      else if (run.status === 'succeeded') announce(`${title}: ${outcome(run).text}`);
+      else if (run.status === 'succeeded') announce(`${title}: ${outcome(run, { all: Object.values(known.current) }).text}`);
     }
     if (TERMINAL.has(run.status)) reload('workspace');
   }, []);

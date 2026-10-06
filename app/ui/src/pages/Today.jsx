@@ -6,10 +6,11 @@ import { RunItem } from '../components/RunItem.jsx';
 import { HelpLink, Tag } from '../components/ui.jsx';
 import { reload, setResource, useResource } from '../data.js';
 import { fit, jobName, plural, shortDate, statusLabel } from '../lib/labels.js';
-import { outcome, runTitle } from '../lib/runs.js';
+import { isTopLevel, outcome, runTitle } from '../lib/runs.js';
 import { todayCards } from '../lib/today.js';
 import { useRuns } from '../runs.jsx';
 import { announce } from '../shell/announce.jsx';
+import { boardType } from '../lib/boards.js';
 import { cvSummaryText, readTextFile } from '../lib/cvtext.js';
 import { PageHead } from '../shell/router.jsx';
 import { offerUndo } from '../shell/undo.jsx';
@@ -53,6 +54,7 @@ function CvStep() {
       announce(`Your CV is saved: ${cvSummaryText(saved.summary)}`);
     } catch (e) {
       setError(e.message);
+      announce(`Your CV was not saved: ${e.message}`, { assertive: true });
     } finally {
       setBusy(false);
     }
@@ -75,8 +77,11 @@ function CvStep() {
             noValidate
             onSubmit={(e) => {
               e.preventDefault();
-              if (!text.trim()) setError('Paste your CV first, or choose a file.');
-              else save(text);
+              if (!text.trim()) {
+                setError('Paste your CV first, or choose a file.');
+                announce('Paste your CV first, or choose a file.', { assertive: true });
+                document.getElementById('cv-paste')?.focus();
+              } else save(text);
             }}
           >
             <div className="field">
@@ -86,7 +91,10 @@ function CvStep() {
                 rows={8}
                 value={text}
                 placeholder="Paste your CV here (Markdown or plain text)"
-                onChange={(e) => setText(e.target.value)}
+                onChange={(e) => {
+                  setText(e.target.value);
+                  setError(null);
+                }}
                 aria-invalid={error ? true : undefined}
                 aria-describedby={error ? 'cv-paste-err cv-paste-hint' : 'cv-paste-hint'}
               />
@@ -99,10 +107,14 @@ function CvStep() {
                 Saved in your workspace folder as cv.md, so the command-line tools see it too. You can edit it later in My CV.
               </p>
             </div>
-            <div className="field">
-              <label htmlFor="cv-file">Or choose a file</label>
+            <div className="row">
+              <span className="small muted">Or</span>
+              <label htmlFor="cv-file" className="btn2 btn-sm file-button">
+                Choose a file…
+              </label>
               <input
                 id="cv-file"
+                className="visually-hidden"
                 type="file"
                 accept=".md,.txt,text/markdown,text/plain"
                 onChange={async (e) => {
@@ -150,7 +162,11 @@ function CompanyStep() {
     if (!name.trim()) found.name = 'Type the company name.';
     if (!/^https?:\/\/\S+$/i.test(link.trim())) found.link = 'Paste the careers page link, starting with https://';
     setErrors(found);
-    if (Object.keys(found).length) return;
+    if (Object.keys(found).length) {
+      announce(Object.values(found).join(' '), { assertive: true });
+      document.getElementById(found.name ? 'co-name' : 'co-url')?.focus();
+      return;
+    }
     setBusy(true);
     try {
       await createPortalEntry('company', { name: name.trim(), careersUrl: link.trim(), enabled: true }, portals.data?.etag ?? null);
@@ -160,6 +176,7 @@ function CompanyStep() {
       announce(`Following ${name.trim()}`);
     } catch (err) {
       setErrors({ form: err.message });
+      announce(`The company was not followed: ${err.message}`, { assertive: true });
     } finally {
       setBusy(false);
     }
@@ -173,8 +190,9 @@ function CompanyStep() {
       {done ? (
         <div className="stack-sm">
           <p id="co-saved" tabIndex={-1} ref={savedRef}>
-            Following <b>{following[0].name}</b>
-            {following.length > 1 ? ` and ${plural(following.length - 1, 'other company', 'other companies')}` : ''}. <a href="#/companies">Companies you follow</a>
+            Following <b>{following[0].name}</b> · {boardType(following[0])} job board recognised from the link
+            {following.length > 1 ? ` · and ${plural(following.length - 1, 'other company', 'other companies')}` : ''}. The first check for new openings shows whether it answers.{' '}
+            <a href="#/companies">Companies you follow</a>
           </p>
           <div className="row">
             <button
@@ -197,7 +215,10 @@ function CompanyStep() {
             <div className="grid-2">
               <div className="field">
                 <label htmlFor="co-name">Company name</label>
-                <input id="co-name" type="text" value={name} placeholder="e.g. Example Corp" onChange={(e) => setName(e.target.value)} aria-invalid={errors.name ? true : undefined} aria-describedby={errors.name ? 'co-name-err' : undefined} />
+                <input id="co-name" type="text" value={name} placeholder="e.g. Example Corp" onChange={(e) => {
+                    setName(e.target.value);
+                    setErrors((x) => ({ ...x, name: undefined }));
+                  }} aria-invalid={errors.name ? true : undefined} aria-describedby={errors.name ? 'co-name-err' : undefined} />
                 {errors.name ? (
                   <p className="error" id="co-name-err">
                     {errors.name}
@@ -206,7 +227,10 @@ function CompanyStep() {
               </div>
               <div className="field">
                 <label htmlFor="co-url">Careers page link</label>
-                <input id="co-url" type="url" value={link} placeholder="https://…" onChange={(e) => setLink(e.target.value)} aria-invalid={errors.link ? true : undefined} aria-describedby={errors.link ? 'co-url-err' : 'co-url-hint'} />
+                <input id="co-url" type="url" value={link} placeholder="https://…" onChange={(e) => {
+                    setLink(e.target.value);
+                    setErrors((x) => ({ ...x, link: undefined }));
+                  }} aria-invalid={errors.link ? true : undefined} aria-describedby={errors.link ? 'co-url-err' : 'co-url-hint'} />
                 {errors.link ? (
                   <p className="error" id="co-url-err">
                     {errors.link}
@@ -414,16 +438,20 @@ export function TodayPage() {
   });
   const rowForReport = (id) => pipeline.data?.rows?.find((r) => r.reportId === id) ?? null;
   const finished = list.filter(
-    (r) => r.status === 'succeeded' && ['evaluate', 'pdf', 'cover', 'scan', 'cv-render'].includes(r.kind) && !dismissed.includes(r.id) && !ackd.includes(r.id) && !shownInline.has(r.id) && (r.endedAt ?? 0) > (lastSeenRef.current ? Date.parse(lastSeenRef.current) : 0),
+    (r) => r.status === 'succeeded' && isTopLevel(r) && ['evaluate', 'pdf', 'cover', 'scan', 'cv-render'].includes(r.kind) && !dismissed.includes(r.id) && !ackd.includes(r.id) && !shownInline.has(r.id) && (r.endedAt ?? 0) > (lastSeenRef.current ? Date.parse(lastSeenRef.current) : 0),
   );
 
   const dismiss = async (run) => {
     await saveToday({ dismiss: run.id });
     await reload('today');
-    offerUndo(`Dismissed ${runTitle(run)}`, async () => {
-      await saveToday({ undismiss: run.id });
-      await reload('today');
-    });
+    offerUndo(
+      `Dismissed ${runTitle(run)}`,
+      async () => {
+        await saveToday({ undismiss: run.id });
+        await reload('today');
+      },
+      { focus: true },
+    );
   };
 
   const { needs, fresh, waiting, working } = cards;
@@ -458,8 +486,8 @@ export function TodayPage() {
                 ))}
               </ul>
               <div className="row">
-                <a className="btn2" href="#/workspace">
-                  Show me how to fix it
+                <a className="btn2" href="#/workspace#health">
+                  Show me
                 </a>
               </div>
             </article>
@@ -470,7 +498,7 @@ export function TodayPage() {
               <h3 id="design-h">Your CV design fails the screening check</h3>
               <p>
                 Tailored CVs made with the “{design.data.template}” design lose text when an applicant-tracking system reads them
-                {design.data.issues?.length ? `: ${design.data.issues[0]}` : ''}.
+                {design.data.issues?.length ? `: ${design.data.issues[0].replace(/\.$/, '')}` : ''}.
               </p>
               <div className="row">
                 <a className="btn" href="#/my-cv/design">
@@ -504,7 +532,7 @@ export function TodayPage() {
           </h2>
           {finished.map((r) => {
             const row = rowForReport(Number(r.result?.reportId ?? r.meta?.reportId));
-            const res = outcome(r, { rowForReport });
+            const res = outcome(r, { rowForReport, all: list });
             return (
               <article className="card ok" key={r.id} aria-labelledby={`done-${r.id}`}>
                 <Tag tone="ok">Done</Tag>
@@ -615,6 +643,11 @@ export function TodayPage() {
                   </li>
                 ))}
               </ul>
+              <div className="row">
+                <a className="btn2" href={`#/applications/${waiting.replied[0].id}#documents`}>
+                  Get documents ready{waiting.replied.length > 1 ? ' (start with the first)' : ''}
+                </a>
+              </div>
             </article>
           ) : null}
           {waiting.reviewed.length ? (

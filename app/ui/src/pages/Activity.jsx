@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { RunItem } from '../components/RunItem.jsx';
 import { EmptyState } from '../components/ui.jsx';
-import { FOLLOW_UP_KINDS, runState, runTitle } from '../lib/runs.js';
+import { isTopLevel, runState, runTitle } from '../lib/runs.js';
 import { useRuns } from '../runs.jsx';
 import { PageHead } from '../shell/router.jsx';
 
@@ -43,11 +43,11 @@ export function ActivityPage({ params }) {
   const [filter, setFilter] = useState('all');
   if (params.id) return <OneActivity id={params.id} />;
 
-  const top = list.filter((r) => !FOLLOW_UP_KINDS.has(r.kind));
+  const top = list.filter(isTopLevel);
   const shown = top.filter(FILTERS.find((f) => f.id === filter).test);
   return (
     <>
-      <PageHead title="Activity" lead="Everything the app has done for you: checks, documents and openings. The last 60 are kept across restarts; older logs are in your workspace folder (data/jsc/logs)." />
+      <PageHead title="Activity" lead="Everything the app has done for you: checks, documents and openings. The last 60 are kept even when the app restarts; older logs stay in your workspace folder." />
       <div className="chips" role="group" aria-label="Show">
         {FILTERS.map((f) => (
           <button key={f.id} type="button" className="chip" aria-pressed={filter === f.id} onClick={() => setFilter(f.id)}>

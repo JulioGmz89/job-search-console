@@ -36,6 +36,14 @@ export const AGENT_KINDS = new Set(['evaluate', 'pdf', 'cover', 'skills-extract'
 /** Runs nobody asked for by name: shown nested under the run that started them. */
 export const FOLLOW_UP_KINDS = new Set(['merge-tracker', 'reconcile-auto', 'skills-fetch-auto', 'mark-pdf-ready']);
 
+/**
+ * A run the user started, as opposed to one the app chained after it (the
+ * merge into Applications, the automatic tailored CV, laying out its PDF).
+ * Only these are listed and announced; the others are told as "then: …"
+ * under their parent (ia.md §2.8).
+ */
+export const isTopLevel = (run) => !run?.parentId && !FOLLOW_UP_KINDS.has(run?.kind);
+
 /** "Check fit · Driftwood Analytics — Data Engineer". */
 export function runTitle(run) {
   const name = RUN_NAMES[run?.kind] ?? run?.label ?? 'Activity';
@@ -117,7 +125,7 @@ export function explainFailure(run) {
  * @param {{rowForReport?: (reportId: number) => object|null}} [ctx]
  * @returns {{text: string, open: {href: string, label: string}|null}}
  */
-export function outcome(run, { rowForReport = () => null } = {}) {
+export function outcome(run, { rowForReport = () => null, all = [] } = {}) {
   const result = run?.result ?? {};
   const reportId = result.reportId ?? run?.meta?.reportId ?? null;
   const row = reportId !== null ? rowForReport(Number(reportId)) : null;
@@ -128,8 +136,16 @@ export function outcome(run, { rowForReport = () => null } = {}) {
         text: typeof result.score === 'number' ? `Fit ${fit(result.score)} / 5. The fit report is ready.` : 'The fit report is ready.',
         open: jobHref ? { href: jobHref, label: 'Open the job' } : null,
       };
-    case 'pdf':
-      return { text: 'Your tailored CV is ready.', open: jobHref ? { href: `${jobHref}#documents`, label: 'Open the CV' } : null };
+    case 'pdf': {
+      // Its PDF is laid out by a chained render, which carries the screening verdict.
+      const render = all.find((r) => r.parentId === run.id && r.kind === 'cv-render');
+      const verdict = render?.result?.ats?.verdict;
+      const text =
+        verdict === 'fail'
+          ? 'Your tailored CV is ready, but it fails the screening check: an applicant-tracking system would lose part of it. Choose a design that passes in My CV › Design, then make it again.'
+          : 'Your tailored CV is ready.';
+      return { text, open: jobHref ? { href: `${jobHref}#documents`, label: 'Open the CV' } : null };
+    }
     case 'cover':
       return { text: 'Your cover letter is ready.', open: jobHref ? { href: `${jobHref}#documents`, label: 'Open the letter' } : null };
     case 'cv-render': {
@@ -150,13 +166,13 @@ export function outcome(run, { rowForReport = () => null } = {}) {
 
 /** A failure the user still has to act on: not retried, not dismissed. */
 export function needsAttention(run, all, dismissed = []) {
-  if (runState(run) !== 'failed' || dismissed.includes(run.id) || FOLLOW_UP_KINDS.has(run.kind)) return false;
+  if (runState(run) !== 'failed' || dismissed.includes(run.id) || !isTopLevel(run)) return false;
   return !all.some((r) => r.retryOf === run.id);
 }
 
 /** The Activity button's state and label (ia.md §1). */
 export function activitySummary(all, { dismissed = [], lastOpened = 0 } = {}) {
-  const top = all.filter((r) => !FOLLOW_UP_KINDS.has(r.kind));
+  const top = all.filter(isTopLevel);
   const working = top.filter((r) => ['waiting', 'working'].includes(runState(r))).length;
   const failed = top.filter((r) => needsAttention(r, all, dismissed)).length;
   const done = top.filter((r) => runState(r) === 'done' && (r.endedAt ?? 0) > lastOpened).length;
@@ -167,11 +183,23 @@ export function activitySummary(all, { dismissed = [], lastOpened = 0 } = {}) {
 }
 
 /** "then: added to Applications, made tailored CV". */
+/** What a chained run did, in a few words; null for bookkeeping not worth saying. */
+const FOLLOW_UP_WORDS = {
+  'merge-tracker': 'added to Applications',
+  pdf: 'made the tailored CV',
+  cover: 'wrote the cover letter',
+  'cv-render': 'laid out the PDF',
+  'reconcile-auto': null,
+  'mark-pdf-ready': null,
+  'skills-fetch-auto': 'read the new postings for Skills',
+};
+
 export function followUps(run, all) {
-  const children = all.filter((r) => r.parentId === run.id);
+  const children = all.filter((r) => r.parentId === run.id && FOLLOW_UP_WORDS[r.kind] !== null);
   if (!children.length) return '';
   const words = children.map((c) => {
-    const verb = c.kind === 'merge-tracker' ? 'added to Applications' : c.kind === 'pdf' ? 'made tailored CV' : (RUN_NAMES[c.kind] ?? c.label ?? c.kind).toLowerCase();
+    const verb = FOLLOW_UP_WORDS[c.kind] ?? (RUN_NAMES[c.kind] ?? c.label ?? c.kind).toLowerCase();
+    if (c.kind === 'cv-render' && runState(c) === 'done' && c.result?.ats?.verdict === 'fail') return `${verb} (it fails the screening check)`;
     return runState(c) === 'failed' ? `${verb} (failed)` : runState(c) === 'working' || runState(c) === 'waiting' ? `${verb} (working)` : verb;
   });
   return `then: ${words.join(', ')}`;
