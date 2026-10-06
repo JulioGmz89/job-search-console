@@ -50,6 +50,7 @@ import { createEntry, deleteEntry, readPortals, updateEntry } from './services/p
 import { listReports, readReport, resolveReportPdf } from './services/reports.js';
 import { readLastScanRun, readPortalHealth } from './services/scanner.js';
 import { setStatus } from './services/status.js';
+import { subjectFor } from './services/subjects.js';
 import { BATCH_SIZE, pendingLlm, readCv, readPostingsWithSkills, readSkillsOverview } from './skills/service.js';
 import { writeOverride } from './skills/store.js';
 import { createWatcher } from './watch.js';
@@ -104,7 +105,13 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
   // One runner per app instance, not a module singleton: each test file builds
   // its own app, and shared mutable run state across parallel test files would
   // be a flake generator.
-  const runner = createRunner({ repoRoot, root });
+  const runner = createRunner({
+    repoRoot,
+    root,
+    // data/jsc/ is the fork's own folder, created at server start (index.js).
+    historyFile: join(resolveDataRoot(root), 'data', 'jsc', 'runs.jsonl'),
+    describe: (spec) => subjectFor(spec, { root }),
+  });
   app.addHook('onClose', async () => runner.close());
 
   // The server-wide event feed: file changes under the data root and run
@@ -562,8 +569,8 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
       });
       let run = null;
       if (input.evaluate === true) {
-        const spec = buildSpec('evaluate', { url: input.url, autoPdf: input.autoPdf !== false }, specContext);
-        run = runner.start(spec);
+        const asked = { kind: 'evaluate', options: { url: input.url, autoPdf: input.autoPdf !== false } };
+        run = runner.start({ ...buildSpec(asked.kind, asked.options, specContext), request: asked });
       }
       return reply.code(201).send({ ok: true, ...added, run });
     } catch (error) {
@@ -661,11 +668,12 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
   app.post('/api/runs', async (request, reply) => {
     try {
       const input = body(request);
-      const spec = buildSpec(input.kind, input.options ?? {}, specContext);
+      const asked = { kind: input.kind, options: input.options ?? {} };
+      const spec = buildSpec(asked.kind, asked.options, specContext);
       // Burn the confirmation before spawning: if the token is bad, nothing has
       // run, and a valid token can never authorise a second write.
       if (spec.confirmRequired) runner.consumeConfirmation(input.confirmToken, spec.kind);
-      return reply.code(202).send(runner.start(spec));
+      return reply.code(202).send(runner.start({ ...spec, request: asked }));
     } catch (error) {
       return fail(reply, error);
     }
@@ -675,6 +683,33 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     const run = runner.get(request.params.id);
     if (!run) return reply.code(404).send({ error: 'No such run' });
     return run;
+  });
+
+  /**
+   * "Try again" (ia.md §2.8): queue the same request as a failed or cancelled
+   * run, linked to it by `retryOf`. Follow-up runs the browser never asked for
+   * (the automatic tailored CV) are rebuilt from their meta. A run that needs a
+   * preview first is not retried blind: the user previews it again.
+   */
+  app.post('/api/runs/:id/retry', async (request, reply) => {
+    try {
+      const failed = runner.get(request.params.id);
+      if (!failed) return reply.code(404).send({ error: 'No such run' });
+      if (!['failed', 'cancelled'].includes(failed.status)) {
+        return reply.code(409).send({ error: 'Only a run that failed or was cancelled can be tried again', code: 'run-not-failed' });
+      }
+      const again = failed.request
+        ?? (failed.kind === 'evaluate' && failed.meta?.url ? { kind: 'evaluate', options: { url: failed.meta.url, autoPdf: failed.meta.autoPdf !== false } } : null)
+        ?? (failed.kind === 'pdf' && failed.meta?.reportId ? { kind: 'pdf', options: { reportId: failed.meta.reportId } } : null);
+      if (!again) return reply.code(422).send({ error: 'This run cannot be repeated from here', code: 'retry-unsupported' });
+      const spec = buildSpec(again.kind, again.options, specContext);
+      if (spec.confirmRequired) {
+        return reply.code(409).send({ error: 'Preview it again, then confirm', code: 'confirm-required' });
+      }
+      return reply.code(202).send(runner.start({ ...spec, request: again, retryOf: failed.id }));
+    } catch (error) {
+      return fail(reply, error);
+    }
   });
 
   app.post('/api/runs/:id/cancel', async (request, reply) => {

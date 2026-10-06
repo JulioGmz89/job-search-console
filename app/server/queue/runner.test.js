@@ -377,3 +377,37 @@ test('close cancels the queue and stops what is running', async () => {
   assert.equal(r.get(active.id).status, 'cancelled');
   assert.throws(() => r.start(spec()), (e) => e.code === 'closing');
 });
+
+test('finished runs survive a restart through the history file, read-only', async () => {
+  const { mkdtempSync, existsSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const dir = mkdtempSync(join(tmpdir(), 'jsc-history-'));
+  try {
+    const historyFile = join(dir, 'runs.jsonl');
+    const first = createRunner({ repoRoot: BIN, historyFile, describe: () => 'Kestrel Media — Backend Engineer' });
+    const { id } = first.start({ ...spec(['--lines', '1', '--exit', '2'], { dryRun: true }), request: { kind: 'test', options: {} } });
+    const failed = await settled(first, id);
+    assert.equal(failed.subject, 'Kestrel Media — Backend Engineer');
+    assert.ok(existsSync(historyFile));
+
+    const second = createRunner({ repoRoot: BIN, historyFile });
+    const restored = second.get(id);
+    assert.equal(restored.status, 'failed');
+    assert.equal(restored.restored, true);
+    assert.equal(restored.subject, 'Kestrel Media — Backend Engineer');
+    assert.deepEqual(restored.request, { kind: 'test', options: {} });
+    assert.equal(second.list().recent[0].id, id);
+    assert.throws(() => second.consumeConfirmation(id, 'test'), (e) => e.code === 'confirm-required', 'an old preview confirms nothing');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('no history is written when its folder does not exist', async () => {
+  const historyFile = join(here, '__no_such_dir__', 'runs.jsonl');
+  const r = createRunner({ repoRoot: BIN, historyFile });
+  const { id } = r.start(spec(['--lines', '1']));
+  assert.equal((await settled(r, id)).status, 'succeeded');
+  const { existsSync } = await import('node:fs');
+  assert.equal(existsSync(dirname(historyFile)), false);
+});

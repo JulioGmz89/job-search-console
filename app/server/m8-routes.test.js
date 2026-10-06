@@ -99,3 +99,52 @@ test('profile: read with defaults, saved in place, refused with the field named'
   assert.equal(bad.status, 400);
   assert.equal(bad.body.detail[0].field, 'autoPdfThreshold');
 });
+
+test('a failed check is named after its job, kept across restarts, and Try again links the retry', async () => {
+  const { cpSync, mkdirSync, writeFileSync } = await import('node:fs');
+  const root = mkdtempSync(join(tmpdir(), 'jsc-m8-retry-'));
+  scratches.push(root);
+  cpSync(join(dirname(FAKE_CLAUDE), '..', '..', '__fixtures__', 'workspace'), root, { recursive: true });
+  writeFileSync(join(root, 'cv.md'), '# Ada Lovelace\n\n## Experience\n- Built the engine\n');
+  mkdirSync(join(root, 'data', 'jsc'), { recursive: true });
+  writeFileSync(join(root, 'data', 'jsc', 'fake-scenarios'), 'evaluate-is-error\n');
+  process.env.FAKE_CLAUDE_SCENARIO = 'evaluate-ok';
+  const fake = { file: process.execPath, args: [FAKE_CLAUDE], found: true, shell: false, source: 'env', display: 'fake-claude' };
+
+  const app = buildApp({ root, serveUi: false, watch: false, agent: fake });
+  apps.push(app);
+  const call = async (method, url, payload) => {
+    const res = await app.inject({ method, url, payload });
+    return { status: res.statusCode, body: res.json() };
+  };
+  const until = async (id) => {
+    for (let i = 0; i < 400; i++) {
+      const run = (await call('GET', `/api/runs/${id}`)).body;
+      if (['succeeded', 'failed', 'cancelled'].includes(run.status)) return run;
+      await new Promise((r) => setTimeout(r, 50));
+    }
+    throw new Error('run did not finish');
+  };
+
+  const url = 'https://job-boards.greenhouse.io/driftwoodanalytics/jobs/4109592';
+  const added = await call('POST', '/api/inbox/urls', { url, company: 'Driftwood Analytics', title: 'Data Engineer', evaluate: true });
+  assert.equal(added.status, 201, JSON.stringify(added.body));
+  assert.equal(added.body.run.subject, 'Driftwood Analytics — Data Engineer');
+  const failed = await until(added.body.run.id);
+  assert.equal(failed.status, 'failed');
+  assert.deepEqual(failed.request, { kind: 'evaluate', options: { url, autoPdf: true } });
+
+  const notFailed = await call('POST', `/api/runs/${failed.id}/retry`);
+  assert.equal(notFailed.status, 202);
+  const retried = await until(notFailed.body.id);
+  assert.equal(retried.retryOf, failed.id);
+  assert.equal(retried.status, 'succeeded', retried.error ?? '');
+  assert.equal((await call('POST', `/api/runs/${retried.id}/retry`)).status, 409);
+
+  // A new server over the same folder still knows about both.
+  const again = buildApp({ root, serveUi: false, watch: false, agent: fake });
+  apps.push(again);
+  const recent = (await again.inject({ method: 'GET', url: '/api/runs' })).json().recent;
+  assert.ok(recent.some((r) => r.id === failed.id && r.restored && r.status === 'failed'));
+  delete process.env.FAKE_CLAUDE_SCENARIO;
+});

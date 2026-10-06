@@ -25,7 +25,8 @@
 
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { join } from 'node:path';
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 
 /**
  * Confine a child to one data root.
@@ -61,6 +62,9 @@ const MAX_LINES = 5_000;
 
 /** Completed runs kept in memory, newest first. A chained evaluation is four runs. */
 const MAX_HISTORY = 60;
+
+/** Log lines kept per run in the history file: enough for "Technical details". */
+const HISTORY_LINES = 200;
 
 /** Runs allowed to wait. Past this the client is misbehaving, not busy. */
 const MAX_QUEUED = 50;
@@ -112,11 +116,17 @@ function maxAgentsFromEnv() {
  * one per test file — owns its own state. Shared mutable run state across test
  * files running in parallel would be a flake generator.
  *
- * @param {{repoRoot: string, root?: string, spawnFn?: Function, maxAgents?: number}} options
+ * @param {{repoRoot: string, root?: string, spawnFn?: Function, maxAgents?: number,
+ *   historyFile?: string|null, describe?: (spec: object) => string|null}} options
  *   `root` pins the data root for the child, mirroring the service seam.
  *   `spawnFn` exists for tests; nothing in production passes it.
+ *   `historyFile` keeps finished runs across restarts (M8: a failure the user
+ *   has not seen yet must still be on Today after the server restarts). It is
+ *   written only while its folder exists, so a read-only fixture stays untouched.
+ *   `describe` names what a run is about ("Driftwood Analytics — Data
+ *   Engineer"), so every surface names the job rather than the board host (F-009).
  */
-export function createRunner({ repoRoot, root, spawnFn = spawn, maxAgents = maxAgentsFromEnv() } = {}) {
+export function createRunner({ repoRoot, root, spawnFn = spawn, maxAgents = maxAgentsFromEnv(), historyFile = null, describe = null } = {}) {
   /** @type {Map<string, object>} */
   const runs = new Map();
   /** @type {Map<string, Set<Function>>} */
@@ -172,8 +182,51 @@ export function createRunner({ repoRoot, root, spawnFn = spawn, maxAgents = maxA
     result: run.result,
     parentId: run.parentId,
     dependsOn: run.dependsOn,
+    subject: run.subject,
+    retryOf: run.retryOf,
+    request: run.request,
+    restored: run.restored === true,
     ...(lines ? { lines: run.lines } : { lineCount: run.lines.length }),
   });
+
+  /** Append a finished run to the history file. Never fails the run. */
+  const persist = (run) => {
+    if (!historyFile || !existsSync(dirname(historyFile))) return;
+    try {
+      const kept = run.lines.slice(-HISTORY_LINES);
+      const entry = { ...publicRun(run), lines: kept, truncated: run.truncated || kept.length < run.lines.length };
+      appendFileSync(historyFile, `${JSON.stringify(entry)}\n`, 'utf-8');
+    } catch {
+      // History is a convenience; a full disk must not turn a success into a failure.
+    }
+  };
+
+  /** Bring back the newest finished runs from a previous server, read-only. */
+  const restore = () => {
+    if (!historyFile || !existsSync(historyFile)) return;
+    const byId = new Map();
+    const lines = readFileSync(historyFile, 'utf-8').split('\n').filter(Boolean);
+    for (const line of lines) {
+      try {
+        const entry = JSON.parse(line);
+        if (entry?.id && TERMINAL.has(entry.status)) byId.set(entry.id, entry);
+      } catch {
+        // A line cut short by a crash is skipped, not fatal.
+      }
+    }
+    const newest = [...byId.values()].sort((a, b) => (a.endedAt ?? 0) - (b.endedAt ?? 0)).slice(-MAX_HISTORY);
+    for (const entry of newest) {
+      runs.set(entry.id, { ...entry, restored: true, hooks: null, child: null, timer: null, cancelling: false });
+    }
+    // Keep the file from growing forever: rewrite it once it holds twice what is kept.
+    if (lines.length > MAX_HISTORY * 2) {
+      try {
+        writeFileSync(historyFile, newest.map((e) => `${JSON.stringify(e)}\n`).join(''), 'utf-8');
+      } catch {
+        // Compaction is best-effort.
+      }
+    }
+  };
 
   const summary = (run) => publicRun(run, { lines: false });
 
@@ -289,6 +342,7 @@ export function createRunner({ repoRoot, root, spawnFn = spawn, maxAgents = maxA
     if (drainingId === run.id) drainingId = null;
     emit(run.id, { type: 'done', run: summary(run) });
     transition(run);
+    persist(run);
     pruneHistory();
     schedule();
   };
@@ -505,6 +559,8 @@ export function createRunner({ repoRoot, root, spawnFn = spawn, maxAgents = maxA
     }
   }
 
+  restore();
+
   const api = {
     /**
      * Enqueue a run. It starts at once if its lane has room.
@@ -552,6 +608,10 @@ export function createRunner({ repoRoot, root, spawnFn = spawn, maxAgents = maxA
         result: null,
         parentId: spec.parentId ?? null,
         dependsOn: [...(spec.dependsOn ?? [])],
+        subject: null,
+        retryOf: spec.retryOf ?? null,
+        // What the browser asked for, so "Try again" can ask for it again.
+        request: spec.request ?? null,
         parseProgress: spec.parseProgress,
         hooks: spec.hooks ?? null,
         // A `script` spec is the M2 shape: a Node script at the repository root.
@@ -565,6 +625,11 @@ export function createRunner({ repoRoot, root, spawnFn = spawn, maxAgents = maxA
         timedOut: false,
         timer: null,
       };
+      try {
+        run.subject = describe?.(spec) ?? null;
+      } catch {
+        // A run is never refused because its name could not be worked out.
+      }
       runs.set(run.id, run);
       queue.push(run.id);
       emit(run.id, { type: 'queued', run: summary(run) });
@@ -664,7 +729,8 @@ export function createRunner({ repoRoot, root, spawnFn = spawn, maxAgents = maxA
      */
     consumeConfirmation(token, kind) {
       const run = typeof token === 'string' ? runs.get(token) : null;
-      if (!run || !run.dryRun || run.kind !== kind) {
+      // A preview from before a restart is history, not a fresh look at the data.
+      if (!run || !run.dryRun || run.kind !== kind || run.restored) {
         throw new RunError(`Run a preview of "${kind}" first, then confirm it`, { code: 'confirm-required', status: 409 });
       }
       if (run.status !== 'succeeded') {
