@@ -7,6 +7,16 @@ import { documentTitle, parseHash } from '../lib/routes.js';
  * (ia.md §1, §3 "Focus": a page change moves focus to the page's <h1>).
  */
 
+/**
+ * One page at a time may hold the user back from leaving (unsaved changes,
+ * ia.md §2.7). It is asked before a page change; returning false keeps the
+ * user where they are, and the page asks them itself.
+ */
+let leaveGuard = null;
+export function setLeaveGuard(guard) {
+  leaveGuard = guard;
+}
+
 const RouteContext = createContext({ route: { page: 'today', params: {} }, hash: '', changed: false });
 
 /** Is this hash only an anchor inside the current page (#/applications/12#documents)? */
@@ -19,7 +29,14 @@ export function RouteProvider({ children }) {
   const [changed, setChanged] = useState(false);
 
   useEffect(() => {
+    let current = window.location.hash;
     const onHash = () => {
+      const target = window.location.hash;
+      if (leaveGuard && pagePart(target) !== pagePart(current) && leaveGuard(target) === false) {
+        window.history.replaceState(null, '', current);
+        return;
+      }
+      current = target;
       setHash((before) => {
         if (pagePart(before) !== pagePart(window.location.hash)) setChanged(true);
         return window.location.hash;

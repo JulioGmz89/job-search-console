@@ -325,3 +325,14 @@ ul.plain { list-style: none; margin: 0; padding: 0; }
 .switch[data-disabled] { opacity: 0.55; cursor: not-allowed; }
 .card.flush { padding: 0; gap: 0; }
 .pad { padding: var(--space-4); }
+
+/* ── My CV ─────────────────────────────────── */
+textarea.editor { font-family: var(--font-mono); font-size: var(--text-sm); min-height: 18rem; }
+.file-button { margin: 0; display: inline-flex; }
+.design-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: var(--space-6); align-items: start; }
+@media (max-width: 1023px) { .design-layout { grid-template-columns: 1fr; } }
+.thumb-img { width: 100%; height: 9rem; object-fit: cover; object-position: top; border-radius: var(--radius-sm); border: var(--border-width) solid var(--border); background: #ffffff; }
+.preview-empty { min-height: 20rem; display: flex; align-items: center; justify-content: center; border: var(--border-width) dashed var(--border-strong); border-radius: var(--radius-sm); }
+.add-word { align-items: flex-start; }
+.add-word .btn { margin-top: 1.9rem; }
+@media (min-width: 1024px) { .design-preview { position: sticky; top: var(--space-4); } .design-preview iframe.doc { height: 60vh; } }
