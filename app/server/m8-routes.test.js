@@ -244,3 +244,24 @@ test('to review: each link says the day the scanner first saw it', async () => {
   const pending = (await call('GET', '/api/inbox')).body.pending;
   assert.deepEqual(pending.map((p) => p.firstSeen), ['2026-10-05', null]);
 });
+
+test('first run: the first evaluation in an empty folder lands in Applications', async () => {
+  const { writeFileSync } = await import('node:fs');
+  const fake = { file: process.execPath, args: [FAKE_CLAUDE], found: true, shell: false, source: 'env', display: 'fake-claude' };
+  process.env.FAKE_CLAUDE_SCENARIO = 'evaluate-ok';
+  const { root, call } = await emptyWorkspace({ agent: fake });
+  writeFileSync(join(root, 'cv.md'), '# Alex Rivera\n\n## Experience\n### Engineer — Northwind\n');
+  const started = await call('POST', '/api/inbox/urls', { url: 'https://example.com/jobs/1', company: 'Kestrel Media', title: 'Engineer', evaluate: true, autoPdf: false });
+  assert.equal(started.status, 201, JSON.stringify(started.body));
+  for (let i = 0; i < 400; i++) {
+    const { rows } = (await call('GET', '/api/pipeline')).body;
+    const runs = (await call('GET', '/api/runs')).body;
+    const busy = [...runs.queued, ...runs.active].length;
+    if (rows.length && !busy) break;
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  const { rows } = (await call('GET', '/api/pipeline')).body;
+  assert.equal(rows.length, 1, 'the first application is in the tracker');
+  assert.match(readFileSync(join(root, 'data', 'applications.md'), 'utf-8'), /^# Applications Tracker/);
+  delete process.env.FAKE_CLAUDE_SCENARIO;
+});

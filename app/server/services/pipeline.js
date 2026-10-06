@@ -20,7 +20,8 @@
  * and `app.js` still strips `rawLine` before it can cross the wire.
  */
 
-import { readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 
 import {
   extractTrackerReportNumbers,
@@ -28,7 +29,8 @@ import {
   resolveColumns,
 } from '../../../tracker-parse.mjs';
 
-import { loadStates, trackerPath } from './paths.js';
+import { resolveTrackerPathForWrite } from '../../../path-resolver.mjs';
+import { loadStates, resolveDataRoot, trackerPath } from './paths.js';
 
 /** Tracker "no data" sentinels. Upstream uses an em dash; hyphen appears too. */
 const EMPTY_CELLS = new Set(['—', '-', '', 'n/a', 'N/A']);
@@ -200,4 +202,25 @@ export function readPipeline({ root } = {}) {
   });
 
   return { trackerPath: path, columns, rows, issues, statuses: states };
+}
+
+/** Upstream's own empty tracker (AGENTS.md: "If data/applications.md doesn't exist, create it"). */
+export const EMPTY_TRACKER = '# Applications Tracker\n\n| # | Date | Company | Role | Score | Status | PDF | Report | Notes |\n|---|------|---------|------|-------|--------|-----|--------|-------|\n';
+
+/**
+ * Create the tracker when there is none, exactly as upstream's instructions
+ * do. `merge-tracker.mjs` never creates it ("Nothing to merge into"), so on a
+ * first run the first evaluation would never reach Applications.
+ *
+ * @param {{root?: string}} [options]
+ * @returns {boolean} true when the file was created.
+ */
+export function ensureTracker({ root } = {}) {
+  // The read resolver falls back to the legacy root applications.md when there
+  // is none; a new tracker goes where upstream's writers put it.
+  if (existsSync(trackerPath(root))) return false;
+  const path = resolveTrackerPathForWrite(resolveDataRoot(root));
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, EMPTY_TRACKER, { encoding: 'utf-8', flag: 'wx' });
+  return true;
 }

@@ -26,6 +26,7 @@ import { recordCover } from '../services/covers.js';
 import { isCvPayload } from '../services/cvdocs.js';
 import { validateInboxUrl } from '../services/inbox.js';
 import { resolveDataRoot } from '../services/paths.js';
+import { ensureTracker } from '../services/pipeline.js';
 import { releaseReportNumber, removeStrayAdditions, reserveReportNumber } from '../services/report-numbers.js';
 import { indexReportFiles, readReport, resolveReportPdf } from '../services/reports.js';
 import { internalSpec, SpecError } from './specs.js';
@@ -211,6 +212,8 @@ export function buildEvaluateSpec({ url, autoPdf = true, model = null } = {}, { 
         });
         record(`Report written: reports/${written}${score === null ? '' : ` · score ${score}/5`}`);
 
+        // First run: there is no tracker yet, and merge-tracker.mjs will not create one.
+        if (ensureTracker({ root: dataRoot })) record('Created data/applications.md (your first application)');
         const next = [internalSpec('merge-tracker', { root, repoRoot })];
         const threshold = plumbing.profile.autoPdfThreshold;
         if (run.meta.autoPdf && score !== null && score >= threshold) {
