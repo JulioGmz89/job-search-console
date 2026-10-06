@@ -1,0 +1,184 @@
+import { useEffect, useState } from 'react';
+
+import { fetchRun } from '../api.js';
+import { useResource } from '../data.js';
+import { dateTime, duration } from '../lib/labels.js';
+import { AGENT_KINDS, explainFailure, followUps, outcome, runState, runTitle, technicalDetails, waitingText } from '../lib/runs.js';
+import { useRuns } from '../runs.jsx';
+import { announce } from '../shell/announce.jsx';
+import { Progress } from './ui.jsx';
+
+/** A clock that ticks while something is running. */
+export function useNow(active) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!active) return undefined;
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, [active]);
+  return now;
+}
+
+/** Looks up the tracker row for a report, so outcomes can link to the job page. */
+export function useRowForReport() {
+  const { data } = useResource('pipeline');
+  return (reportId) => data?.rows?.find((r) => r.reportId === reportId) ?? null;
+}
+
+/** The raw log, fetched only when someone opens Technical details. */
+function TechnicalDetails({ run }) {
+  const [lines, setLines] = useState(null);
+  return (
+    <details
+      onToggle={(event) => {
+        if (event.currentTarget.open && lines === null) {
+          fetchRun(run.id)
+            .then((full) => setLines(full.lines ?? []))
+            .catch(() => setLines([]));
+        }
+      }}
+    >
+      <summary>Technical details</summary>
+      <p className="mono">{technicalDetails(run)}</p>
+      {lines?.length ? (
+        <pre className="log" tabIndex={0} aria-label={`Log of ${runTitle(run)}`}>
+          {lines.slice(-80).map((l) => l.text).join('\n')}
+        </pre>
+      ) : null}
+    </details>
+  );
+}
+
+const BADGE = {
+  waiting: ['neutral', 'Waiting'],
+  working: ['new', 'Working'],
+  done: ['ok', 'Done'],
+  failed: ['fail', 'Failed'],
+  cancelled: ['neutral', 'Cancelled'],
+};
+
+/**
+ * One activity, in any of its states (ia.md §2.8). `heading` is the level of
+ * its title; `link` makes the title a link to its own page.
+ */
+export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }) {
+  const { list, retry, cancel } = useRuns();
+  const rowForReport = useRowForReport();
+  const state = runState(run);
+  const now = useNow(state === 'working');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+  const retried = list.find((r) => r.retryOf === run.id) ?? null;
+  const title = runTitle(run);
+  const H = `h${headingLevel}`;
+  const [tone, badge] = state === 'failed' && retried ? ['neutral', 'Failed, tried again'] : BADGE[state];
+  const active = list.filter((r) => r.status === 'running').length;
+
+  const doRetry = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const again = await retry(run.id);
+      announce(`Started again: ${title}`);
+      onRetried?.(again);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const doCancel = async () => {
+    setBusy(true);
+    try {
+      await cancel(run.id);
+      announce(`Cancelled: ${title}`);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const why = state === 'failed' ? explainFailure(run) : null;
+  const done = state === 'done' ? outcome(run, { rowForReport }) : null;
+  const then = followUps(run, list);
+  const started = run.startedAt ?? run.queuedAt;
+
+  return (
+    <article className={`act ${state === 'failed' && !retried ? 'failed' : state}`} aria-labelledby={`act-${run.id}`}>
+      <div className="row between">
+        <span className="row">
+          <span className={`badge ${tone}`}>{badge}</span>
+          <span className="small muted">
+            {started ? dateTime(started) : ''}
+            {state === 'working' && run.startedAt ? ` · ${duration(now - run.startedAt)} so far` : ''}
+            {['done', 'failed', 'cancelled'].includes(state) && run.startedAt && run.endedAt ? ` · took ${duration(run.endedAt - run.startedAt)}` : ''}
+          </span>
+        </span>
+      </div>
+      <H id={`act-${run.id}`} className="act-title">
+        {link ? <a href={`#/activity/${run.id}`}>{title}</a> : title}
+      </H>
+      {run.retryOf ? <p className="small muted">Second attempt — the first one didn't finish.</p> : null}
+
+      {state === 'waiting' ? <p className="small">{waitingText(active)}</p> : null}
+      {state === 'working' ? (
+        <>
+          <Progress label={title} />
+          <p className="small muted">{AGENT_KINDS.has(run.kind) ? 'Usually 2–5 min. You can leave this page; it carries on.' : 'Usually a few seconds to a minute.'}</p>
+          <div className="row">
+            <button type="button" className="btn2 btn-sm" onClick={doCancel} disabled={busy}>
+              Cancel<span className="visually-hidden"> {title}</span>
+            </button>
+          </div>
+        </>
+      ) : null}
+
+      {why && !retried ? (
+        <>
+          <p>
+            <b>What happened:</b> {why.what}
+          </p>
+          <p>
+            <b>What to do:</b> {why.todo}
+          </p>
+          <div className="row">
+            {why.retry ? (
+              <button type="button" className="btn btn-sm" onClick={doRetry} disabled={busy}>
+                Try again<span className="visually-hidden"> {title}</span>
+              </button>
+            ) : null}
+            {run.meta?.url ? (
+              <a className="btn2 btn-sm" href={run.meta.url} target="_blank" rel="noopener noreferrer">
+                Open the posting ↗<span className="visually-hidden"> (opens in a new tab)</span>
+              </a>
+            ) : null}
+          </div>
+        </>
+      ) : null}
+      {why && retried ? (
+        <p className="small">
+          Tried again: <a href={`#/activity/${retried.id}`}>{runState(retried) === 'done' ? 'that worked' : runState(retried) === 'failed' ? 'that failed too' : 'still working'}</a>.
+        </p>
+      ) : null}
+
+      {done ? <p>{done.text}</p> : null}
+      {then ? <p className="nested">{then}</p> : null}
+      {done?.open ? (
+        <div className="row">
+          <a className="btn btn-sm" href={done.open.href}>
+            {done.open.label}
+          </a>
+        </div>
+      ) : null}
+      {state === 'cancelled' ? <p className="small">Cancelled{run.error ? `: ${run.error}` : ''}.</p> : null}
+      {error ? (
+        <p className="error" role="alert">
+          {error}
+        </p>
+      ) : null}
+      <TechnicalDetails run={run} />
+    </article>
+  );
+}

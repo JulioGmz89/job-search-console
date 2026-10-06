@@ -99,3 +99,28 @@ export const cvPreviewUrl = (id) => `/api/cv/preview/${id}.pdf`;
 export const fetchCvThemes = (documentId, style) => request('POST', '/api/cv/themes', { documentId, style });
 export const cvThumbUrl = (key) => `/api/cv/thumbs/${key}.png`;
 export const renderAllCvs = (template) => request('POST', '/api/cv/render-all', { template });
+
+// ── M8: first run, My CV, Today, Workspace, recovery ─────────────────
+
+export const fetchWorkspace = () => get('/api/workspace');
+export const fetchToday = () => get('/api/today');
+export const saveToday = (change) => request('PUT', '/api/today', change);
+
+export const fetchCvContent = () => get('/api/cv/content');
+export const saveCvContent = (text) => request('PUT', '/api/cv/content', { text });
+export const fetchProfile = () => get('/api/profile');
+export const saveProfile = (fields) => request('PUT', '/api/profile', { fields });
+
+/** `refresh`: re-find the CLI and ask it again ("Check again"). */
+export const checkAgent = () => get('/api/agent/status?refresh=1');
+
+export const retryRun = (id) => request('POST', `/api/runs/${id}/retry`);
+
+export const removeInboxUrl = (url) => request('DELETE', '/api/inbox/urls', { url });
+export const restoreInboxLine = (line) => request('POST', '/api/inbox/urls/restore', { line });
+
+export const addAvoidWord = (word) => request('POST', '/api/cv/voice/words', { word });
+export const removeAvoidWord = (word) => request('DELETE', '/api/cv/voice/words', { word });
+export const restoreVoice = () => request('POST', '/api/cv/voice/restore');
+
+export const fetchDesignCheck = () => get('/api/cv/design-check');
