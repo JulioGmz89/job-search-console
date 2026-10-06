@@ -340,9 +340,13 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     const pdf = resolveReportPdf(report.id, { root });
     // The ATS verdict the console recorded when it rendered this PDF (M5); none for older PDFs.
     const ats = pdf ? readAtsRecord(resolveDataRoot(root), pdf.fileName) : null;
+    // When the PDF was written, to the second: the document card compares it with
+    // the last change to the writing rules ("made under your current rules").
+    const pdfModified = pdf ? (await stat(pdf.absolutePath)).mtime.toISOString() : null;
     return {
       ...report,
-      ats: ats ? { verdict: ats.verdict, score: ats.score, issues: ats.issues, checkedAt: ats.checkedAt } : null,
+      pdf: report.pdf ? { ...report.pdf, modified: pdfModified, fileName: pdf?.fileName ?? null } : report.pdf,
+      ats: ats ? { verdict: ats.verdict, score: ats.score, issues: ats.issues, checkedAt: ats.checkedAt, template: ats.template ?? null } : null,
       cover: cover ? { path: cover.path, date: cover.date } : null,
       tracker: row
         ? { id: row.id, status: row.status, statusId: row.statusId, date: row.date, notes: row.notes }
