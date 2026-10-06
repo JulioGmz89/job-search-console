@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>C · Today — a check failed</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#fafafa;color:#18181b;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px}
+a{color:#6d28d9}a:hover{color:#4c1d95}
+:focus-visible{outline:3px solid #6d28d9;outline-offset:3px}
+.top a{color:#e4e4e7;text-decoration:none;padding:8px 12px;border-radius:10px;font-size:15px}
+.top a:hover{background:#3f3f46;color:#fff}
+.top a[aria-current=page]{background:#fff;color:#18181b;font-weight:600}
+.top a:focus-visible{outline-color:#c4b5fd}
+.btn{font:inherit;font-weight:700;padding:12px 20px;border-radius:14px;border:0;background:#6d28d9;color:#fff;cursor:pointer;min-height:48px;text-decoration:none;display:inline-flex;align-items:center}
+.btn:hover{background:#5b21b6;color:#fff}
+.btn2{font:inherit;font-weight:600;padding:12px 20px;border-radius:14px;border:2px solid #52525b;background:#fff;color:#18181b;cursor:pointer;min-height:48px;text-decoration:none;display:inline-flex;align-items:center}
+.btn2:hover{border-color:#18181b;color:#18181b}
+.card{background:#fff;border:2px solid #d4d4d8;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:10px}
+.tag{font-size:14px;font-weight:800;letter-spacing:.04em}
+summary{cursor:pointer;color:#3f3f46}
+</style>
+</helmet>
+<div style="min-height: 860px; display: flex; flex-direction: column">
+  <header class="top" style="background: #18181b; color: #fff; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 12px 28px">
+    <div style="font-weight: 800; font-size: 18px; margin-right: 8px">Job Search Console</div>
+    <nav aria-label="Main" style="display: flex; gap: 2px; flex-wrap: wrap"><a href="#main" aria-current="page">Today</a><a href="#main">Applications</a><a href="#main">Openings</a><a href="#main">My CV</a><a href="#main">Skills</a><a href="#main">Companies</a></nav>
+    <div style="margin-left: auto; display: flex; gap: 10px; align-items: center"><label for="s" style="position: absolute; left: -9999px">Search</label><input id="s" placeholder="Find a job, company or document" style="font: inherit; font-size: 15px; padding: 8px 12px; border-radius: 10px; border: 1px solid #71717a; background: #27272a; color: #fff; width: 260px"><a href="#main">{{actLabel}}</a></div>
+  </header>
+
+  <main id="main" style="flex: 1; width: 100%; max-width: 920px; margin: 0 auto; padding: 36px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+    <div><h1 style="margin: 0; font-size: 38px">Good morning, Alex</h1><p style="margin: 8px 0 0; color: #52525b; font-size: 19px">{{sub}}</p></div>
+    <p role="status" style="position: absolute; left: -9999px">{{announce}}</p>
+
+    <sc-if value="{{failed}}" hint-placeholder-val="{{ true }}">
+      <article class="card" style="border-color: #b91c1c">
+        <span class="tag" style="color: #b91c1c">NEEDS YOU · A CHECK DIDN'T FINISH</span>
+        <h2 style="margin: 0; font-size: 26px">Driftwood Analytics — Data Engineer</h2>
+        <p style="margin: 0">You asked for a fit check at 09:14. The assistant opened the posting but stopped before writing the report — usually a slow page or a session that ended early. Trying again normally works and uses your Claude plan again.</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap"><button class="btn" onClick="{{retry}}">Try again</button><a class="btn2" href="#main">Open the posting</a><button class="btn2">Dismiss</button></div>
+        <details><summary>Technical details</summary><p style="margin: 6px 0 0; font-family: ui-monospace, Consolas, monospace; font-size: 14px">Session ended without writing reports/041-*.md · log data/jsc/logs/evaluate-7f3a.log</p></details>
+      </article>
+    </sc-if>
+    <sc-if value="{{working}}" hint-placeholder-val="{{ false }}">
+      <article class="card" style="border-color: #6d28d9">
+        <span class="tag" style="color: #6d28d9">WORKING ON IT · 2–5 MIN</span>
+        <h2 style="margin: 0; font-size: 26px">Driftwood Analytics — Data Engineer</h2>
+        <div role="progressbar" aria-label="Checking Driftwood Analytics — Data Engineer" style="height: 10px; background: #ede9fe; border-radius: 5px; overflow: hidden"><div style="width: 40%; height: 10px; background: #6d28d9"></div></div>
+        <p style="margin: 0; color: #3f3f46">You can keep going — this card updates when it's done.</p>
+      </article>
+    </sc-if>
+    <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+      <article class="card" style="border-color: #166534">
+        <span class="tag" style="color: #166534">DONE · ADDED TO APPLICATIONS (#41)</span>
+        <h2 style="margin: 0; font-size: 26px">Driftwood Analytics — Data Engineer</h2>
+        <p style="margin: 0; font-size: 20px"><b>Fit 3.7 / 5</b> · suggestion: <b>Consider</b></p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap"><a class="btn" href="#main">Open it</a><button class="btn2">Got it</button></div>
+      </article>
+    </sc-if>
+
+    <article class="card">
+      <span class="tag" style="color: #6d28d9">NEW SINCE FRIDAY</span>
+      <h2 style="margin: 0; font-size: 22px">4 new openings at the companies you follow</h2>
+      <p style="margin: 0; color: #3f3f46">Kestrel Media, Lumen Grid (2), Ember Payments. One company's job board couldn't be reached: Juniper Mobility.</p>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap"><a class="btn2" href="#main">Look at the 4 openings</a><a class="btn2" href="#main">Fix Juniper Mobility</a></div>
+    </article>
+    <article class="card">
+      <span class="tag" style="color: #6d28d9">COMING UP</span>
+      <h2 style="margin: 0; font-size: 22px">Granite Cloud recruiter screen — no tailored CV or letter yet</h2>
+      <div><a class="btn2" href="C-T5-documents.dc.html">Get them ready</a></div>
+    </article>
+    <article class="card">
+      <span class="tag" style="color: #6d28d9">WAITING FOR YOU</span>
+      <h2 style="margin: 0; font-size: 22px">9 jobs checked but not applied — best: Cobalt Freight, Staff Software Engineer (4.2)</h2>
+      <div><a class="btn2" href="#main">Review them</a></div>
+    </article>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { phase: 'failed' };
+  }
+  renderVals() {
+    const p = this.state.phase;
+    return {
+      failed: p === 'failed', working: p === 'working', done: p === 'done',
+      sub: p === 'failed' ? '1 thing needs you, 3 suggestions.' : '3 suggestions.',
+      actLabel: p === 'working' ? 'Activity · 1 working' : p === 'failed' ? 'Activity · 1 failed' : 'Activity',
+      announce: p === 'failed' ? 'A fit check did not finish: Driftwood Analytics — Data Engineer.' : p === 'working' ? 'Checking Driftwood Analytics — Data Engineer.' : 'Done: Driftwood Analytics — Data Engineer, fit 3.7 out of 5, added to your applications.',
+      retry: () => { this.setState({ phase: 'working' }); setTimeout(() => this.setState({ phase: 'done' }), 2500); },
+    };
+  }
+}
+</script>
+</body>
+</html>

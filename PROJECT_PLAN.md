@@ -298,9 +298,17 @@ Each milestone ships something usable. Do not start N+1 before N works end-to-en
 
 ## 11. Open questions (resolve with the user before implementing)
 
-- UI framework details beyond React + Vite (component library, styling).
-  **To be resolved in M7** using the M6 evidence (§12.4). Until then, keep plain
-  CSS custom properties in `app/ui/src/styles.css`.
+- ~~UI framework details beyond React + Vite (component library, styling).
+  To be resolved in M7 using the M6 evidence (§12.4). Until then, keep plain
+  CSS custom properties in `app/ui/src/styles.css`.~~
+  **Resolved in M7 (2026-10-06): React Aria Components + plain CSS tokens.**
+  `react-aria-components` supplies the interactive primitives: keyboard tables, dialogs,
+  selects that commit on choose, tabs, menus, the search combobox and live
+  announcements. These are the behaviours behind M6's accessibility findings.
+  - Styling is plain CSS over the custom properties in `app/ux/design/tokens.css`, with
+    no Tailwind or CSS-in-JS.
+  - The library is bundled locally and nothing loads from a CDN (§9.2).
+  - Rationale and rejected alternatives: `app/ux/design/decisions.md` (D-2).
 - ~~Whether skill extraction (§6 step 1) runs through `claude -p` (no extra API key,
   reuses the user's Claude subscription) or a direct API call (faster for bulk,
   needs a key). Default assumption: through the agent runner, batched.~~

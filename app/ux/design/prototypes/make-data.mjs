@@ -1,0 +1,152 @@
+#!/usr/bin/env node
+
+/**
+ * make-data.mjs — build prototypes/data.js from the UX sandbox seed.
+ *
+ *   node app/ux/design/prototypes/make-data.mjs
+ *
+ * The prototypes show the same fictional workspace the M6 tests used (Alex
+ * Rivera, twelve fictional companies), read through the server's own read-only
+ * services, so the numbers a walkthrough sees match the sandbox. Nothing is
+ * written except data.js beside this file.
+ */
+
+import { readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { readInbox } from '../../../server/services/inbox.js';
+import { readPipeline } from '../../../server/services/pipeline.js';
+import { readPortals } from '../../../server/services/portals.js';
+import { readPdfIndex, readReport } from '../../../server/services/reports.js';
+import { readSkillsOverview } from '../../../server/skills/service.js';
+
+const here = dirname(fileURLToPath(import.meta.url));
+const root = resolve(here, '../../sandbox/seeds/populated');
+
+const covers = JSON.parse(readFileSync(join(root, 'data/jsc/covers.json'), 'utf-8'));
+const pdfs = readPdfIndex(root);
+const pdfFor = (id) => {
+  const hit = pdfs instanceof Map ? pdfs.get(id) ?? pdfs.get(String(id).padStart(3, '0')) : null;
+  return hit ? { file: String(hit.pdf ?? hit.path ?? hit).split('/').pop(), date: hit.date ?? null } : null;
+};
+
+/** Markdown to one line of plain text, for the report excerpts. */
+const plainText = (md) =>
+  String(md ?? '')
+    .replace(/^\|?[\s|:-]+\|?$/gm, ' ')
+    .replace(/[*#_`>|]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const pipeline = readPipeline({ root });
+const apps = pipeline.rows.map((row) => {
+  let report;
+  try {
+    report = readReport(row.reportId, { root, html: false });
+  } catch {
+    report = null;
+  }
+  const summary = report?.machine ?? {};
+  const pdf = pdfFor(row.reportId);
+  const cover = covers[String(row.id)] ?? null;
+  return {
+    id: row.id,
+    date: row.date,
+    company: row.company,
+    role: row.role,
+    via: row.via,
+    score: row.score,
+    status: row.status,
+    notes: row.notes || '',
+    decision: summary.final_decision ?? null,
+    comp: summary.advertised_comp ?? null,
+    gaps: summary.soft_gaps ?? [],
+    strengths: summary.top_strengths ?? [],
+    nextAction: summary.next_action ?? null,
+    url: report?.header?.url ?? report?.url ?? null,
+    archetype: report?.header?.archetype ?? null,
+    report: (report?.sections ?? []).map((sec) => ({ title: sec.title, text: plainText(sec.markdown).slice(0, 320) })),
+    pdf: pdf ?? (row.hasPdfFlag ? { file: `cv-alex-rivera-${row.company.toLowerCase().replace(/[^a-z]/g, '')}-${String(row.id).padStart(3, '0')}.pdf`, date: row.date } : null),
+    cover: cover ? { file: cover.path.split('/').pop(), date: cover.date } : null,
+  };
+});
+
+const inbox = readInbox({ root });
+const toReview = inbox.pending.map((p) => ({
+  url: p.url,
+  company: p.company,
+  role: p.title,
+  location: p.location,
+  posted: p.posted,
+  error: p.error ?? null,
+}));
+
+const health = Object.fromEntries(
+  readFileSync(join(root, 'data/portal-health.tsv'), 'utf-8')
+    .split(/\r?\n/)
+    .slice(1)
+    .filter(Boolean)
+    .map((l) => l.split('\t'))
+    .map(([at, company, status]) => [company, { at: at.slice(0, 10), status }]),
+);
+const portals = readPortals({ root });
+const companies = portals.companies.map((c) => ({
+  name: c.name,
+  careersUrl: c.careersUrl,
+  provider: c.provider,
+  enabled: c.enabled,
+  health: health[c.name] ?? null,
+}));
+const boards = portals.boards.map((b) => ({ name: b.name, query: b.scanQuery ?? b.query ?? null, enabled: b.enabled }));
+
+const sk = readSkillsOverview({ root, now: new Date('2026-10-06T09:00:00Z') });
+const byId = Object.fromEntries((Array.isArray(sk.skills) ? sk.skills : Object.values(sk.skills)).map((s) => [s.id, s]));
+const postingCompany = (pid) => sk.postings?.[pid]?.company ?? null;
+const skill = (id) => {
+  const s = byId[id];
+  const companiesFor = [...new Set((s.postings ?? []).map((p) => postingCompany(p.id)).filter(Boolean))];
+  return {
+    id: s.id,
+    name: s.name,
+    category: s.category,
+    status: s.status,
+    demand: s.demand,
+    required: s.required,
+    nice: s.nice,
+    strong: s.strong,
+    gapReports: s.gapReports ?? [],
+    companies: companiesFor,
+    cooccur: (s.cooccur ?? []).slice(0, 4).map((c) => c.name),
+    // Every posting behind the count, so a filter can recompute all of a row (WP-T6-01).
+    postings: (s.postings ?? []).map((p) => {
+      const post = sk.postings?.[p.id] ?? {};
+      return { company: post.company ?? null, role: post.title ?? null, level: p.level, score: post.score ?? null, url: post.url ?? null, reportId: post.reportId ?? null };
+    }),
+  };
+};
+const skills = {
+  coverage: sk.coverage,
+  learn: sk.lists.learn.slice(0, 10).map(skill),
+  deepen: (sk.lists.deepen ?? []).slice(0, 8).map(skill),
+  demanded: sk.lists.demanded.slice(0, 10).map(skill),
+};
+
+const data = {
+  generatedFrom: 'app/ux/sandbox/seeds/populated (fictional)',
+  candidate: 'Alex Rivera',
+  apps,
+  toReview,
+  companies,
+  boards,
+  skills,
+  voice: readFileSync(join(root, 'voice-dna.md'), 'utf-8'),
+  cv: readFileSync(join(root, 'cv.md'), 'utf-8'),
+};
+
+writeFileSync(
+  join(here, 'data.js'),
+  `// Generated by make-data.mjs from the UX sandbox seed. Fictional data only.\nwindow.PROTO_DATA = ${JSON.stringify(data, null, 1)};\n`,
+  'utf-8',
+);
+console.log(`data.js: ${apps.length} applications, ${toReview.length} to review, ${companies.length} companies, ${skills.learn.length} skills to learn`);

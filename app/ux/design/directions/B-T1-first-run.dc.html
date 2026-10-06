@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>B · First run — three-step set-up</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#fbfaf7;color:#1f1d1a;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px}
+a{color:#0f766e}a:hover{color:#134e4a}
+:focus-visible{outline:3px solid #0f766e;outline-offset:2px}
+h1,h2,h3{font-family:Charter,"Iowan Old Style","Palatino Linotype",Georgia,serif}
+.stage{display:flex;flex-direction:column;align-items:flex-start;padding:8px 16px;border-radius:10px;color:#57534e;text-decoration:none;min-width:110px}
+.stage b{font-size:15px;color:#57534e}
+.btn{font:inherit;font-weight:600;padding:10px 18px;border-radius:10px;border:1px solid #0f766e;background:#0f766e;color:#fff;cursor:pointer;min-height:44px}
+.btn:hover{background:#115e59}
+.btn2{font:inherit;padding:10px 18px;border-radius:10px;border:1px solid #78716c;background:#fff;color:#1f1d1a;cursor:pointer;min-height:44px}
+.btn2:hover{border-color:#1f1d1a}
+.field{font:inherit;padding:10px 12px;border:1px solid #78716c;border-radius:10px;background:#fff;color:#1f1d1a;width:100%;box-sizing:border-box}
+label{font-weight:600;display:block;margin-bottom:6px}
+.hint{color:#57534e;font-size:14px;margin:6px 0 0}
+.dot{width:32px;height:32px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:700;border:2px solid #a8a29e;color:#57534e;background:#fff}
+.dot.on{border-color:#0f766e;color:#0f766e}
+.dot.ok{border-color:#0f766e;background:#0f766e;color:#fff}
+</style>
+</helmet>
+<div style="min-height: 860px; display: flex; flex-direction: column">
+  <header style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; padding: 14px 32px; background: #f1efe9; border-bottom: 1px solid #d6d3cd">
+    <div style="font-weight: 700; font-family: Charter, Georgia, serif; font-size: 19px">Job Search Console</div>
+    <nav aria-label="Stages" style="display: flex; gap: 4px; flex-wrap: wrap; align-items: center">
+      <span class="stage"><b>1 · Find</b><span style="font-size: 13px">openings</span></span><span aria-hidden="true" style="color: #a8a29e">→</span>
+      <span class="stage"><b>2 · Decide</b><span style="font-size: 13px">fit checks</span></span><span aria-hidden="true" style="color: #a8a29e">→</span>
+      <span class="stage"><b>3 · Apply</b><span style="font-size: 13px">CV and letter</span></span><span aria-hidden="true" style="color: #a8a29e">→</span>
+      <span class="stage"><b>4 · Track</b><span style="font-size: 13px">applications</span></span>
+    </nav>
+    <p style="margin: 0; font-size: 14px; color: #57534e">{{stagesNote}}</p>
+  </header>
+
+  <main id="main" style="flex: 1; display: flex; justify-content: center; padding: 40px 24px">
+    <div style="width: 100%; max-width: 720px; display: flex; flex-direction: column; gap: 24px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <p style="margin: 0; color: #57534e">Welcome, let's get you ready</p>
+        <h1 style="margin: 0; font-size: 34px; line-height: 1.15">{{heading}}</h1>
+      </div>
+      <ol aria-label="Set-up progress" style="list-style: none; margin: 0; padding: 0; display: flex; gap: 12px; align-items: center">
+        <li style="display: flex; gap: 8px; align-items: center"><span class="dot {{d1}}" aria-hidden="true">{{n1}}</span><span>Your CV</span></li>
+        <li aria-hidden="true" style="flex: 1; height: 2px; background: #d6d3cd"></li>
+        <li style="display: flex; gap: 8px; align-items: center"><span class="dot {{d2}}" aria-hidden="true">{{n2}}</span><span>Companies</span></li>
+        <li aria-hidden="true" style="flex: 1; height: 2px; background: #d6d3cd"></li>
+        <li style="display: flex; gap: 8px; align-items: center"><span class="dot {{d3}}" aria-hidden="true">{{n3}}</span><span>AI assistant</span></li>
+      </ol>
+      <p role="status" style="position: absolute; left: -9999px">{{announce}}</p>
+
+      <section style="background: #ffffff; border: 1px solid #d6d3cd; border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 16px">
+        <sc-if value="{{s1}}" hint-placeholder-val="{{ true }}">
+          <p style="margin: 0; color: #44403c">Everything the app writes for you — fit checks, tailored CVs, letters — starts from your CV. Paste it below or choose a file.</p>
+          <div><label for="cv">Your CV (Markdown or plain text)</label><textarea id="cv" class="field" rows="8" placeholder="# Alex Rivera&#10;Austin, TX (remote) · alex.rivera@example.com&#10;&#10;## Summary&#10;Backend engineer with seven years building payment and data platforms."></textarea><p class="hint">Kept in your workspace folder as cv.md. Edit it later under My CV.</p></div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap"><button class="btn" onClick="{{next}}">Save and continue</button><button class="btn2">Choose a file…</button></div>
+        </sc-if>
+        <sc-if value="{{s2}}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 0; color: #44403c">Which companies should the app watch for new openings? Add one now; you can add more any time.</p>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+            <div><label for="n">Company name</label><input id="n" class="field" placeholder="Kestrel Media"></div>
+            <div><label for="u">Careers page link</label><input id="u" class="field" placeholder="https://job-boards.greenhouse.io/kestrelmedia"></div>
+          </div>
+          <p class="hint" style="margin: 0">We recognise Greenhouse, Lever, Ashby and most other job boards from the link.</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap"><button class="btn" onClick="{{next}}">Follow and continue</button><button class="btn2" onClick="{{back}}">Back</button></div>
+        </sc-if>
+        <sc-if value="{{s3}}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 0; font-size: 18px"><b style="color: #0f766e">✓</b> Claude Code is installed and signed in.</p>
+          <p style="margin: 0; color: #44403c">The app uses it for fit checks, tailored CVs and letters. Each one takes 2–5 minutes and uses your Claude plan. You'll always see what's running under Activity.</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap"><button class="btn" onClick="{{next}}">Finish set-up</button><button class="btn2" onClick="{{back}}">Back</button></div>
+        </sc-if>
+        <sc-if value="{{s4}}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 0; font-size: 18px">Your CV is saved and you follow <b>Kestrel Media</b> (6 open roles found).</p>
+          <p style="margin: 0; color: #44403c">Next: look at what's open in <b>Find</b>, or paste a job you already like to check your fit.</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end">
+            <div style="flex: 1 1 300px"><label for="j">Job posting link</label><input id="j" class="field" placeholder="https://job-boards.greenhouse.io/kestrelmedia/jobs/4134913"></div>
+            <button class="btn">Check my fit</button>
+          </div>
+          <a href="#main">Or go to Find — 6 openings at Kestrel Media</a>
+        </sc-if>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: 1 };
+  }
+  renderVals() {
+    const s = this.state.step;
+    const dot = (i) => (s > i ? 'ok' : s === i ? 'on' : '');
+    const num = (i) => (s > i ? '✓' : String(i));
+    const heads = { 1: 'Step 1 — add your CV', 2: 'Step 2 — follow a company', 3: 'Step 3 — your AI assistant', 4: "You're ready" };
+    return {
+      s1: s === 1, s2: s === 2, s3: s === 3, s4: s === 4,
+      heading: heads[s],
+      d1: dot(1), d2: dot(2), d3: dot(3), n1: num(1), n2: num(2), n3: num(3),
+      stagesNote: s === 4 ? 'All four stages are open.' : 'The stages open after set-up (about 5 minutes).',
+      announce: heads[s],
+      next: () => this.setState({ step: Math.min(4, s + 1) }),
+      back: () => this.setState({ step: Math.max(1, s - 1) }),
+    };
+  }
+}
+</script>
+</body>
+</html>

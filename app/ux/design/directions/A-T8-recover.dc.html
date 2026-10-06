@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A · Failed check — Activity tray</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#f6f7f9;color:#0f172a;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px}
+a{color:#1d4ed8}a:hover{color:#1e3a8a}
+:focus-visible{outline:3px solid #1d4ed8;outline-offset:2px}
+.nav a{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:6px;color:#e2e8f0;text-decoration:none}
+.nav a:hover{background:#1e293b;color:#fff}
+.nav a[aria-current=page]{background:#1e293b;color:#fff;box-shadow:inset 3px 0 0 #93c5fd}
+.nav a:focus-visible{outline-color:#93c5fd}
+.count{font-size:12px;color:#94a3b8}
+.btn{font:inherit;font-weight:600;padding:8px 14px;border-radius:6px;border:1px solid #1d4ed8;background:#1d4ed8;color:#fff;cursor:pointer;min-height:36px}
+.btn:hover{background:#1e40af}
+.btn2{font:inherit;padding:8px 14px;border-radius:6px;border:1px solid #64748b;background:#fff;color:#0f172a;cursor:pointer;min-height:36px;text-decoration:none;display:inline-flex;align-items:center}
+.btn2:hover{border-color:#0f172a;color:#0f172a}
+table{border-collapse:collapse;width:100%;background:#fff}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #e2e8f0}
+th{font-size:12px;color:#475569;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+td a{color:#0f172a;font-weight:600;text-decoration:none}td a:hover{text-decoration:underline;color:#1d4ed8}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600}
+.item{border:1px solid #cbd5e1;border-radius:8px;padding:12px 14px;background:#fff;display:flex;flex-direction:column;gap:6px}
+summary{cursor:pointer;color:#334155}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 860px">
+  <aside style="flex: 1 1 220px; max-width: 240px; background: #0f172a; color: #e2e8f0; padding: 20px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px">
+    <div style="padding: 0 12px; font-weight: 700; font-size: 15px; color: #fff">Job Search Console</div>
+    <nav class="nav" aria-label="Main" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="#main" aria-current="page"><span>Applications</span><span class="count">{{appCount}}</span></a>
+      <a href="#main"><span>To review</span><span class="count">13</span></a>
+      <a href="#main"><span>Companies you follow</span><span class="count">12</span></a>
+      <a href="#main"><span>Skills</span></a>
+      <a href="#main"><span>My CV</span></a>
+    </nav>
+    <div style="margin-top: auto; padding: 0 12px">
+      <button onClick="{{toggleTray}}" aria-expanded="{{trayOpen}}" aria-controls="tray" style="font: inherit; width: 100%; text-align: left; padding: 10px 12px; border-radius: 6px; cursor: pointer; border: 1px solid {{trayBtnBorder}}; background: {{trayBtnBg}}; color: #fff; font-weight: 600">{{trayLabel}}</button>
+    </div>
+  </aside>
+
+  <main id="main" style="flex: 999 1 480px; min-width: 0; padding: 28px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px">
+    <h1 style="margin: 0; font-size: 24px">Applications</h1>
+    <div style="overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px">
+      <table>
+        <caption style="text-align: left; padding: 10px; color: #475569">{{appCount}} applications · newest first</caption>
+        <thead><tr><th scope="col">Company and role</th><th scope="col">Fit</th><th scope="col">Status</th><th scope="col">Checked</th></tr></thead>
+        <tbody>
+          <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+            <tr style="background: #eff6ff"><td><a href="#main">Driftwood Analytics — Data Engineer</a> <span class="badge" style="background: #dbeafe; color: #1e3a8a">New</span></td><td>3.7 / 5</td><td>Reviewed — not applied</td><td>Today</td></tr>
+          </sc-if>
+          <tr><td><a href="#main">Mosaic Retail — Senior Backend Engineer</a></td><td>3.4 / 5</td><td>Reviewed — not applied</td><td>Sep 4</td></tr>
+          <tr><td><a href="#main">Lumen Grid — Infrastructure Engineer</a></td><td>3.0 / 5</td><td>Reviewed — not applied</td><td>Sep 3</td></tr>
+          <tr><td><a href="#main">Ironleaf Security — Machine Learning Engineer</a></td><td>3.1 / 5</td><td>Reviewed — not applied</td><td>Sep 2</td></tr>
+          <tr><td><a href="#main">Harbor Learning — Backend Engineer (Go)</a></td><td>3.2 / 5</td><td>Reviewed — not applied</td><td>Sep 1</td></tr>
+          <tr><td><a href="#main">Granite Cloud — Senior Backend Engineer</a></td><td>3.3 / 5</td><td>Reviewed — not applied</td><td>Aug 30</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <sc-if value="{{trayOpen}}" hint-placeholder-val="{{ true }}">
+    <section id="tray" aria-labelledby="trayh" style="flex: 1 1 340px; max-width: 400px; background: #f1f5f9; border-left: 1px solid #cbd5e1; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <h2 id="trayh" style="margin: 0; font-size: 18px">Activity</h2>
+        <button class="btn2" onClick="{{toggleTray}}" aria-label="Close activity">Close</button>
+      </div>
+      <p role="status" style="margin: 0; color: #334155">{{announce}}</p>
+
+      <sc-if value="{{failed}}" hint-placeholder-val="{{ true }}">
+        <article class="item" style="border-color: #b91c1c; border-width: 2px">
+          <div style="display: flex; gap: 8px; align-items: center"><span class="badge" style="background: #b91c1c; color: #fff">Failed</span><span style="color: #475569">today 09:14 · after 3 min</span></div>
+          <h3 style="margin: 0; font-size: 15px">Check fit · Driftwood Analytics — Data Engineer</h3>
+          <p style="margin: 0"><b>What happened:</b> the assistant opened the posting but did not write a fit report. This is usually temporary — the page was slow or the session stopped early.</p>
+          <p style="margin: 0"><b>What to do:</b> try again. It usually works the second time and uses your Claude plan again.</p>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap"><button class="btn" onClick="{{retry}}">Try again</button><a class="btn2" href="#main">Open the posting</a></div>
+          <details><summary>Technical details</summary><p style="margin: 6px 0 0; font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: #334155">Session ended without writing reports/041-*.md · exit 0 · log data/jsc/logs/evaluate-7f3a.log</p></details>
+        </article>
+      </sc-if>
+
+      <sc-if value="{{working}}" hint-placeholder-val="{{ false }}">
+        <article class="item" style="border-color: #1d4ed8">
+          <div style="display: flex; gap: 8px; align-items: center"><span class="badge" style="background: #dbeafe; color: #1e3a8a">Working</span><span style="color: #475569">started just now · usually 2–5 min</span></div>
+          <h3 style="margin: 0; font-size: 15px">Check fit · Driftwood Analytics — Data Engineer</h3>
+          <div role="progressbar" aria-label="Checking fit for Driftwood Analytics — Data Engineer" style="height: 6px; background: #dbeafe; border-radius: 3px; overflow: hidden"><div style="width: 45%; height: 6px; background: #1d4ed8"></div></div>
+          <p style="margin: 0; color: #334155">Reading the posting and comparing it with your CV. You can keep working; we'll tell you here when it's done.</p>
+          <div><button class="btn2">Cancel</button></div>
+        </article>
+      </sc-if>
+
+      <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+        <article class="item" style="border-color: #15803d; border-width: 2px">
+          <div style="display: flex; gap: 8px; align-items: center"><span class="badge" style="background: #15803d; color: #fff">Done</span><span style="color: #475569">today 09:21 · 2 min</span></div>
+          <h3 style="margin: 0; font-size: 15px">Check fit · Driftwood Analytics — Data Engineer</h3>
+          <p style="margin: 0; font-size: 15px"><b>Fit 3.7 / 5</b> · Recommendation: <b>Consider</b></p>
+          <p style="margin: 0">Added to your applications as #41. The first attempt is kept in the history below.</p>
+          <div><a class="btn" href="#main" style="text-decoration: none; display: inline-flex">Open the application</a></div>
+        </article>
+      </sc-if>
+
+      <h3 style="margin: 8px 0 0; font-size: 13px; color: #475569; text-transform: uppercase; letter-spacing: .04em">Earlier today</h3>
+      <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+        <article class="item"><span><span class="badge" style="background: #fee2e2; color: #7f1d1d">Failed, retried</span> Check fit · Driftwood Analytics — Data Engineer</span></article>
+      </sc-if>
+      <article class="item"><span><span class="badge" style="background: #dcfce7; color: #14532d">Done</span> Check for new openings · 12 companies · 4 new</span><a href="#main">Review the 4 new openings</a></article>
+      <article class="item"><span><span class="badge" style="background: #dcfce7; color: #14532d">Done</span> Tailored CV · Cobalt Freight — Staff Software Engineer</span><a href="#main">Open the PDF</a></article>
+    </section>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { phase: 'failed', tray: false };
+  }
+  renderVals() {
+    const { phase, tray } = this.state;
+    const label = phase === 'failed' ? 'Activity · 1 failed' : phase === 'working' ? 'Activity · 1 working' : 'Activity · all done';
+    return {
+      failed: phase === 'failed', working: phase === 'working', done: phase === 'done',
+      trayOpen: tray,
+      trayLabel: label,
+      trayBtnBg: phase === 'failed' ? '#b91c1c' : '#1e293b',
+      trayBtnBorder: phase === 'failed' ? '#fecaca' : '#475569',
+      appCount: phase === 'done' ? '41' : '40',
+      announce: phase === 'failed' ? '1 thing failed and can be tried again.' : phase === 'working' ? 'Checking fit for Driftwood Analytics — Data Engineer.' : 'Done: Driftwood Analytics — Data Engineer, fit 3.7 out of 5, added to your applications.',
+      toggleTray: () => this.setState({ tray: !this.state.tray }),
+      retry: () => {
+        this.setState({ phase: 'working' });
+        setTimeout(() => this.setState({ phase: 'done' }), 2500);
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>
