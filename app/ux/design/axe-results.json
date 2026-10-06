@@ -1,0 +1,770 @@
+[
+  {
+    "view": "today-setup",
+    "page": "T1.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today-setup-errors",
+    "page": "T1.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "applications",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "applications-status-menu",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "job",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "job-cover-form",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "document",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "to-review",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "companies",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "companies-follow-form",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "skills",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-content",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-profile",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-writing",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "activity",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "workspace",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "help",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "search",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today-broken",
+    "page": "T8.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "activity-panel",
+    "page": "T8.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "activity-failed",
+    "page": "T8.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-design-failing",
+    "page": "T7.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "confirm-dialog",
+    "page": "T7.html",
+    "scheme": "light",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today-setup",
+    "page": "T1.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today-setup-errors",
+    "page": "T1.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "applications",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "applications-status-menu",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "job",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "job-cover-form",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "document",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "to-review",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "companies",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "companies-follow-form",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "skills",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-content",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-profile",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-writing",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "activity",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "workspace",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "help",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "search",
+    "page": "T2.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today-broken",
+    "page": "T8.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "activity-panel",
+    "page": "T8.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "activity-failed",
+    "page": "T8.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-design-failing",
+    "page": "T7.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "confirm-dialog",
+    "page": "T7.html",
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today-setup",
+    "page": "T1.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today-setup-errors",
+    "page": "T1.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "applications",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "applications-status-menu",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "job",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "job-cover-form",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "document",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "to-review",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "companies",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "companies-follow-form",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "skills",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-content",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-profile",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-writing",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "activity",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "workspace",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "help",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "search",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today-broken",
+    "page": "T8.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "activity-panel",
+    "page": "T8.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "activity-failed",
+    "page": "T8.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-design-failing",
+    "page": "T7.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "confirm-dialog",
+    "page": "T7.html",
+    "scheme": "dark",
+    "zoom": "100",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today-setup",
+    "page": "T1.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today-setup-errors",
+    "page": "T1.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "applications",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "applications-status-menu",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "job",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "job-cover-form",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "document",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "to-review",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "companies",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "companies-follow-form",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "skills",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-content",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-profile",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-writing",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "activity",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "workspace",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "help",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "search",
+    "page": "T2.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "today-broken",
+    "page": "T8.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "activity-panel",
+    "page": "T8.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "activity-failed",
+    "page": "T8.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "my-cv-design-failing",
+    "page": "T7.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  },
+  {
+    "view": "confirm-dialog",
+    "page": "T7.html",
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": false,
+    "violations": []
+  }
+]
