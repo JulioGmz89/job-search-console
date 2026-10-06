@@ -1,5 +1,4 @@
-import { useMemo, useState } from 'react';
-import { ComboBox, Input, Label, ListBox, ListBoxItem, Popover } from 'react-aria-components';
+import { useId, useMemo, useRef, useState } from 'react';
 
 import { useResource } from '../data.js';
 import { jobName } from '../lib/labels.js';
@@ -24,13 +23,23 @@ const PLACES = [
 ];
 
 /**
- * "Find a job, company or document": an accessible combobox over jobs,
+ * "Find a job, company or document" (ia.md §1): a combobox over jobs,
  * companies, documents, pages and actions. Enter opens the result.
+ *
+ * Written to the ARIA 1.2 combobox pattern by hand rather than with React
+ * Aria's ComboBox, which hides the rest of the page (aria-hidden) while its
+ * list is open; axe reports that as aria-hidden-focus (serious). Focus never
+ * leaves the input: the active option is announced through
+ * aria-activedescendant.
  */
 export function Search() {
   const pipeline = useResource('pipeline');
   const portals = useResource('portals');
   const [text, setText] = useState('');
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(0);
+  const input = useRef(null);
+  const listId = useId();
 
   const all = useMemo(() => {
     const rows = pipeline.data?.rows ?? [];
@@ -44,38 +53,82 @@ export function Search() {
   }, [pipeline.data, portals.data]);
 
   const items = useMemo(() => {
-    const q = text.trim().toLowerCase();
-    if (!q) return [];
-    const words = q.split(/\s+/);
+    const words = text.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    if (!words.length) return [];
     return all.filter((i) => words.every((w) => i.label.toLowerCase().includes(w))).slice(0, 12);
   }, [all, text]);
 
+  const shown = open && text.trim() !== '';
+  const choose = (item) => {
+    if (!item) return;
+    setText('');
+    setOpen(false);
+    navigate(item.href);
+  };
+  const optionId = (i) => `${listId}-o${i}`;
+
   return (
-    <ComboBox
-      className="search"
-      items={items}
-      inputValue={text}
-      onInputChange={setText}
-      menuTrigger="input"
-      allowsEmptyCollection
-      onSelectionChange={(key) => {
-        const hit = all.find((i) => i.id === key);
-        if (!hit) return;
-        setText('');
-        navigate(hit.href);
-      }}
-    >
-      <Label className="visually-hidden">Find a job, company or document</Label>
-      <Input className="search-input" placeholder="Find a job, company or document…" />
-      <Popover className="popover search-popover" placement="bottom end">
-        <ListBox className="menu" renderEmptyState={() => <p className="menu-empty">Nothing matches “{text}”.</p>}>
-          {(item) => (
-            <ListBoxItem id={item.id} className="menu-item" textValue={item.label}>
-              <span className="search-kind">{item.kind}</span> {item.label}
-            </ListBoxItem>
-          )}
-        </ListBox>
-      </Popover>
-    </ComboBox>
+    <div className="search">
+      <label className="visually-hidden" htmlFor={`${listId}-input`}>
+        Find a job, company or document
+      </label>
+      <input
+        ref={input}
+        id={`${listId}-input`}
+        className="search-input"
+        type="text"
+        role="combobox"
+        autoComplete="off"
+        aria-autocomplete="list"
+        aria-expanded={shown}
+        aria-controls={listId}
+        aria-activedescendant={shown && items.length ? optionId(active) : undefined}
+        placeholder="Find a job, company or document…"
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value);
+          setActive(0);
+          setOpen(true);
+        }}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setOpen(true);
+            setActive((a) => Math.min(a + 1, Math.max(items.length - 1, 0)));
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setActive((a) => Math.max(a - 1, 0));
+          } else if (e.key === 'Enter' && shown) {
+            e.preventDefault();
+            choose(items[active]);
+          } else if (e.key === 'Escape') {
+            if (shown) setOpen(false);
+            else setText('');
+          }
+        }}
+      />
+      <ul id={listId} role="listbox" aria-label="Results" className="popover search-popover menu" hidden={!shown}>
+        {items.map((item, i) => (
+          <li
+            key={item.id}
+            id={optionId(i)}
+            role="option"
+            aria-selected={i === active}
+            className="menu-item"
+            data-focused={i === active ? true : undefined}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => choose(item)}
+          >
+            <span className="search-kind">{item.kind}</span> {item.label}
+          </li>
+        ))}
+        {shown && !items.length ? (
+          <li role="option" aria-selected="false" aria-disabled="true" className="menu-empty">
+            Nothing matches “{text}”.
+          </li>
+        ) : null}
+      </ul>
+    </div>
   );
 }
