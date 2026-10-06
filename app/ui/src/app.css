@@ -323,3 +323,5 @@ ul.plain { list-style: none; margin: 0; padding: 0; }
 .switch[data-selected] .switch-thumb { transform: translateX(1.1rem); background: var(--on-accent); }
 .switch[data-focus-visible] .switch-track { outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-offset); }
 .switch[data-disabled] { opacity: 0.55; cursor: not-allowed; }
+.card.flush { padding: 0; gap: 0; }
+.pad { padding: var(--space-4); }
