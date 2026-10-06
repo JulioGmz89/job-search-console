@@ -24,3 +24,4 @@ direction. The `ux-researcher` agent rewrites it in full during the re-measure
 | `POST /api/cv/voice/words` | Adds one word under `## Never write` | My CV › Writing rules › Words to avoid |
 | `DELETE /api/cv/voice/words` | Removes one word from `## Never write` | My CV › Writing rules › Words to avoid |
 | `POST /api/cv/voice/restore` | Swaps `voice-dna.md` with its `.bak` (Undo) | My CV › Writing rules › Undo |
+| `GET /api/cv/design-check` | Renders the saved design with the newest CV once and reports its screening verdict | Today › Needs you; My CV › Design |

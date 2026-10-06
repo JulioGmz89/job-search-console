@@ -487,6 +487,38 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
       .send(preview.pdf);
   });
 
+  /**
+   * Does the saved design pass the screening check? (Today's "Needs you" card,
+   * ia.md §2.1; F-007.) Renders the newest CV once in the saved style through
+   * the warm preview pool and remembers the answer until the style or the
+   * newest CV changes, so Today can ask on every visit for free.
+   */
+  let designCheck = { key: null, result: null };
+  app.get('/api/cv/design-check', async (request, reply) => {
+    try {
+      const { style } = readStyle({ root });
+      const doc = listCvDocuments({ root })[0] ?? null;
+      if (!doc) return { template: style.template, documentId: null, verdict: null };
+      const key = JSON.stringify([style, doc.id, doc.modified]);
+      if (designCheck.key !== key) {
+        const preview = await renderPreview({ documentId: doc.id, style, root, pool: cvPool });
+        designCheck = {
+          key,
+          result: {
+            template: style.template,
+            documentId: doc.id,
+            verdict: preview.ats?.verdict ?? null,
+            issues: (preview.ats?.issues ?? []).filter((i) => i.severity === 'critical').map((i) => i.message),
+            checkedAt: new Date().toISOString(),
+          },
+        };
+      }
+      return designCheck.result;
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
   /** The gallery: every theme rendered with this document and the given tokens, each with its ATS verdict. */
   app.post('/api/cv/themes', async (request, reply) => {
     try {

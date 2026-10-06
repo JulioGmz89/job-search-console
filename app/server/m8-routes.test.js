@@ -221,3 +221,14 @@ test('writing rules: a file without the section gets one at the end', async () =
   assert.equal(readFileSync(join(root, 'voice-dna.md'), 'utf-8'), '# Voice\n\n## Tone\nPlain.\n\n## Never write\n- robust\n');
   assert.equal((await call('POST', '/api/cv/voice/restore')).status, 200);
 });
+
+const needsChromium = !(await import('playwright').then((m) => existsSync(m.chromium.executablePath())).catch(() => false));
+
+test('design check: the saved design is rendered once and its screening verdict kept', { skip: needsChromium && 'Chromium is not installed' }, async () => {
+  const { call } = await emptyWorkspace();
+  const first = await call('GET', '/api/cv/design-check');
+  assert.equal(first.status, 200, JSON.stringify(first.body));
+  assert.ok(['pass', 'warn', 'fail'].includes(first.body.verdict));
+  const again = await call('GET', '/api/cv/design-check');
+  assert.equal(again.body.checkedAt, first.body.checkedAt, 'not rendered twice for the same style');
+});
