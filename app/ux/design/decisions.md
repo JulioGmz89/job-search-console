@@ -84,6 +84,11 @@ checkpoint 1.
 - **Today's `data/jsc/today.json`** (last seen, dismissed cards) is fork-owned state. It
   is not part of the data contract.
 
+- **T6 success criterion in `app/ux/tasks.md`.** With the fit filter on, Skills now
+  re-ranks the list by good-fit postings (WP-T6-01's fix), so the top three can differ
+  from `lists.learn`. Before M8 re-runs T6, the criterion should also accept the
+  filtered top three, with the evidence checked against the same filtered postings.
+
 ## Approval (checkpoint 2)
 
 _Pending. Recorded here when the maintainer approves the prototypes and the IA: date,
