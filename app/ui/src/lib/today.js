@@ -6,8 +6,22 @@
 
 import { needsAttention } from './runs.js';
 
-/** Board health values that mean "this company is not being checked". */
-const BROKEN_BOARD = new Set(['slug_gone', 'not_found', 'error', 'unreachable', 'blocked', 'gone']);
+/**
+ * Board health values (data/portal-health.tsv) that need the user: the board
+ * moved or closed, or wants a login. Network and server errors are usually
+ * transient and fix themselves on the next check.
+ */
+const BROKEN_BOARD = new Set(['slug_gone', 'auth']);
+
+/** A board's health in words. */
+export const BOARD_HEALTH = Object.freeze({
+  reachable: 'Working',
+  empty: 'Working, no openings right now',
+  slug_gone: 'Board not found',
+  auth: 'The board wants a login, so it can’t be read',
+  network: 'Couldn’t be reached last time (usually temporary)',
+  server: 'The board had an error last time (usually temporary)',
+});
 
 /**
  * Openings in To review the user has not seen: first seen after the day they
