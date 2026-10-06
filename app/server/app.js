@@ -45,6 +45,7 @@ import { listCvTemplates, listWritingSamples, readStyle, readVoice, writeStyle, 
 import { appendInboxUrl, readInbox } from './services/inbox.js';
 import { repoRoot, resolveDataRoot } from './services/paths.js';
 import { readPipeline, SCORE_BANDS } from './services/pipeline.js';
+import { readCvContent, readProfileForm, writeCvContent, writeProfileForm } from './services/profile.js';
 import { createEntry, deleteEntry, readPortals, updateEntry } from './services/portals.js';
 import { listReports, readReport, resolveReportPdf } from './services/reports.js';
 import { readLastScanRun, readPortalHealth } from './services/scanner.js';
@@ -301,6 +302,28 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
       .header('Content-Length', size)
       .header('Content-Disposition', `inline; filename="${cover.fileName.replace(/["\r\n]/g, '')}"`)
       .send(createReadStream(cover.absolutePath));
+  });
+
+  // ── My CV, M8: the CV text and the profile (ia.md §2.7) ────────────
+
+  app.get('/api/cv/content', async () => readCvContent({ root }));
+
+  app.put('/api/cv/content', async (request, reply) => {
+    try {
+      return { ok: true, ...writeCvContent({ root, text: body(request).text }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.get('/api/profile', async () => readProfileForm({ root }));
+
+  app.put('/api/profile', async (request, reply) => {
+    try {
+      return { ok: true, ...writeProfileForm({ root, fields: body(request).fields }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
   });
 
   // ── CV Studio: style tokens, voice rules, templates, samples ───────

@@ -9,13 +9,14 @@
  * directory applies the same voice rules the console's runs do.
  */
 
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 
 import yaml from 'js-yaml';
 
 import { CV_SECTION_KEYS, DEFAULT_STYLE, DENSITIES, listCvTemplates as listTemplates, loadStyle, STYLE_FIELDS, stylePath, validateStyle } from '../../cv/theme.js';
 import { readProfile } from '../agents/profile.js';
+import { atomicWrite } from './files.js';
 import { repoRoot, resolveDataRoot } from './paths.js';
 
 export class CvStyleError extends Error {
@@ -54,14 +55,6 @@ export function readStyle({ root } = {}) {
     profileWarnings: profileWarnings(dataRoot),
   };
 }
-
-const atomicWrite = (path, text) => {
-  mkdirSync(dirname(path), { recursive: true });
-  const tmp = `${path}.tmp-${process.pid}`;
-  writeFileSync(tmp, text, 'utf-8');
-  if (existsSync(path)) writeFileSync(`${path}.bak`, readFileSync(path));
-  renameSync(tmp, path);
-};
 
 /**
  * Validate and save the style. Only recognized keys are written, and an

@@ -25,6 +25,15 @@ const appRoot = resolve(here, '..');
 const repoRoot = resolve(appRoot, '..');
 const read = (name) => readFileSync(join(here, name), 'utf-8');
 
+/**
+ * M8 re-measures into app/ux/m8/ and keeps the M6 baseline as history. The
+ * coverage checks accept a capability listed in either inventory; only the
+ * current one (M8's once it exists) must cite files that are still there.
+ */
+const M8_INVENTORY = join('m8', 'inventory.md');
+const currentInventory = () => read(existsSync(join(here, M8_INVENTORY)) ? M8_INVENTORY : 'inventory.md');
+const allInventories = () => [read('inventory.md'), ...(existsSync(join(here, M8_INVENTORY)) ? [read(M8_INVENTORY)] : [])].join('\n');
+
 /** Every table cell in a markdown file, trimmed, with backticks removed. */
 function cells(markdown) {
   return markdown
@@ -55,7 +64,7 @@ function interactiveComponents() {
 }
 
 test('the inventory names every server route in a table cell', () => {
-  const inventory = cells(read('inventory.md'));
+  const inventory = cells(allInventories());
   const routes = serverRoutes();
   assert.ok(routes.length > 30, `parsed only ${routes.length} routes from app.js`);
   const missing = routes.filter((r) => !inventory.some((c) => c === r || c.includes(r)));
@@ -63,16 +72,16 @@ test('the inventory names every server route in a table cell', () => {
 });
 
 test('the inventory names every run kind in a table cell', () => {
-  const inventory = cells(read('inventory.md'));
+  const inventory = cells(allInventories());
   const missing = Object.keys(RUN_KINDS).filter((k) => !inventory.some((c) => c === k || c.split(/[\s,()]+/).includes(k)));
   assert.deepEqual(missing, [], `run kinds missing from inventory.md: ${missing.join(', ')}`);
 });
 
 test('the inventory covers every UI component with an action, and cites only real files', () => {
-  const inventory = read('inventory.md');
+  const inventory = allInventories();
   const missing = interactiveComponents().filter((f) => !inventory.includes(f) && !inventory.includes(f.split('/').pop()));
   assert.deepEqual(missing, [], `UI components never cited in inventory.md: ${missing.join(', ')}`);
-  const cited = [...new Set([...inventory.matchAll(/app\/ui\/src\/[\w./-]+\.(?:jsx?|css)/g)].map((m) => m[0]))];
+  const cited = [...new Set([...currentInventory().matchAll(/app\/ui\/src\/[\w./-]+\.(?:jsx?|css)/g)].map((m) => m[0]))];
   const absent = cited.filter((p) => !existsSync(join(repoRoot, p)));
   assert.deepEqual(absent, [], `inventory.md cites files that do not exist: ${absent.join(', ')}`);
 });
