@@ -76,6 +76,29 @@ function parseScore(value) {
 }
 
 /**
+ * A row the parser could not read, in words a person can act on (F-021): which
+ * application it seems to be and what is wrong with it. Best effort — the row
+ * is malformed by definition — so every field may be null.
+ *
+ * @param {string} line - The raw tracker line.
+ * @param {string[]} lines - The whole file, for the header's column count.
+ * @returns {{number: number|null, company: string|null, problem: string, message: string}}
+ */
+export function describeUnparseable(line, lines) {
+  const cellsOf = (text) => text.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+  const cells = cellsOf(line);
+  const header = lines.find((l) => /^\|\s*#\s*\|/.test(l));
+  const expected = header ? cellsOf(header).length : null;
+  const number = /^\d+$/.test(cells[0] ?? '') ? Number(cells[0]) : null;
+  const company = cells.slice(1).find((c) => c && !EMPTY_CELLS.has(c) && !/^\d{4}-\d{2}-\d{2}$/.test(c) && !/^[\d.,/]+$/.test(c)) ?? null;
+  const problem = expected !== null && cells.length !== expected
+    ? `it has ${cells.length} columns instead of ${expected}, so the score and status are in the wrong places`
+    : 'the score or the status could not be read';
+  const who = [company, number !== null ? `#${number}` : null].filter(Boolean).join(' ');
+  return { number, company, problem, message: `${who || 'An application'}: ${problem}.` };
+}
+
+/**
  * Read and normalize the whole tracker.
  *
  * Never throws on bad data. A single malformed row must not blank the whole
@@ -120,7 +143,7 @@ export function readPipeline({ root } = {}) {
       // Header and separator rows return null by design; only flag lines that
       // look like they were meant to be data.
       if (!/^\|\s*(#|-{3,}|:?-)/.test(line) && line.replace(/[|\s]/g, '') !== '') {
-        issues.push({ level: 'warn', code: 'row-unparseable', line: index + 1 });
+        issues.push({ level: 'warn', code: 'row-unparseable', line: index + 1, ...describeUnparseable(line, lines) });
       }
       return;
     }

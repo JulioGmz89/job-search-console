@@ -220,6 +220,8 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
           : null,
         hasReport: report !== null,
         pdf: report?.pdf?.exists ? { format: report.pdf.format } : null,
+        // Today's "replied without a tailored CV or letter" needs both documents per row.
+        cover: report ? resolveReportCover(report.id, { root }) !== null : false,
       };
     });
 
