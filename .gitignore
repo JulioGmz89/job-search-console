@@ -190,3 +190,6 @@ config/cv/*.bak
 config/cv/templates/*
 !config/cv/templates/README.md
 !config/cv/templates/.gitkeep
+
+# M8 persona runs: the sandbox log is local noise.
+app/ux/m8/runs/*/sandbox.log

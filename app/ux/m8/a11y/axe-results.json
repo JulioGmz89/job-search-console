@@ -1,0 +1,1400 @@
+[
+  {
+    "key": "populated/today/light/100",
+    "state": "populated",
+    "view": "today",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-today-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/applications/light/100",
+    "state": "populated",
+    "view": "applications",
+    "m6": "pipeline",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-applications-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/applications-row-menu/light/100",
+    "state": "populated",
+    "view": "applications-row-menu",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-applications-row-menu-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/applications-status-select/light/100",
+    "state": "populated",
+    "view": "applications-status-select",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-applications-status-select-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/job/light/100",
+    "state": "populated",
+    "view": "job",
+    "m6": "report-detail",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-job-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/job-cover-form/light/100",
+    "state": "populated",
+    "view": "job-cover-form",
+    "m6": "cover-dialog",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-job-cover-form-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/job-applied-dialog/light/100",
+    "state": "populated",
+    "view": "job-applied-dialog",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-job-applied-dialog-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/to-review/light/100",
+    "state": "populated",
+    "view": "to-review",
+    "m6": "sources",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-to-review-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/companies/light/100",
+    "state": "populated",
+    "view": "companies",
+    "m6": "sources",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-companies-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/companies-follow-form/light/100",
+    "state": "populated",
+    "view": "companies-follow-form",
+    "m6": "sources-add-form",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-companies-follow-form-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/skills/light/100",
+    "state": "populated",
+    "view": "skills",
+    "m6": "skills",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-skills-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/skills-evidence/light/100",
+    "state": "populated",
+    "view": "skills-evidence",
+    "m6": "skills-expanded",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-skills-evidence-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-content/light/100",
+    "state": "populated",
+    "view": "my-cv-content",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-my-cv-content-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-profile/light/100",
+    "state": "populated",
+    "view": "my-cv-profile",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-my-cv-profile-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-design/light/100",
+    "state": "populated",
+    "view": "my-cv-design",
+    "m6": "cv-studio",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-my-cv-design-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-writing/light/100",
+    "state": "populated",
+    "view": "my-cv-writing",
+    "m6": "cv-studio",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-my-cv-writing-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/activity/light/100",
+    "state": "populated",
+    "view": "activity",
+    "m6": "runs",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-activity-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/activity-panel/light/100",
+    "state": "populated",
+    "view": "activity-panel",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-activity-panel-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/workspace/light/100",
+    "state": "populated",
+    "view": "workspace",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-workspace-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/help/light/100",
+    "state": "populated",
+    "view": "help",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-help-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/search-results/light/100",
+    "state": "populated",
+    "view": "search-results",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/populated-search-results-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/today/light/200",
+    "state": "populated",
+    "view": "today",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-today-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/applications/light/200",
+    "state": "populated",
+    "view": "applications",
+    "m6": "pipeline",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-applications-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/applications-row-menu/light/200",
+    "state": "populated",
+    "view": "applications-row-menu",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-applications-row-menu-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/applications-status-select/light/200",
+    "state": "populated",
+    "view": "applications-status-select",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-applications-status-select-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/job/light/200",
+    "state": "populated",
+    "view": "job",
+    "m6": "report-detail",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-job-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/job-cover-form/light/200",
+    "state": "populated",
+    "view": "job-cover-form",
+    "m6": "cover-dialog",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-job-cover-form-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/job-applied-dialog/light/200",
+    "state": "populated",
+    "view": "job-applied-dialog",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-job-applied-dialog-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/to-review/light/200",
+    "state": "populated",
+    "view": "to-review",
+    "m6": "sources",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-to-review-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/companies/light/200",
+    "state": "populated",
+    "view": "companies",
+    "m6": "sources",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-companies-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/companies-follow-form/light/200",
+    "state": "populated",
+    "view": "companies-follow-form",
+    "m6": "sources-add-form",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-companies-follow-form-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/skills/light/200",
+    "state": "populated",
+    "view": "skills",
+    "m6": "skills",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-skills-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/skills-evidence/light/200",
+    "state": "populated",
+    "view": "skills-evidence",
+    "m6": "skills-expanded",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-skills-evidence-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-content/light/200",
+    "state": "populated",
+    "view": "my-cv-content",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-my-cv-content-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-profile/light/200",
+    "state": "populated",
+    "view": "my-cv-profile",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-my-cv-profile-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-design/light/200",
+    "state": "populated",
+    "view": "my-cv-design",
+    "m6": "cv-studio",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-my-cv-design-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-writing/light/200",
+    "state": "populated",
+    "view": "my-cv-writing",
+    "m6": "cv-studio",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-my-cv-writing-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/activity/light/200",
+    "state": "populated",
+    "view": "activity",
+    "m6": "runs",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-activity-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/activity-panel/light/200",
+    "state": "populated",
+    "view": "activity-panel",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-activity-panel-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/workspace/light/200",
+    "state": "populated",
+    "view": "workspace",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-workspace-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/help/light/200",
+    "state": "populated",
+    "view": "help",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/populated-help-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/search-results/light/200",
+    "state": "populated",
+    "view": "search-results",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "skipped": "could not open: locator.fill: Timeout 30000ms exceeded."
+  },
+  {
+    "key": "populated/today/dark/100",
+    "state": "populated",
+    "view": "today",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-today-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/applications/dark/100",
+    "state": "populated",
+    "view": "applications",
+    "m6": "pipeline",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-applications-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/applications-row-menu/dark/100",
+    "state": "populated",
+    "view": "applications-row-menu",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-applications-row-menu-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/applications-status-select/dark/100",
+    "state": "populated",
+    "view": "applications-status-select",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-applications-status-select-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/job/dark/100",
+    "state": "populated",
+    "view": "job",
+    "m6": "report-detail",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-job-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/job-cover-form/dark/100",
+    "state": "populated",
+    "view": "job-cover-form",
+    "m6": "cover-dialog",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-job-cover-form-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/job-applied-dialog/dark/100",
+    "state": "populated",
+    "view": "job-applied-dialog",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-job-applied-dialog-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/to-review/dark/100",
+    "state": "populated",
+    "view": "to-review",
+    "m6": "sources",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-to-review-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/companies/dark/100",
+    "state": "populated",
+    "view": "companies",
+    "m6": "sources",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-companies-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/companies-follow-form/dark/100",
+    "state": "populated",
+    "view": "companies-follow-form",
+    "m6": "sources-add-form",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-companies-follow-form-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/skills/dark/100",
+    "state": "populated",
+    "view": "skills",
+    "m6": "skills",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-skills-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/skills-evidence/dark/100",
+    "state": "populated",
+    "view": "skills-evidence",
+    "m6": "skills-expanded",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-skills-evidence-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-content/dark/100",
+    "state": "populated",
+    "view": "my-cv-content",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-my-cv-content-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-profile/dark/100",
+    "state": "populated",
+    "view": "my-cv-profile",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-my-cv-profile-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-design/dark/100",
+    "state": "populated",
+    "view": "my-cv-design",
+    "m6": "cv-studio",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-my-cv-design-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-writing/dark/100",
+    "state": "populated",
+    "view": "my-cv-writing",
+    "m6": "cv-studio",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-my-cv-writing-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/activity/dark/100",
+    "state": "populated",
+    "view": "activity",
+    "m6": "runs",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-activity-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/activity-panel/dark/100",
+    "state": "populated",
+    "view": "activity-panel",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-activity-panel-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/workspace/dark/100",
+    "state": "populated",
+    "view": "workspace",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-workspace-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/help/dark/100",
+    "state": "populated",
+    "view": "help",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-help-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/search-results/dark/100",
+    "state": "populated",
+    "view": "search-results",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/populated-search-results-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "populated/today/dark/200",
+    "state": "populated",
+    "view": "today",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-today-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/applications/dark/200",
+    "state": "populated",
+    "view": "applications",
+    "m6": "pipeline",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-applications-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/applications-row-menu/dark/200",
+    "state": "populated",
+    "view": "applications-row-menu",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-applications-row-menu-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/applications-status-select/dark/200",
+    "state": "populated",
+    "view": "applications-status-select",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-applications-status-select-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/job/dark/200",
+    "state": "populated",
+    "view": "job",
+    "m6": "report-detail",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-job-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/job-cover-form/dark/200",
+    "state": "populated",
+    "view": "job-cover-form",
+    "m6": "cover-dialog",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-job-cover-form-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/job-applied-dialog/dark/200",
+    "state": "populated",
+    "view": "job-applied-dialog",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-job-applied-dialog-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/to-review/dark/200",
+    "state": "populated",
+    "view": "to-review",
+    "m6": "sources",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-to-review-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/companies/dark/200",
+    "state": "populated",
+    "view": "companies",
+    "m6": "sources",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-companies-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/companies-follow-form/dark/200",
+    "state": "populated",
+    "view": "companies-follow-form",
+    "m6": "sources-add-form",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-companies-follow-form-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/skills/dark/200",
+    "state": "populated",
+    "view": "skills",
+    "m6": "skills",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-skills-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/skills-evidence/dark/200",
+    "state": "populated",
+    "view": "skills-evidence",
+    "m6": "skills-expanded",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-skills-evidence-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-content/dark/200",
+    "state": "populated",
+    "view": "my-cv-content",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-my-cv-content-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-profile/dark/200",
+    "state": "populated",
+    "view": "my-cv-profile",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-my-cv-profile-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-design/dark/200",
+    "state": "populated",
+    "view": "my-cv-design",
+    "m6": "cv-studio",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-my-cv-design-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/my-cv-writing/dark/200",
+    "state": "populated",
+    "view": "my-cv-writing",
+    "m6": "cv-studio",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-my-cv-writing-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/activity/dark/200",
+    "state": "populated",
+    "view": "activity",
+    "m6": "runs",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-activity-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/activity-panel/dark/200",
+    "state": "populated",
+    "view": "activity-panel",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-activity-panel-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/workspace/dark/200",
+    "state": "populated",
+    "view": "workspace",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-workspace-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/help/dark/200",
+    "state": "populated",
+    "view": "help",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/populated-help-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "populated/search-results/dark/200",
+    "state": "populated",
+    "view": "search-results",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "skipped": "could not open: locator.fill: Timeout 30000ms exceeded."
+  },
+  {
+    "key": "empty/today-setup/light/100",
+    "state": "empty",
+    "view": "today-setup",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-today-setup-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/applications/light/100",
+    "state": "empty",
+    "view": "applications",
+    "m6": "pipeline",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-applications-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/to-review/light/100",
+    "state": "empty",
+    "view": "to-review",
+    "m6": "sources",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-to-review-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/companies/light/100",
+    "state": "empty",
+    "view": "companies",
+    "m6": "sources",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-companies-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/skills/light/100",
+    "state": "empty",
+    "view": "skills",
+    "m6": "skills",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-skills-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/my-cv-content/light/100",
+    "state": "empty",
+    "view": "my-cv-content",
+    "m6": "cv-studio",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-my-cv-content-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/my-cv-profile/light/100",
+    "state": "empty",
+    "view": "my-cv-profile",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-my-cv-profile-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/activity/light/100",
+    "state": "empty",
+    "view": "activity",
+    "m6": "runs",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-activity-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/workspace/light/100",
+    "state": "empty",
+    "view": "workspace",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/empty-workspace-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/today-setup/light/200",
+    "state": "empty",
+    "view": "today-setup",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-today-setup-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/applications/light/200",
+    "state": "empty",
+    "view": "applications",
+    "m6": "pipeline",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-applications-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/to-review/light/200",
+    "state": "empty",
+    "view": "to-review",
+    "m6": "sources",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-to-review-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/companies/light/200",
+    "state": "empty",
+    "view": "companies",
+    "m6": "sources",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-companies-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/skills/light/200",
+    "state": "empty",
+    "view": "skills",
+    "m6": "skills",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-skills-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/my-cv-content/light/200",
+    "state": "empty",
+    "view": "my-cv-content",
+    "m6": "cv-studio",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-my-cv-content-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/my-cv-profile/light/200",
+    "state": "empty",
+    "view": "my-cv-profile",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-my-cv-profile-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/activity/light/200",
+    "state": "empty",
+    "view": "activity",
+    "m6": "runs",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-activity-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/workspace/light/200",
+    "state": "empty",
+    "view": "workspace",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/empty-workspace-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/today-setup/dark/100",
+    "state": "empty",
+    "view": "today-setup",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-today-setup-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/applications/dark/100",
+    "state": "empty",
+    "view": "applications",
+    "m6": "pipeline",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-applications-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/to-review/dark/100",
+    "state": "empty",
+    "view": "to-review",
+    "m6": "sources",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-to-review-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/companies/dark/100",
+    "state": "empty",
+    "view": "companies",
+    "m6": "sources",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-companies-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/skills/dark/100",
+    "state": "empty",
+    "view": "skills",
+    "m6": "skills",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-skills-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/my-cv-content/dark/100",
+    "state": "empty",
+    "view": "my-cv-content",
+    "m6": "cv-studio",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-my-cv-content-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/my-cv-profile/dark/100",
+    "state": "empty",
+    "view": "my-cv-profile",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-my-cv-profile-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/activity/dark/100",
+    "state": "empty",
+    "view": "activity",
+    "m6": "runs",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-activity-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/workspace/dark/100",
+    "state": "empty",
+    "view": "workspace",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/empty-workspace-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "empty/today-setup/dark/200",
+    "state": "empty",
+    "view": "today-setup",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-today-setup-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/applications/dark/200",
+    "state": "empty",
+    "view": "applications",
+    "m6": "pipeline",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-applications-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/to-review/dark/200",
+    "state": "empty",
+    "view": "to-review",
+    "m6": "sources",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-to-review-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/companies/dark/200",
+    "state": "empty",
+    "view": "companies",
+    "m6": "sources",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-companies-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/skills/dark/200",
+    "state": "empty",
+    "view": "skills",
+    "m6": "skills",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-skills-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/my-cv-content/dark/200",
+    "state": "empty",
+    "view": "my-cv-content",
+    "m6": "cv-studio",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-my-cv-content-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/my-cv-profile/dark/200",
+    "state": "empty",
+    "view": "my-cv-profile",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-my-cv-profile-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/activity/dark/200",
+    "state": "empty",
+    "view": "activity",
+    "m6": "runs",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-activity-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "empty/workspace/dark/200",
+    "state": "empty",
+    "view": "workspace",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/empty-workspace-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "broken/today-needs-you/light/100",
+    "state": "broken",
+    "view": "today-needs-you",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/broken-today-needs-you-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "broken/applications-unreadable/light/100",
+    "state": "broken",
+    "view": "applications-unreadable",
+    "m6": "pipeline-issues",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/broken-applications-unreadable-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "broken/activity-failed/light/100",
+    "state": "broken",
+    "view": "activity-failed",
+    "m6": "runs-failed",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/broken-activity-failed-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "broken/my-cv-design-ats-fail/light/100",
+    "state": "broken",
+    "view": "my-cv-design-ats-fail",
+    "m6": "cv-studio-ats-fail",
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/broken-my-cv-design-ats-fail-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "broken/workspace-health/light/100",
+    "state": "broken",
+    "view": "workspace-health",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "100",
+    "screenshot": "shots/broken-workspace-health-light-100.png",
+    "violations": []
+  },
+  {
+    "key": "broken/today-needs-you/light/200",
+    "state": "broken",
+    "view": "today-needs-you",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/broken-today-needs-you-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "broken/applications-unreadable/light/200",
+    "state": "broken",
+    "view": "applications-unreadable",
+    "m6": "pipeline-issues",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/broken-applications-unreadable-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "broken/activity-failed/light/200",
+    "state": "broken",
+    "view": "activity-failed",
+    "m6": "runs-failed",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/broken-activity-failed-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "broken/my-cv-design-ats-fail/light/200",
+    "state": "broken",
+    "view": "my-cv-design-ats-fail",
+    "m6": "cv-studio-ats-fail",
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/broken-my-cv-design-ats-fail-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "broken/workspace-health/light/200",
+    "state": "broken",
+    "view": "workspace-health",
+    "m6": null,
+    "scheme": "light",
+    "zoom": "200",
+    "screenshot": "shots/broken-workspace-health-light-200.png",
+    "violations": []
+  },
+  {
+    "key": "broken/today-needs-you/dark/100",
+    "state": "broken",
+    "view": "today-needs-you",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/broken-today-needs-you-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "broken/applications-unreadable/dark/100",
+    "state": "broken",
+    "view": "applications-unreadable",
+    "m6": "pipeline-issues",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/broken-applications-unreadable-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "broken/activity-failed/dark/100",
+    "state": "broken",
+    "view": "activity-failed",
+    "m6": "runs-failed",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/broken-activity-failed-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "broken/my-cv-design-ats-fail/dark/100",
+    "state": "broken",
+    "view": "my-cv-design-ats-fail",
+    "m6": "cv-studio-ats-fail",
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/broken-my-cv-design-ats-fail-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "broken/workspace-health/dark/100",
+    "state": "broken",
+    "view": "workspace-health",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "100",
+    "screenshot": "shots/broken-workspace-health-dark-100.png",
+    "violations": []
+  },
+  {
+    "key": "broken/today-needs-you/dark/200",
+    "state": "broken",
+    "view": "today-needs-you",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/broken-today-needs-you-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "broken/applications-unreadable/dark/200",
+    "state": "broken",
+    "view": "applications-unreadable",
+    "m6": "pipeline-issues",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/broken-applications-unreadable-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "broken/activity-failed/dark/200",
+    "state": "broken",
+    "view": "activity-failed",
+    "m6": "runs-failed",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/broken-activity-failed-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "broken/my-cv-design-ats-fail/dark/200",
+    "state": "broken",
+    "view": "my-cv-design-ats-fail",
+    "m6": "cv-studio-ats-fail",
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/broken-my-cv-design-ats-fail-dark-200.png",
+    "violations": []
+  },
+  {
+    "key": "broken/workspace-health/dark/200",
+    "state": "broken",
+    "view": "workspace-health",
+    "m6": null,
+    "scheme": "dark",
+    "zoom": "200",
+    "screenshot": "shots/broken-workspace-health-dark-200.png",
+    "violations": []
+  }
+]
