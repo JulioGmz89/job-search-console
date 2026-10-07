@@ -203,9 +203,12 @@ export function outcome(run, { rowForReport = () => null, all = [], rows = [] } 
       return { text, open: { href: '#/to-review', label: added.length ? `See the ${plural(added.length, 'new opening')}` : 'Open To review' } };
     }
     case 'skills-extract':
-    case 'skills-cv':
-    case 'skills-fetch':
       return { text: 'The skills analysis is up to date.', open: { href: '#/skills/learn', label: 'Open Skills' } };
+    case 'skills-cv':
+      return { text: 'Your CV’s skills were read again; Skills uses them now.', open: { href: '#/skills/learn', label: 'Open Skills' } };
+    case 'skills-fetch':
+      // It says what it read, not that all is well: some postings may still fail (R-disc-05).
+      return { text: 'Finished reading postings. The line at the top of Skills says how many could not be loaded.', open: { href: '#/skills/learn', label: 'Open Skills' } };
     case 'verify-pipeline':
     case 'validate-portals':
     case 'verify-portals': {

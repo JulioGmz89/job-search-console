@@ -109,7 +109,7 @@ function EntryForm({ kind, entry = null, providers = [], scanMethods = [], onSav
               ))}
             </select>
           </div>
-          {field('api', 'API endpoint', { placeholder: 'Filled in automatically when blank' })}
+          {field('api', 'Job board’s data link (API)', { placeholder: 'Filled in automatically when blank' })}
           <div className="field">
             <label htmlFor={`${id}-method`}>How to check for openings</label>
             <select id={`${id}-method`} value={draft.scanMethod ?? ''} onChange={set('scanMethod')}>
@@ -225,7 +225,7 @@ function EntryRow({ entry, kind, health, portals, onEdit, editing, children }) {
       </div>
       {!entry.editable ? <p className="small muted">Written in a shape the app can’t edit safely; change it in portals.yml with your editor.</p> : null}
       {fixing ? (
-        <div className="notice warn stack-sm">
+        <div className="notice warn stack-sm" data-run-home>
           <p>
             <b>{entry.name}’s job board {status === 'auth' ? 'wants a login' : 'moved or closed'}.</b>{' '}
             {status === 'auth'
@@ -260,10 +260,11 @@ function EntryRow({ entry, kind, health, portals, onEdit, editing, children }) {
               </a>
             ) : null}
           </div>
-          {finding ? (
-            <div data-run-home>
-              <RunItem run={finding} headingLevel={4} takeFocus />
-            </div>
+          {finding && runState(finding) !== 'done' ? <RunItem run={finding} headingLevel={4} takeFocus /> : null}
+          {finding && runState(finding) === 'done' ? (
+            <p className="notice info" tabIndex={-1} data-run-focus>
+              {boardAnswer(entry.name, finding)}
+            </p>
           ) : null}
           <p className="small muted">Finding the board asks Greenhouse, Lever and Ashby whether {entry.name} has one now. A few seconds; no AI. If one is found, use Edit the link to switch to it.</p>
         </div>
@@ -279,6 +280,21 @@ function EntryRow({ entry, kind, health, portals, onEdit, editing, children }) {
       </ConfirmDialog>
     </li>
   );
+}
+
+/** "2026-08" → "Aug 2026"; anything else as written. */
+function monthOf(value) {
+  const m = String(value).match(/^(\d{4})-(\d{2})/u);
+  return m ? new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, 1)).toLocaleDateString('en', { month: 'short', year: 'numeric', timeZone: 'UTC' }) : value;
+}
+
+/** What the board finder found for one company, in words (R-disc-04). */
+function boardAnswer(name, run) {
+  const mine = (run.result?.findings ?? []).find((f) => f.startsWith(`${name}:`)) ?? null;
+  const moved = mine?.match(/its board may now be (\S+)/u)?.[1];
+  if (moved) return `Found a board for ${name}: ${moved.replace('/', ' › ')}. Use Edit the link and paste that board’s link.`;
+  if (mine) return `No board for ${name} was found on Greenhouse, Lever or Ashby. Open their careers page to see where they post jobs now, or pause ${name}.`;
+  return `${name}’s board answered this time; the status above is up to date.`;
 }
 
 /**
@@ -303,7 +319,7 @@ function SkipList() {
               <li key={c.company}>
                 <b>{c.company}</b>
                 {c.reason ? ` · ${c.reason}` : ''}
-                {c.since ? <span className="small muted"> · since {c.since}</span> : null}
+                {c.since ? <span className="small muted"> · since {monthOf(c.since)}</span> : null}
               </li>
             ))}
           </ul>
@@ -359,12 +375,14 @@ export function CompaniesPage() {
   const { list, start } = useRuns();
   const [form, setForm] = useState(null);
   const [scanId, setScanId] = useState(null);
+  const [cardRunId, setCardRunId] = useState(null);
   const followButton = useRef(null);
 
   if (!portals.data) return <PageHead title="Companies you follow" lead={portals.error ? portals.error.message : 'Loading…'} />;
   const { companies, boards, health = {}, etag, providers, scanMethods } = portals.data;
   const broken = brokenBoards(companies, health);
-  const checkRun = latest(list.filter((r) => ['verify-portals', 'validate-portals'].includes(r.kind)), 'verify-portals');
+  // The check started from this card, else the last board check (R-disc-03).
+  const checkRun = (cardRunId ? list.find((r) => r.id === cardRunId) : null) ?? latest(list, 'verify-portals');
   const checking = checkRun && ['waiting', 'working'].includes(runState(checkRun));
 
   const closeForm = () => {
@@ -455,10 +473,10 @@ export function CompaniesPage() {
         ) : null}
         {!checking ? (
           <div className="row">
-            <button type="button" className="btn2" onClick={() => start('verify-portals', {}).then((r) => announce(`Started: ${runTitle(r)}`))}>
+            <button type="button" className="btn2" onClick={() => start('verify-portals', {}).then((r) => (setCardRunId(r.id), announce(`Started: ${runTitle(r)}`)))}>
               Check companies’ job boards
             </button>
-            <button type="button" className="btn2" onClick={() => start('validate-portals', {}).then((r) => announce(`Started: ${runTitle(r)}`))}>
+            <button type="button" className="btn2" onClick={() => start('validate-portals', {}).then((r) => (setCardRunId(r.id), announce(`Started: ${runTitle(r)}`)))}>
               Check the companies list for mistakes
             </button>
             <span className="hint inline">Reads your companies file for unknown board types, missing names and broken links. Changes nothing.</span>

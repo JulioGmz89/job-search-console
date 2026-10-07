@@ -228,7 +228,7 @@ export function WorkspacePage() {
               {loose.slice(0, 20).map((rep) => (
                 <li key={rep.id}>
                   {jobName({ company: rep.machine?.company, role: rep.machine?.role }) || rep.title} · fit report {rep.id}
-                  {rep.date ? `, ${shortDate(rep.date)}` : ''} · <a href={`#/applications/report/${rep.id}`}>Open<span className="visually-hidden"> fit report {rep.id}</span></a>
+                  {rep.date ? `, ${shortDate(rep.date)}` : ''} · <a href={`#/applications/report/${rep.id}`}>Open<span className="visually-hidden"> the fit report for {jobName({ company: rep.machine?.company, role: rep.machine?.role }) || rep.title}</span></a>
                 </li>
               ))}
             </ul>
@@ -259,6 +259,7 @@ export function WorkspacePage() {
             confirmLabel="Remove these links"
           />
           <Tool id="tool-verify" kind="verify-pipeline" title="Check my list for problems" description="Checks that every application has a valid status, score and fit report." />
+          <Tool id="tool-validate" kind="validate-portals" title="Check the companies list for mistakes" description="Reads your companies file for unknown board types, missing names and broken links. Changes nothing." />
           <Tool
             id="tool-boards"
             kind="verify-portals"

@@ -5,7 +5,7 @@ import { RunItem } from '../components/RunItem.jsx';
 import { ChoiceSelect, EmptyState } from '../components/ui.jsx';
 import { reload, useResource } from '../data.js';
 import { fit, plural, shortDate } from '../lib/labels.js';
-import { runState } from '../lib/runs.js';
+import { outcome, runState } from '../lib/runs.js';
 import { rankSkills, SKILL_VIEWS } from '../lib/skills.js';
 import { useRuns } from '../runs.jsx';
 import { announce } from '../shell/announce.jsx';
@@ -115,7 +115,14 @@ export function SkillsPage({ params }) {
   const skills = useResource('skills');
   const pipeline = useResource('pipeline');
   const portals = useResource('portals');
-  const { list, track } = useRuns();
+  const { list, track: trackRun } = useRuns();
+  // The last run started here; its result stays on the basis line (R-disc-05).
+  const [startedId, setStartedId] = useState(null);
+  const track = (run) => {
+    trackRun(run);
+    setStartedId(run.id);
+  };
+  const startedRun = startedId ? (list.find((r) => r.id === startedId) ?? null) : null;
   const [goodFitOnly, setGoodFitOnly] = useState(false);
   const [showIgnored, setShowIgnored] = useState(false);
   const [category, setCategory] = useState('');
@@ -244,15 +251,20 @@ export function SkillsPage({ params }) {
     <>
       {head}
       {nav}
-      <div className="notice info stack-sm">
+      <div className="notice info stack-sm" data-run-home>
         <p>
           Based on <b>{plural(cov.postings, 'posting')}</b> from {plural((portals.data?.companies ?? []).length, 'company', 'companies')}
           {cov.lastFetchAt ? `, last read ${shortDate(cov.lastFetchAt)}` : ''} · {cov.extractedLlm} read by Claude, {cov.rulesOnly} by quick rules
           {cov.fetchFailed ? `, ${cov.fetchFailed} couldn’t be loaded (the job was taken down)` : ''}
           {cov.unfetched ? `, ${cov.unfetched} not read yet` : ''}.
         </p>
+        {startedRun && !improving && runState(startedRun) !== 'waiting' && runState(startedRun) !== 'working' ? (
+          <p className="small" tabIndex={-1} data-run-focus>
+            <b>{runState(startedRun) === 'failed' ? 'That didn’t finish' : 'Done'}:</b> {runState(startedRun) === 'failed' ? 'see Activity for what happened.' : outcome(startedRun).text.replace(/ The line at the top of Skills says/u, ' The line above says')}
+          </p>
+        ) : null}
         {improving ? (
-          <RunItem run={improving} headingLevel={3} />
+          <RunItem run={improving} headingLevel={3} takeFocus />
         ) : (
           <div className="row">
             {cov.pendingLlm ? (

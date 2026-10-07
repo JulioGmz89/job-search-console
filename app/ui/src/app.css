@@ -374,3 +374,5 @@ label.file-button:has(+ input:focus-visible) { outline: var(--focus-width) solid
 /* ── discoverability pass (M8) ─────────── */
 /* Profile's Save stays in view at the bottom of the window while the form scrolls. */
 .savebar { position: sticky; bottom: 0; z-index: 1; background: var(--bg); padding: var(--space-2) 0; border-top: 1px solid var(--border); }
+/* The sticky bar never hides the field being typed in (R-disc-01, WCAG 2.4.11). */
+html:has(.savebar) { scroll-padding-bottom: 8rem; }

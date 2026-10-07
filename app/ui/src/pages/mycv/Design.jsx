@@ -191,7 +191,7 @@ export function DesignSection() {
     try {
       await persist();
       const name = themes?.find((t) => t.name === chosen)?.displayName ?? chosen;
-      setNotice(`${name} is now your design for every new CV. CVs you already have keep their old layout until you update them: Update existing CVs, or Lay out this CV again beside the preview.`);
+      setNotice(`${name} is now your design for every new CV. CVs you already have keep their old layout until you update them: Update existing CVs, or Lay out this CV again below the preview.`);
       announce(`${name} is now your design for every new CV.`);
     } catch (e) {
       setErrors(Array.isArray(e.detail) ? e.detail : []);
@@ -245,9 +245,9 @@ export function DesignSection() {
       {warnings.style || warnings.cvSections ? (
         <div className="notice warn stack-sm">
           <p>
-            Your profile (config/profile.yml) has its own {warnings.style ? 'style' : ''}
+            Your Profile sets its own {warnings.style ? 'CV colours and fonts' : ''}
             {warnings.style && warnings.cvSections ? ' and ' : ''}
-            {warnings.cvSections ? 'section order' : ''}, which wins over the settings here; the preview already shows their effect.
+            {warnings.cvSections ? 'order of CV sections' : ''}, which win over the settings on this page; the preview already shows them.
           </p>
           <div className="row">
             <button type="button" className="btn2 btn-sm" onClick={handOver}>

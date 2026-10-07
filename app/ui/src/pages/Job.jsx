@@ -101,7 +101,10 @@ function ReportBody({ report, score }) {
  * (R-reports-list). Readable, with the way back into Applications.
  */
 function ReportOnly({ reportId, back }) {
-  const { start } = useRuns();
+  const { list, start } = useRuns();
+  // The check started here, shown where it was clicked with its result (R-disc-02).
+  const [runId, setRunId] = useState(null);
+  const run = runId ? (list.find((r) => r.id === runId) ?? null) : null;
   const { report, error } = useReport(reportId, 'once');
   if (!report) return <PageHead title={error ? 'Fit report not found' : 'Loading…'} back={back} lead={error ? error.message : null} />;
   const machine = report.machine ?? {};
@@ -111,14 +114,24 @@ function ReportOnly({ reportId, back }) {
       <PageHead title={title} docTitle={title} back={back} lead={`Fit report ${reportId}${report.header?.date ? ` · ${shortDate(report.header.date)}` : ''}`} />
       <div className="notice info stack-sm">
         <p>This fit report isn’t in your Applications. It was never added, or its application was merged into another one or removed.</p>
-        {report.url ? (
+        {run ? (
+          <div data-run-home>
+            <RunItem run={run} headingLevel={2} takeFocus />
+          </div>
+        ) : null}
+        {report.url && !run ? (
           <div className="row">
             <button
               type="button"
               className="btn2 btn-sm"
               onClick={async () => {
-                const run = await start('evaluate', { url: report.url, autoPdf: false });
-                announce(`Started: ${runTitle(run)}`);
+                try {
+                  const started = await start('evaluate', { url: report.url, autoPdf: false });
+                  setRunId(started.id);
+                  announce(`Started: ${runTitle(started)}`);
+                } catch (e) {
+                  announce(`Could not start the check: ${e.message}`, { assertive: true });
+                }
               }}
             >
               Check fit again and add it to Applications
@@ -289,24 +302,39 @@ export function JobPage({ params }) {
 
       <section aria-labelledby="his-h" className="stack" id="history">
         <h2 id="his-h">History</h2>
+        {/* One list, newest first: this job's runs, its recorded status changes, and when it was added (R-disc-06). */}
         <ul className="small">
-          {runs
-            .filter((r) => !['merge-tracker', 'mark-pdf-ready', 'reconcile-auto'].includes(r.kind))
-            .map((r) => (
-              <li key={r.id}>
-                <a href={`#/activity/${r.id}`}>{runTitle(r)}</a> — {runState(r) === 'done' ? 'done' : runState(r)}, {shortDate(r.endedAt ?? r.queuedAt)}
-              </li>
+          {[
+            ...runs
+              .filter((r) => !['merge-tracker', 'mark-pdf-ready', 'reconcile-auto'].includes(r.kind))
+              .map((r) => ({
+                key: r.id,
+                at: r.endedAt ?? r.queuedAt ?? 0,
+                body: (
+                  <>
+                    {shortDate(r.endedAt ?? r.queuedAt)} · <a href={`#/activity/${r.id}`}>{runTitle(r)}</a> — {runState(r)}
+                  </>
+                ),
+              })),
+            ...changes.map((c, i) => ({
+              key: `status-${i}`,
+              // A ledger day sorts after that day's "added" and before the next day's events.
+              at: Date.parse(`${c.date}T12:00:00`) + i,
+              body: (
+                <>
+                  {shortDate(c.date)} · {c.from && c.from !== c.to ? `${statusLabel(c.from)} → ${statusLabel(c.to)}` : statusLabel(c.to)}
+                  {c.source && !['set-status', 'web'].includes(c.source) ? <span className="muted"> · by {c.source}</span> : null}
+                </>
+              ),
+            })),
+            { key: 'added', at: Date.parse(`${row.date}T00:00:00`), body: <>{shortDate(row.date)} · added to Applications</> },
+          ]
+            .sort((x, y) => y.at - x.at)
+            .map((item) => (
+              <li key={item.key}>{item.body}</li>
             ))}
-          {changes.map((c, i) => (
-            <li key={`${c.date}-${i}`}>
-              {shortDate(c.date)} · {c.from && c.from !== c.to ? `${statusLabel(c.from)} → ${statusLabel(c.to)}` : statusLabel(c.to)}
-              {c.source && !['set-status', 'web'].includes(c.source) ? <span className="muted"> · by {c.source}</span> : null}
-            </li>
-          ))}
-          <li>
-            {shortDate(row.date)} · added to Applications · now {statusLabel(statusId)}
-          </li>
         </ul>
+        <p className="small muted">Now {statusLabel(statusId)}.</p>
       </section>
 
       <WhenDialog isOpen={askSent} row={row} onConfirm={sent} onCancel={() => setAskSent(false)} />

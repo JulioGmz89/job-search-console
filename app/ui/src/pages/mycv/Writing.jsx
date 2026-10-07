@@ -136,7 +136,7 @@ function Words({ words }) {
         </button>
       </form>
       {saved ? (
-        <p className="notice ok" role="status">
+        <p className="notice ok">
           {saved}
         </p>
       ) : null}
@@ -256,6 +256,12 @@ export function WritingSection() {
       setEdited(false);
       setSaved(`Rules saved ${dateTime(new Date())}. They apply to the next tailored CV or letter.`);
       announce('Your writing rules are saved.');
+      // Back to the rules before this save (R-cv-voice-restore); the server kept them as voice-dna.md.bak.
+      offerUndo('Saved your writing rules', async () => {
+        const back = await restoreVoice();
+        setResource('voice', back);
+        setEdited(false);
+      });
     } catch (err) {
       setError(err.message);
     }
@@ -289,7 +295,7 @@ export function WritingSection() {
             <textarea
               id="rules-edit"
               className="editor"
-              rows={16}
+              rows={10}
               value={text}
               onChange={(e) => {
                 setText(e.target.value);
