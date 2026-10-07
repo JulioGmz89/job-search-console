@@ -28,9 +28,12 @@ const pendingOrder = (style) => (style?.sections?.length === 1 ? { ...style, sec
 
 function SectionOrder({ value, keys, onChange }) {
   const chosen = value ?? [];
-  const rest = keys.filter((k) => !chosen.includes(k));
+  // With no order set, the sections are listed anyway, so Up, Down and Remove
+  // are in reach; the first change sets the order (UI-cv-section-move).
+  const shown = chosen.length ? chosen : keys;
+  const rest = keys.filter((k) => !shown.includes(k));
   const move = (i, delta) => {
-    const next = [...chosen];
+    const next = [...shown];
     const j = i + delta;
     if (j < 0 || j >= next.length) return;
     [next[i], next[j]] = [next[j], next[i]];
@@ -39,26 +42,28 @@ function SectionOrder({ value, keys, onChange }) {
   return (
     <div className="stack-sm">
       <span className="label">Section order</span>
+      {chosen.length ? null : <p className="small muted">Not set: the design uses its own order. Move or remove a section to set one.</p>}
+      <ol className="stack-sm">
+        {shown.map((key, i) => (
+          <li key={key} className="row">
+            <span className="grow">{key}</span>
+            <button type="button" className="btn2 btn-sm" onClick={() => move(i, -1)} disabled={i === 0}>
+              Up<span className="visually-hidden"> {key}</span>
+            </button>
+            <button type="button" className="btn2 btn-sm" onClick={() => move(i, 1)} disabled={i === shown.length - 1}>
+              Down<span className="visually-hidden"> {key}</span>
+            </button>
+            <button type="button" className="btn2 btn-sm" onClick={() => onChange(shown.filter((k) => k !== key))} disabled={shown.length === 1}>
+              Remove<span className="visually-hidden"> {key} from the order</span>
+            </button>
+          </li>
+        ))}
+      </ol>
       {chosen.length ? (
-        <ol className="stack-sm">
-          {chosen.map((key, i) => (
-            <li key={key} className="row">
-              <span className="grow">{key}</span>
-              <button type="button" className="btn2 btn-sm" onClick={() => move(i, -1)} disabled={i === 0}>
-                Up<span className="visually-hidden"> {key}</span>
-              </button>
-              <button type="button" className="btn2 btn-sm" onClick={() => move(i, 1)} disabled={i === chosen.length - 1}>
-                Down<span className="visually-hidden"> {key}</span>
-              </button>
-              <button type="button" className="btn2 btn-sm" onClick={() => onChange(chosen.filter((k) => k !== key))}>
-                Remove<span className="visually-hidden"> {key} from the order</span>
-              </button>
-            </li>
-          ))}
-        </ol>
-      ) : (
-        <p className="small muted">The design’s own order.</p>
-      )}
+        <button type="button" className="btn-link" onClick={() => onChange([])}>
+          Back to the design’s own order
+        </button>
+      ) : null}
       {rest.length ? (
         <div className="field narrow">
           <label htmlFor="add-section">Add a section to the order</label>
