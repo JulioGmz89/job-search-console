@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { cancelRun, fetchRuns, retryRun, startRun } from './api.js';
-import { filesChanged, reload } from './data.js';
+import { filesChanged, reload, useResource } from './data.js';
 import { explainFailure, isTopLevel, outcome, runState, runTitle } from './lib/runs.js';
 import { announce } from './shell/announce.jsx';
 import { useServerEvents } from './useServerEvents.js';
@@ -24,6 +24,9 @@ export function RunsProvider({ children }) {
   const [runs, setRuns] = useState({});
   const [connected, setConnected] = useState(true);
   const known = useRef({});
+  const pipeline = useResource('pipeline');
+  const rowsRef = useRef([]);
+  rowsRef.current = pipeline.data?.rows ?? [];
 
   const load = useCallback(() => {
     fetchRuns()
@@ -44,7 +47,7 @@ export function RunsProvider({ children }) {
     if (TERMINAL.has(run.status) && before && !TERMINAL.has(before.status) && isTopLevel(run)) {
       const title = runTitle(run);
       if (run.status === 'failed') announce(`${title} didn't finish. ${explainFailure(run).what}`, { assertive: true });
-      else if (run.status === 'succeeded') announce(`${title}: ${outcome(run, { all: Object.values(known.current) }).text}`);
+      else if (run.status === 'succeeded') announce(`${title}: ${outcome(run, { all: Object.values(known.current), rows: rowsRef.current }).text}`);
     }
     if (TERMINAL.has(run.status)) reload('workspace');
   }, []);

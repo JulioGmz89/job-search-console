@@ -434,7 +434,6 @@ export function TodayPage() {
     health: portals.data?.health ?? {},
     pending: inbox.data?.pending ?? [],
     lastSeen: lastSeenRef.current,
-    lastScan: inbox.data?.lastScan ?? null,
   });
   const rowForReport = (id) => pipeline.data?.rows?.find((r) => r.reportId === id) ?? null;
   const finished = list.filter(
@@ -532,7 +531,7 @@ export function TodayPage() {
           </h2>
           {finished.map((r) => {
             const row = rowForReport(Number(r.result?.reportId ?? r.meta?.reportId));
-            const res = outcome(r, { rowForReport, all: list });
+            const res = outcome(r, { rowForReport, all: list, rows: pipeline.data?.rows ?? [] });
             return (
               <article className="card ok" key={r.id} aria-labelledby={`done-${r.id}`}>
                 <Tag tone="ok">Done</Tag>

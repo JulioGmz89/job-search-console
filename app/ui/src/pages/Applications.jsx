@@ -6,7 +6,7 @@ import { StatusControl } from '../components/StatusControl.jsx';
 import { ActionMenu, EmptyState, Notice } from '../components/ui.jsx';
 import { useResource } from '../data.js';
 import { fit, jobName, plural, shortDate, statusLabel } from '../lib/labels.js';
-import { runTitle } from '../lib/runs.js';
+import { mergeInfo, runTitle } from '../lib/runs.js';
 import { useRuns } from '../runs.jsx';
 import { announce } from '../shell/announce.jsx';
 import { navigate, PageHead } from '../shell/router.jsx';
@@ -54,7 +54,7 @@ const SORTS = {
  */
 export function ApplicationsPage() {
   const pipeline = useResource('pipeline');
-  const { start } = useRuns();
+  const { start, list } = useRuns();
   const [filters, setFiltersState] = useState(readFilters);
   const [moved, setMoved] = useState({});
   const setFilters = (change) => {
@@ -65,6 +65,14 @@ export function ApplicationsPage() {
   };
 
   const rows = pipeline.data?.rows ?? [];
+  // Applications a recent check merged into rather than added (F-015).
+  const updated = new Map(
+    list
+      .filter((r) => r.kind === 'evaluate' && r.status === 'succeeded')
+      .map((r) => mergeInfo(r, rows))
+      .filter(Boolean)
+      .map((m) => [m.rowId, m]),
+  );
   const statuses = pipeline.data?.statuses ?? [];
   const unreadable = (pipeline.data?.issues ?? []).filter((i) => i.code === 'row-unparseable');
   const counts = useMemo(() => {
@@ -232,6 +240,11 @@ export function ApplicationsPage() {
                           <a className="joblink" href={`#/applications/${row.id}`}>
                             {jobName(row)}
                           </a>
+                          {updated.has(row.id) ? (
+                            <span className="badge new" title="A recent check was merged into this application">
+                              Updated
+                            </span>
+                          ) : null}
                           {left ? <span className="rowmsg">Moved to {statusLabel(moved[row.id])}</span> : null}
                         </Cell>
                         <Cell className="num">{fit(row.score)}</Cell>

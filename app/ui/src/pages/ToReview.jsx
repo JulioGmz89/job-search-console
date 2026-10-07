@@ -6,14 +6,14 @@ import { ActionMenu, ConfirmDialog, CostNote, EmptyState } from '../components/u
 import { reload, useResource } from '../data.js';
 import { dateTime, fit, jobName, plural, shortDate } from '../lib/labels.js';
 import { explainFailure, needsAttention, runState, runTitle } from '../lib/runs.js';
-import { brokenBoards, newSince } from '../lib/today.js';
+import { brokenBoards, newFromChecks } from '../lib/today.js';
 import { latest, useRuns } from '../runs.jsx';
 import { announce } from '../shell/announce.jsx';
 import { navigate, PageHead } from '../shell/router.jsx';
 import { offerUndo } from '../shell/undo.jsx';
 
 /** The last check for new openings, in words (ia.md §2.4). */
-function ScanSummary({ inbox, portals, scanRun }) {
+function ScanSummary({ inbox, portals, scanRun, lastReal }) {
   const ref = useRef(null);
   const last = inbox.lastScan;
   const finished = scanRun && runState(scanRun) === 'done';
@@ -21,8 +21,8 @@ function ScanSummary({ inbox, portals, scanRun }) {
     if (finished) ref.current?.focus();
   }, [finished]);
   if (!last) return null;
-  const day = String(last.timestamp ?? '').slice(0, 10);
-  const found = inbox.pending.filter((p) => p.firstSeen === day);
+  // The check's own list of what it added (never dates, which drift across midnight).
+  const found = lastReal?.result?.added ?? [];
   const broken = brokenBoards(portals?.companies ?? [], portals?.health ?? {});
   const failed = last.status && last.status !== 'completed';
   return (
@@ -33,7 +33,10 @@ function ScanSummary({ inbox, portals, scanRun }) {
       {found.length ? (
         <ul>
           {found.slice(0, 10).map((p) => (
-            <li key={p.url}>{jobName(p)}</li>
+            <li key={`${p.company}|${p.title}`}>
+              {p.company} — {p.title}
+              {p.location ? <span className="small muted"> · {p.location}</span> : null}
+            </li>
           ))}
         </ul>
       ) : null}
@@ -142,7 +145,7 @@ export function ToReviewPage() {
   if (!inbox.data) return <PageHead title="To review" lead={inbox.error ? inbox.error.message : 'Loading…'} />;
 
   const pending = inbox.data.pending;
-  const fresh = new Set(newSince(pending, today.data?.lastSeen ?? null, inbox.data.lastScan).map((p) => p.url));
+  const fresh = new Set(newFromChecks(pending, list, today.data?.lastSeen ?? null).map((p) => p.url));
   const agentOk = workspace.data?.setup?.assistant && workspace.data?.setup?.cv;
   const scanRun = latest(list, 'scan');
   const runsFor = (url) => list.filter((r) => r.kind === 'evaluate' && r.meta?.url === url);
@@ -192,7 +195,13 @@ export function ToReviewPage() {
     <>
       <PageHead title="To review" lead="Job links waiting to be checked: found at the companies you follow, or saved by you." />
       <ScanButton portals={portals.data} />
-      <ScanSummary inbox={inbox.data} portals={portals.data} scanRun={scanRun} />
+      <ScanSummary inbox={inbox.data} portals={portals.data} scanRun={scanRun} lastReal={list.filter((r) => r.kind === 'scan' && r.status === 'succeeded' && !r.result?.preview).sort((a, b) => (b.endedAt ?? 0) - (a.endedAt ?? 0))[0] ?? null} />
+      {scanRun?.result?.preview && runState(scanRun) === 'done' ? (
+        <p className="notice info" role="status">
+          Preview, nothing saved: {plural(scanRun.result.added?.length ?? 0, 'new opening')} would be added
+          {scanRun.result.added?.length ? `: ${scanRun.result.added.map((a) => `${a.company} — ${a.title}`).join('; ')}` : ''}.
+        </p>
+      ) : null}
 
       <section aria-labelledby="tr-h" className="stack-sm">
         <div className="row between">

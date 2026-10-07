@@ -64,6 +64,7 @@ const BADGE = {
 export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }) {
   const { list, retry, cancel } = useRuns();
   const rowForReport = useRowForReport();
+  const pipelineRows = useResource('pipeline').data?.rows ?? [];
   const state = runState(run);
   const now = useNow(state === 'working');
   const [busy, setBusy] = useState(false);
@@ -108,8 +109,8 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
   };
 
   const why = state === 'failed' ? explainFailure(run) : null;
-  const done = state === 'done' ? outcome(run, { rowForReport, all: list }) : null;
-  const then = followUps(run, list);
+  const done = state === 'done' ? outcome(run, { rowForReport, all: list, rows: pipelineRows }) : null;
+  const then = followUps(run, list, pipelineRows);
   const started = run.startedAt ?? run.queuedAt;
 
   return (

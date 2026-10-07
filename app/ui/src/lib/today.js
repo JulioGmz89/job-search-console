@@ -24,19 +24,23 @@ export const BOARD_HEALTH = Object.freeze({
 });
 
 /**
- * Openings in To review the user has not seen: first seen after the day they
- * last looked, or on that day by a check that ran after they looked.
+ * The openings checks for new openings added since the user last looked,
+ * matched to To review by company and title (T4). Uses each check's own list,
+ * never dates, so it holds across midnight and time zones.
  *
- * @param {object[]} pending - `/api/inbox` pending entries (with firstSeen).
+ * @param {object[]} pending - `/api/inbox` pending entries.
+ * @param {object[]} runs - every run the app knows about.
  * @param {string|null} lastSeen - ISO time the user last left Today.
- * @param {{timestamp?: string}|null} lastScan
  */
-export function newSince(pending, lastSeen, lastScan = null) {
-  const withDate = pending.filter((p) => p.firstSeen);
-  if (!lastSeen) return withDate;
-  const day = lastSeen.slice(0, 10);
-  const scannedAfter = lastScan?.timestamp ? Date.parse(lastScan.timestamp) > Date.parse(lastSeen) : false;
-  return withDate.filter((p) => p.firstSeen > day || (p.firstSeen === day && scannedAfter));
+export function newFromChecks(pending, runs, lastSeen) {
+  const since = lastSeen ? Date.parse(lastSeen) : 0;
+  const key = (company, title) => `${String(company ?? '').trim().toLowerCase()}|${String(title ?? '').trim().toLowerCase()}`;
+  const added = new Set(
+    runs
+      .filter((r) => r.kind === 'scan' && r.status === 'succeeded' && !r.result?.preview && (r.endedAt ?? 0) > since)
+      .flatMap((r) => (r.result?.added ?? []).map((a) => key(a.company, a.title))),
+  );
+  return pending.filter((p) => added.has(key(p.company, p.title)));
 }
 
 /** Companies whose job board check last failed, with the date it started failing. */
@@ -59,15 +63,14 @@ export function brokenBoards(companies, health = {}) {
  * @param {object} data.health - portal health by company
  * @param {object[]} data.pending - To review entries
  * @param {string|null} data.lastSeen
- * @param {object|null} data.lastScan
  */
-export function todayCards({ runs = [], dismissed = [], rows = [], issues = [], design = null, companies = [], health = {}, pending = [], lastSeen = null, lastScan = null }) {
+export function todayCards({ runs = [], dismissed = [], rows = [], issues = [], design = null, companies = [], health = {}, pending = [], lastSeen = null }) {
   const failures = runs.filter((r) => needsAttention(r, runs, dismissed));
   const unreadable = issues.filter((i) => i.code === 'row-unparseable');
   const boards = brokenBoards(companies, health);
   const designFails = design?.verdict === 'fail';
 
-  const fresh = newSince(pending, lastSeen, lastScan);
+  const fresh = newFromChecks(pending, runs, lastSeen);
   const replied = rows.filter((r) => ['responded', 'interview'].includes(String(r.statusId ?? r.status).toLowerCase()) && (!r.pdf || !r.cover));
   const reviewed = rows
     .filter((r) => String(r.statusId ?? r.status).toLowerCase() === 'evaluated')

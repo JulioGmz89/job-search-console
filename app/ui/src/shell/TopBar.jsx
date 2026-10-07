@@ -2,7 +2,8 @@ import { useState } from 'react';
 
 import { useResource } from '../data.js';
 import { DESTINATIONS, destinationOf } from '../lib/routes.js';
-import { brokenBoards, newSince } from '../lib/today.js';
+import { brokenBoards, newFromChecks } from '../lib/today.js';
+import { useRuns } from '../runs.jsx';
 import { useRoute } from './router.jsx';
 import { Search } from './Search.jsx';
 
@@ -17,9 +18,10 @@ export function TopBar({ activity, onActivity, activityRef, panelOpen }) {
   const inbox = useResource('inbox');
   const portals = useResource('portals');
   const today = useResource('today');
+  const { list } = useRuns();
 
   const counts = {
-    'to-review': newSince(inbox.data?.pending ?? [], today.data?.lastSeen ?? null, inbox.data?.lastScan ?? null).length,
+    'to-review': newFromChecks(inbox.data?.pending ?? [], list, today.data?.lastSeen ?? null).length,
     companies: brokenBoards(portals.data?.companies ?? [], portals.data?.health ?? {}).length,
   };
   const countLabel = { 'to-review': 'new', companies: 'not working' };

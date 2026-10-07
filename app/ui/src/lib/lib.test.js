@@ -79,19 +79,31 @@ test('outcomes say what came of a run and link to it', () => {
   assert.equal(followUps(pdf, [pdf, render, ready]), 'then: laid out the PDF (it fails the screening check)');
   assert.match(outcome(pdf, { all: [pdf, render] }).text, /fails the screening check/);
   assert.equal(activitySummary([done, pdf, render], { lastOpened: 0 }).done, 0, 'chained runs are not counted on their own');
+
+  // A check merged into an application that already existed says so (F-015).
+  const merged = { id: 'e2', kind: 'evaluate', status: 'succeeded', result: { reportId: 44, score: 4.1, trackerBefore: [{ id: 21, score: 3.3, status: 'Applied' }] } };
+  const rows = [{ id: 21, reportId: 44, score: 4.1, company: 'Brightwater Health', role: 'Data Engineer' }];
+  assert.match(outcome(merged, { rows }).text, /Merged into your application #21 \(Brightwater Health — Data Engineer\): fit 3\.3 → 4\.1/);
+  assert.equal(followUps(merged, [merged, { id: 'm3', kind: 'merge-tracker', parentId: 'e2', status: 'succeeded' }], rows), 'then: updated application #21');
+  assert.equal(outcome({ ...merged, result: { ...merged.result, trackerBefore: [] } }, { rows }).text, 'Fit 4.1 / 5. The fit report is ready.');
 });
 
-test('today: new openings are the ones first seen after the user last looked', async () => {
-  const { newSince, todayCards, brokenBoards } = await import('./today.js');
+test('today: new openings are the ones a check added since the user last looked', async () => {
+  const { newFromChecks, todayCards, brokenBoards } = await import('./today.js');
   const pending = [
-    { url: 'a', firstSeen: '2026-10-04' },
-    { url: 'b', firstSeen: '2026-10-06' },
-    { url: 'c', firstSeen: null },
+    { url: 'a', company: 'Lumen Grid', title: 'Platform Engineer' },
+    { url: 'b', company: 'Mosaic Retail', title: 'Platform Engineer' },
+    { url: 'c', company: 'Old Co', title: 'Engineer' },
   ];
-  assert.deepEqual(newSince(pending, null).map((p) => p.url), ['a', 'b']);
-  assert.deepEqual(newSince(pending, '2026-10-05T09:00:00Z').map((p) => p.url), ['b']);
-  assert.deepEqual(newSince(pending, '2026-10-06T09:00:00Z', { timestamp: '2026-10-06T08:00:00Z' }).map((p) => p.url), []);
-  assert.deepEqual(newSince(pending, '2026-10-06T09:00:00Z', { timestamp: '2026-10-06T10:00:00Z' }).map((p) => p.url), ['b']);
+  const scan = (endedAt, added, extra = {}) => ({ kind: 'scan', status: 'succeeded', endedAt, result: { added, ...extra } });
+  const runs = [
+    scan(Date.parse('2026-10-06T23:30:00Z'), [{ company: 'Lumen Grid', title: 'Platform Engineer' }]),
+    scan(Date.parse('2026-10-05T10:00:00Z'), [{ company: 'Old Co', title: 'Engineer' }]),
+    scan(Date.parse('2026-10-07T00:10:00Z'), [{ company: 'Mosaic Retail', title: 'Platform Engineer' }], { preview: true }),
+  ];
+  assert.deepEqual(newFromChecks(pending, runs, '2026-10-06T22:00:00Z').map((p) => p.url), ['a'], 'across midnight, and not from a preview');
+  assert.deepEqual(newFromChecks(pending, runs, null).map((p) => p.url), ['a', 'c']);
+  assert.deepEqual(newFromChecks(pending, [], null), []);
 
   const companies = [{ name: 'Juniper Mobility', enabled: true }, { name: 'Kestrel Media', enabled: true }];
   const health = { 'Juniper Mobility': { status: 'slug_gone', timestamp: '2026-10-02T08:00:00Z' }, 'Kestrel Media': { status: 'reachable' } };
@@ -110,6 +122,7 @@ test('today: new openings are the ones first seen after the user last looked', a
     health,
   });
   assert.equal(cards.needs.count, 4);
+  assert.deepEqual(cards.fresh, []);
   assert.deepEqual(cards.waiting.reviewed.map((r) => r.id), [2, 1]);
   assert.deepEqual(cards.waiting.replied.map((r) => r.id), [3]);
 });

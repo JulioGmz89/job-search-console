@@ -119,23 +119,48 @@ export function explainFailure(run) {
 }
 
 /**
+ * Whether a finished check was merged into an application that already
+ * existed (F-015), and what it changed. Null for a new application.
+ *
+ * @returns {{rowId: number, before: object, after: object}|null}
+ */
+export function mergeInfo(run, rows = []) {
+  const result = run?.result;
+  if (run?.kind !== 'evaluate' || !result?.trackerBefore?.length || result.reportId === undefined) return null;
+  const row = rows.find((r) => r.reportId === result.reportId);
+  const before = row ? result.trackerBefore.find((b) => b.id === row.id) : null;
+  return before ? { rowId: row.id, before, after: row } : null;
+}
+
+/** "Merged into your application #21 (…): fit 3.3 → 4.1; status stays Applied." */
+export function mergeText(merge) {
+  const { rowId, before, after } = merge;
+  const name = [after.company, after.role].filter(Boolean).join(' — ');
+  const scores = before.score === after.score ? `fit still ${fit(after.score)}` : `fit ${fit(before.score)} → ${fit(after.score)}`;
+  return `Merged into your application #${rowId}${name ? ` (${name})` : ''}: ${scores}; its status stays as it was. It now points to this posting.`;
+}
+
+/**
  * The outcome of a finished run in words, and where to open it.
  *
  * @param {object} run
  * @param {{rowForReport?: (reportId: number) => object|null}} [ctx]
  * @returns {{text: string, open: {href: string, label: string}|null}}
  */
-export function outcome(run, { rowForReport = () => null, all = [] } = {}) {
+export function outcome(run, { rowForReport = () => null, all = [], rows = [] } = {}) {
   const result = run?.result ?? {};
   const reportId = result.reportId ?? run?.meta?.reportId ?? null;
   const row = reportId !== null ? rowForReport(Number(reportId)) : null;
   const jobHref = row ? `#/applications/${row.id}` : reportId !== null ? `#/applications/report/${reportId}` : null;
   switch (run?.kind) {
-    case 'evaluate':
+    case 'evaluate': {
+      const merge = mergeInfo(run, rows);
+      const base = typeof result.score === 'number' ? `Fit ${fit(result.score)} / 5. The fit report is ready.` : 'The fit report is ready.';
       return {
-        text: typeof result.score === 'number' ? `Fit ${fit(result.score)} / 5. The fit report is ready.` : 'The fit report is ready.',
+        text: merge ? `${base} ${mergeText(merge)}` : base,
         open: jobHref ? { href: jobHref, label: 'Open the job' } : null,
       };
+    }
     case 'pdf': {
       // Its PDF is laid out by a chained render, which carries the screening verdict.
       const render = all.find((r) => r.parentId === run.id && r.kind === 'cv-render');
@@ -153,8 +178,16 @@ export function outcome(run, { rowForReport = () => null, all = [] } = {}) {
       const words = verdict === 'fail' ? ' It fails the screening check.' : verdict === 'warn' ? ' Readable, with small issues.' : verdict === 'pass' ? ' Readable by screening systems.' : '';
       return { text: `The CV was laid out again.${words}`, open: jobHref ? { href: `${jobHref}#documents`, label: 'Open the CV' } : null };
     }
-    case 'scan':
-      return { text: 'Finished checking for new openings.', open: { href: '#/to-review', label: 'See what came back' } };
+    case 'scan': {
+      const added = result.added ?? [];
+      const names = added.slice(0, 4).map((a) => `${a.company} — ${a.title}`).join('; ');
+      const text = result.preview
+        ? `Preview, nothing saved: ${plural(added.length, 'new opening')} would be added${names ? `: ${names}` : ''}.`
+        : added.length
+          ? `${plural(added.length, 'new opening')}: ${names}${added.length > 4 ? ` and ${added.length - 4} more` : ''}.`
+          : 'No new openings this time.';
+      return { text, open: { href: '#/to-review', label: added.length ? `See the ${plural(added.length, 'new opening')}` : 'Open To review' } };
+    }
     case 'skills-extract':
     case 'skills-cv':
     case 'skills-fetch':
@@ -194,11 +227,12 @@ const FOLLOW_UP_WORDS = {
   'skills-fetch-auto': 'read the new postings for Skills',
 };
 
-export function followUps(run, all) {
+export function followUps(run, all, rows = []) {
   const children = all.filter((r) => r.parentId === run.id && FOLLOW_UP_WORDS[r.kind] !== null);
   if (!children.length) return '';
+  const merge = mergeInfo(run, rows);
   const words = children.map((c) => {
-    const verb = FOLLOW_UP_WORDS[c.kind] ?? (RUN_NAMES[c.kind] ?? c.label ?? c.kind).toLowerCase();
+    const verb = c.kind === 'merge-tracker' && merge ? `updated application #${merge.rowId}` : (FOLLOW_UP_WORDS[c.kind] ?? (RUN_NAMES[c.kind] ?? c.label ?? c.kind).toLowerCase());
     if (c.kind === 'cv-render' && runState(c) === 'done' && c.result?.ats?.verdict === 'fail') return `${verb} (it fails the screening check)`;
     return runState(c) === 'failed' ? `${verb} (failed)` : runState(c) === 'working' || runState(c) === 'waiting' ? `${verb} (working)` : verb;
   });

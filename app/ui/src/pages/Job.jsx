@@ -7,7 +7,7 @@ import { StatusControl } from '../components/StatusControl.jsx';
 import { ConfirmDialog, CostNote, HelpLink } from '../components/ui.jsx';
 import { reload, useResource } from '../data.js';
 import { fit, jobName, shortDate, statusLabel } from '../lib/labels.js';
-import { needsAttention, runState, runTitle } from '../lib/runs.js';
+import { mergeInfo, mergeText, needsAttention, runState, runTitle } from '../lib/runs.js';
 import { latest, runsForJob, useRuns } from '../runs.jsx';
 import { announce } from '../shell/announce.jsx';
 import { PageHead, useAnchor } from '../shell/router.jsx';
@@ -85,7 +85,7 @@ export function JobPage({ params }) {
   const failedCheck = runs.find((r) => r.kind === 'evaluate' && needsAttention(r, list));
   const lastCheck = latest(runs.filter((r) => runState(r) === 'done'), 'evaluate');
   // A check merged into a row that already existed (F-015): say what it changed.
-  const merged = lastCheck && row.date && lastCheck.startedAt && row.date < new Date(lastCheck.startedAt).toISOString().slice(0, 10);
+  const merged = lastCheck ? mergeInfo(lastCheck, rows) : null;
   const machine = report?.machine ?? {};
   const decision = machine.final_decision ?? row.report?.decision ?? null;
 
@@ -118,7 +118,7 @@ export function JobPage({ params }) {
 
       {merged ? (
         <p className="notice info">
-          <span className="badge new">Updated</span> Your last check of this posting was merged into this application (#{row.id}, first added {shortDate(row.date)}): fit is now {fit(row.score)}.
+          <span className="badge new">Updated</span> {mergeText(merged)} It was first added {shortDate(row.date)}.
         </p>
       ) : null}
       {failedCheck ? (
