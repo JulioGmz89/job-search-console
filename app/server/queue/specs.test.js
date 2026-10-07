@@ -156,3 +156,10 @@ test('the companies-list check says its findings, or that it is clean', () => {
   assert.equal(summarizeFindings(lines('validate-portals: /w/portals.yml', '0 errors, 0 warnings')).clean, true);
   assert.deepEqual(summarizeFindings(lines('validate-portals failed: file not found: /w/portals.yml')).findings, ['There is no companies list yet: follow a company first.']);
 });
+
+test('a findings check says what it found even when it exits non-zero (R-disc-03)', () => {
+  const spec = buildSpec('validate-portals', {}, { root: repoRoot, repoRoot });
+  const run = { lines: [{ text: 'validate-portals failed: file not found: /w/portals.yml' }] };
+  assert.deepEqual(spec.hooks.after(run, { provisional: { status: 'failed' } }).result.findings, ['There is no companies list yet: follow a company first.']);
+  assert.deepEqual(spec.hooks.after(run, { provisional: { status: 'cancelled' } }), {});
+});

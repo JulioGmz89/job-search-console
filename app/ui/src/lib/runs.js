@@ -216,7 +216,7 @@ export function outcome(run, { rowForReport = () => null, all = [], rows = [] } 
       const found = run.result?.findings ?? [];
       if (found.length) {
         const total = run.result.total ?? found.length;
-        const shown = found.slice(0, 3).join('; ');
+        const shown = found.slice(0, 3).join('; ').replace(/\.$/u, '');
         return {
           text: `Found ${plural(total, 'problem')}: ${shown}${total > 3 ? `; and ${total - 3} more` : ''}.`,
           open: run.kind === 'verify-pipeline' ? { href: '#/workspace#health', label: 'Open Workspace' } : { href: '#/companies', label: 'Open Companies' },

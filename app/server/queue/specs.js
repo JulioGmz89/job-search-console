@@ -457,6 +457,9 @@ export function buildSpec(kind, options = {}, ctx = {}) {
       ? {
           hooks: {
             after: (run, hookCtx) => {
+              // A check that found problems, or could not start (no portals.yml),
+              // still says what it found; it chains nothing (R-disc-03).
+              if (hookCtx.provisional.status === 'failed' && def.reportsFindings) return { result: def.after(run, hookCtx).result };
               if (hookCtx.provisional.status !== 'succeeded') return {};
               const outcome = def.after(run, hookCtx);
               // Post-steps name the next kind; the spec is built here so the

@@ -149,6 +149,16 @@ function EntryRow({ entry, kind, health, portals, onEdit, editing, children }) {
   const { list, start } = useRuns();
   const [findId, setFindId] = useState(null);
   const finding = findId ? (list.find((r) => r.id === findId) ?? null) : null;
+  const found = finding && runState(finding) === 'done';
+  const answerRef = useRef(null);
+  // The answer replaces the run card: focus and say it there, about this company (R-disc-04).
+  useEffect(() => {
+    if (!found) return;
+    const active = document.activeElement;
+    if (!active || active === document.body || answerRef.current?.closest('[data-run-home]')?.contains(active)) answerRef.current?.focus();
+    announce(boardAnswer(entry.name, finding));
+    // Runs once, when the run finishes.
+  }, [found]);
   const status = health?.status ?? null;
   const broken = ['slug_gone', 'auth'].includes(status);
 
@@ -262,7 +272,7 @@ function EntryRow({ entry, kind, health, portals, onEdit, editing, children }) {
           </div>
           {finding && runState(finding) !== 'done' ? <RunItem run={finding} headingLevel={4} takeFocus /> : null}
           {finding && runState(finding) === 'done' ? (
-            <p className="notice info" tabIndex={-1} data-run-focus>
+            <p className="notice info" tabIndex={-1} data-run-focus ref={answerRef}>
               {boardAnswer(entry.name, finding)}
             </p>
           ) : null}
