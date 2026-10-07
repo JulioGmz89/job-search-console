@@ -133,30 +133,8 @@ export function ProfileSection() {
   return (
     <form className="stack" noValidate onSubmit={submit}>
       {!profile.data.exists ? <p className="notice info">You have no profile yet. Fill in what you like; the file is created when you save.</p> : null}
-      {GROUPS.map((g) => (
-        <fieldset key={g.legend} className="grid-2">
-          <legend>{g.legend}</legend>
-          {g.fields.map(input)}
-        </fieldset>
-      ))}
-      {errors.form ? (
-        <p className="error" role="alert">
-          {errors.form}
-        </p>
-      ) : null}
-      <div className="row">
-        <button type="submit" className="btn" disabled={busy}>
-          Save profile
-        </button>
-        <span className="small muted">Saved in config/profile.yml; comments and everything else in the file stay as they are.</span>
-      </div>
-      {saved ? (
-        <p className="notice ok" tabIndex={-1} ref={savedRef}>
-          {saved}
-        </p>
-      ) : null}
       <details>
-        <summary>Advanced files</summary>
+        <summary>Advanced files: two more files that shape your checks</summary>
         <ul className="small">
           <li>
             <span className="mono">modes/_profile.md</span> — the kinds of roles you target and how checks weigh them. Edit it in your editor.
@@ -168,6 +146,29 @@ export function ProfileSection() {
           </li>
         </ul>
       </details>
+      {GROUPS.map((g) => (
+        <fieldset key={g.legend} className="grid-2">
+          <legend>{g.legend}</legend>
+          {g.fields.map(input)}
+        </fieldset>
+      ))}
+      {errors.form ? (
+        <p className="error" role="alert">
+          {errors.form}
+        </p>
+      ) : null}
+      {/* Sticky, so Save is in view wherever the user is in the form (UI-mycv-profile-save). */}
+      <div className="row savebar">
+        <button type="submit" className="btn" disabled={busy}>
+          Save profile
+        </button>
+        <span className="small muted">Saved in config/profile.yml; comments and everything else in the file stay as they are.</span>
+      </div>
+      {saved ? (
+        <p className="notice ok" tabIndex={-1} ref={savedRef}>
+          {saved}
+        </p>
+      ) : null}
       {leaveDialog}
     </form>
   );

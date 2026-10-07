@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { cvPreviewUrl, cvThumbUrl, fetchCvThemes, renderAllCvs, renderCvPreview, saveCvStyle } from '../../api.js';
+import { cvPreviewUrl, cvThumbUrl, fetchCvThemes, releaseProfileDesign, renderAllCvs, renderCvPreview, restoreProfileDesign, saveCvStyle } from '../../api.js';
 import { useLeaveGuard } from '../../components/LeaveGuard.jsx';
 import { RunItem } from '../../components/RunItem.jsx';
 import { ConfirmDialog, HelpLink } from '../../components/ui.jsx';
@@ -10,6 +10,7 @@ import { jobName, plural, shortDate } from '../../lib/labels.js';
 import { runState, runTitle } from '../../lib/runs.js';
 import { useRuns } from '../../runs.jsx';
 import { announce } from '../../shell/announce.jsx';
+import { offerUndo } from '../../shell/undo.jsx';
 
 const DEBOUNCE_MS = 300;
 
@@ -222,17 +223,39 @@ export function DesignSection() {
     }
   };
 
+  // UI-cv-profile-warning: the Profile form can't edit these, so the page offers to take them over.
+  const handOver = async () => {
+    try {
+      const result = await releaseProfileDesign();
+      setResource('style', result.style);
+      announce(`This page now decides the ${result.removed.join(' and ')}.`);
+      offerUndo(`Removed your profile’s ${result.removed.join(' and ')}`, async () => {
+        const back = await restoreProfileDesign();
+        setResource('style', back.style);
+      }, { focus: true });
+    } catch (e) {
+      announce(`Not changed: ${e.message}`, { assertive: true });
+    }
+  };
   const warnings = style.data.profileWarnings ?? {};
   const failCritical = chosenAts?.issues?.filter((i) => i.severity === 'critical') ?? [];
 
   return (
     <div className="stack">
       {warnings.style || warnings.cvSections ? (
-        <p className="notice warn">
-          Your profile (config/profile.yml) has its own {warnings.style ? 'style' : ''}
-          {warnings.style && warnings.cvSections ? ' and ' : ''}
-          {warnings.cvSections ? 'section order' : ''}, which wins over the settings here. Remove those keys from profile.yml to let this page decide; the preview already shows their effect.
-        </p>
+        <div className="notice warn stack-sm">
+          <p>
+            Your profile (config/profile.yml) has its own {warnings.style ? 'style' : ''}
+            {warnings.style && warnings.cvSections ? ' and ' : ''}
+            {warnings.cvSections ? 'section order' : ''}, which wins over the settings here; the preview already shows their effect.
+          </p>
+          <div className="row">
+            <button type="button" className="btn2 btn-sm" onClick={handOver}>
+              Let this page decide
+            </button>
+            <span className="hint inline">Removes only those settings from profile.yml; everything else in it stays. You can undo it.</span>
+          </div>
+        </div>
       ) : null}
 
       <div className="design-layout">
@@ -248,31 +271,8 @@ export function DesignSection() {
             </select>
           </div>
 
-          <section aria-labelledby="designs-h" className="stack-sm">
-            <h2 id="designs-h" className="card-title">
-              Designs
-            </h2>
-            <p className="small muted">
-              Each design is shown with your CV and checked the way applicant-tracking systems read it. <HelpLink topic="screening">What the screening check is</HelpLink>
-            </p>
-            {themesError ? <p className="notice warn">{themesError}</p> : null}
-            {!themes && !themesError ? <p className="muted">Showing every design with your CV — a few seconds the first time…</p> : null}
-            <div className="designs" role="group" aria-label="Designs">
-              {(themes ?? []).map((t) => (
-                <button key={t.name} type="button" className="design" aria-pressed={t.name === chosen} onClick={() => set('template', t.name)}>
-                  {t.thumb ? <img className="thumb-img" src={cvThumbUrl(t.thumb)} alt="" loading="lazy" /> : <span className="thumb" aria-hidden="true" />}
-                  <b>
-                    {t.displayName}
-                    {t.name === saved ? ' · your design' : ''}
-                  </b>
-                  {t.error ? <span className={`badge fail`}>Can’t be used with your CV</span> : <span className={`badge ${verdictTone(t.ats)}`}>{verdictWords(t.ats)}</span>}
-                </button>
-              ))}
-            </div>
-          </section>
-
           <details className="card">
-            <summary>Fine-tune</summary>
+            <summary>Fine-tune {chosenName}: colour, fonts, size, spacing, section order</summary>
             <div className="grid-2">
               <div className="field">
                 <label htmlFor="ft-accent">Accent colour</label>
@@ -312,6 +312,31 @@ export function DesignSection() {
             </div>
             <SectionOrder value={form.sections} keys={style.data.sectionKeys ?? []} onChange={(sections) => set('sections', sections)} />
           </details>
+
+          <section aria-labelledby="designs-h" className="stack-sm">
+            <h2 id="designs-h" className="card-title">
+              Designs
+            </h2>
+            <p className="small muted">
+              Each design is shown with your CV and checked the way applicant-tracking systems read it. <HelpLink topic="screening">What the screening check is</HelpLink> · <HelpLink topic="own-design">Make your own design</HelpLink>
+            </p>
+            {themesError ? <p className="notice warn">{themesError}</p> : null}
+            {!themes && !themesError ? <p className="muted">Showing every design with your CV — a few seconds the first time…</p> : null}
+            <div className="designs" role="group" aria-label="Designs">
+              {(themes ?? []).map((t) => (
+                <button key={t.name} type="button" className="design" aria-pressed={t.name === chosen} onClick={() => set('template', t.name)}>
+                  {t.thumb ? <img className="thumb-img" src={cvThumbUrl(t.thumb)} alt="" loading="lazy" /> : <span className="thumb" aria-hidden="true" />}
+                  <b>
+                    {t.displayName}
+                    {t.name === saved ? ' · your design' : ''}
+                  </b>
+                  {t.source === 'custom' ? <span className="badge neutral">Yours</span> : null}
+                  {t.error ? <span className={`badge fail`}>Can’t be used with your CV</span> : <span className={`badge ${verdictTone(t.ats)}`}>{verdictWords(t.ats)}</span>}
+                </button>
+              ))}
+            </div>
+          </section>
+
 
         </div>
 
@@ -361,13 +386,24 @@ export function DesignSection() {
               ) : null}
             </div>
           ) : null}
-          {previewError ? <p className="notice attn">{previewError}</p> : null}
-          {preview ? <iframe className="doc" tabIndex={-1} src={cvPreviewUrl(preview.id)} title={`Preview of ${doc ? docLabel(doc) : 'your CV'} in the ${chosenName} design`} /> : <div className="preview-empty muted">{rendering ? 'Drawing your CV…' : 'No CV to preview yet.'}</div>}
+          {/* The actions sit above the 60vh preview, in view with the verdict (UI-cv-save). */}
           <div className="stack-sm">
             <div className="row">
               <button type="button" className="btn" disabled={!dirty} onClick={() => (chosenAts?.verdict === 'fail' ? setConfirm('fail') : makeDefault())}>
                 Make this my design for every CV
               </button>
+              {dirty ? (
+                <button
+                  type="button"
+                  className="btn2"
+                  onClick={() => {
+                    setForm(style.data.style);
+                    announce('Changes discarded: the preview shows your saved design.');
+                  }}
+                >
+                  Discard changes
+                </button>
+              ) : null}
               {reportDocs.length ? (
                 <button type="button" className="btn2" disabled={relaying.length > 0} onClick={() => setConfirm('all')}>
                   Update existing CVs to this design ({reportDocs.length})
@@ -387,6 +423,8 @@ export function DesignSection() {
               </p>
             ) : null}
           </div>
+          {previewError ? <p className="notice attn">{previewError}</p> : null}
+          {preview ? <iframe className="doc" tabIndex={-1} src={cvPreviewUrl(preview.id)} title={`Preview of ${doc ? docLabel(doc) : 'your CV'} in the ${chosenName} design`} /> : <div className="preview-empty muted">{rendering ? 'Drawing your CV…' : 'No CV to preview yet.'}</div>}
           {doc && !doc.sample ? (
             <div className="stack-sm" id="relayout" data-run-home>
               {lastRelay && ['waiting', 'working', 'failed'].includes(runState(lastRelay)) ? <RunItem run={lastRelay} headingLevel={3} /> : null}

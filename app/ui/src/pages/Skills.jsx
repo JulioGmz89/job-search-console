@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { setSkillOverride, startSkillsExtract, startSkillsFetch } from '../api.js';
+import { setSkillOverride, startRun, startSkillsExtract, startSkillsFetch } from '../api.js';
 import { RunItem } from '../components/RunItem.jsx';
 import { ChoiceSelect, EmptyState } from '../components/ui.jsx';
 import { reload, useResource } from '../data.js';
@@ -26,7 +26,7 @@ const INTRO = {
   asked: 'Most asked for: every skill, whether or not you have it',
 };
 
-function SkillRow({ skill, n, max, goodFitOnly, rows, onStatus }) {
+function SkillRow({ skill, n, max, goodFitOnly, rows, onStatus, overridden, onReset }) {
   const what = goodFitOnly ? 'good-fit posting' : 'posting';
   const byCompany = new Map();
   for (const p of skill.postings) byCompany.set(p.company ?? 'Unknown company', [...(byCompany.get(p.company ?? 'Unknown company') ?? []), p]);
@@ -93,6 +93,14 @@ function SkillRow({ skill, n, max, goodFitOnly, rows, onStatus }) {
       </div>
       <div>
         <ChoiceSelect label={`${skill.name} on your CV`} visibleLabel value={skill.status} options={STATUS} onChange={(status) => onStatus(skill, status)} />
+        {overridden ? (
+          <p className="small">
+            You set this.{' '}
+            <button type="button" className="btn-link" onClick={() => onReset(skill)}>
+              Back to automatic<span className="visually-hidden"> for {skill.name}</span>
+            </button>
+          </p>
+        ) : null}
       </div>
     </div>
   );
@@ -180,6 +188,37 @@ export function SkillsPage({ params }) {
     }
   };
 
+  // UI-skills-reset: drop the user's choice, so the CV's own reading decides again.
+  const onReset = async (skill) => {
+    const before = data.overrides?.[skill.id] ?? null;
+    try {
+      await setSkillOverride(skill.id, null);
+      setLocal((l) => {
+        const rest = { ...l };
+        delete rest[skill.id];
+        return rest;
+      });
+      await reload('skills');
+      setTimeout(() => document.getElementById(`skill-${skill.id}`)?.querySelector('button')?.focus(), 0);
+      announce(`${skill.name}: back to what your CV shows`);
+      offerUndo(`${skill.name} back to automatic`, async () => {
+        await setSkillOverride(skill.id, before);
+        await reload('skills');
+      });
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+  const startKind = async (kind, options, said) => {
+    setError(null);
+    try {
+      track(await startRun(kind, options));
+      announce(said);
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
   const improve = async () => {
     setError(null);
     try {
@@ -231,6 +270,21 @@ export function SkillsPage({ params }) {
                 Read the {cov.unfetched} new postings
               </button>
             ) : null}
+            {cov.fetchFailed ? (
+              <button type="button" className="btn2 btn-sm" onClick={() => startKind('skills-fetch', { retryFailed: true }, `Started reading the ${cov.fetchFailed} postings that failed again.`)}>
+                Try the {plural(cov.fetchFailed, 'failed posting')} again
+              </button>
+            ) : null}
+            {data.cv?.present ? (
+              <>
+                <button type="button" className="btn2 btn-sm" onClick={() => startKind('skills-cv', {}, 'Started reading your CV’s skills again.')}>
+                  Read my CV’s skills again
+                </button>
+                <span className="hint inline">
+                  {data.cv.stale ? 'Your CV changed since Claude last read it' : data.cv.engine === 'llm' ? `Read by Claude${data.cv.extractedAt ? ` ${shortDate(data.cv.extractedAt)}` : ''}` : 'Read by quick rules so far'} · one Claude session · uses your Claude plan
+                </span>
+              </>
+            ) : null}
           </div>
         )}
       </div>
@@ -276,7 +330,7 @@ export function SkillsPage({ params }) {
       <p className="small muted">Each bar’s length is how many {what} ask for the skill, against the most-asked one.</p>
       <section className="card flush" id="skills-list" tabIndex={-1} aria-label={`${SKILL_VIEWS[view].label}: skills list`}>
         {rows.length ? (
-          rows.map((skill) => <SkillRow key={skill.id} skill={skill} n={skill.rank} max={max} goodFitOnly={goodFitOnly} rows={pipeline.data?.rows ?? []} onStatus={onStatus} />)
+          rows.map((skill) => <SkillRow key={skill.id} skill={skill} n={skill.rank} max={max} goodFitOnly={goodFitOnly} rows={pipeline.data?.rows ?? []} onStatus={onStatus} overridden={Boolean(data.overrides?.[skill.id])} onReset={onReset} />)
         ) : (
           <p className="pad">No skills to show in this view{goodFitOnly || category || words ? ' with these filters' : ''}.</p>
         )}

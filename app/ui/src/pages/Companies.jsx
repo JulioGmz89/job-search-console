@@ -6,7 +6,7 @@ import { RunItem } from '../components/RunItem.jsx';
 import { ConfirmDialog, EmptyState, HelpLink } from '../components/ui.jsx';
 import { reload, useResource } from '../data.js';
 import { plural, shortDate } from '../lib/labels.js';
-import { runState, runTitle } from '../lib/runs.js';
+import { outcome, runState, runTitle } from '../lib/runs.js';
 import { boardType, isBoard, PROVIDER_NAMES } from '../lib/boards.js';
 import { BOARD_HEALTH, brokenBoards } from '../lib/today.js';
 import { latest, useRuns } from '../runs.jsx';
@@ -146,6 +146,9 @@ function EntryRow({ entry, kind, health, portals, onEdit, editing, children }) {
   const [confirm, setConfirm] = useState(false);
   const [error, setError] = useState(null);
   const [fixing, setFixing] = useState(false);
+  const { list, start } = useRuns();
+  const [findId, setFindId] = useState(null);
+  const finding = findId ? (list.find((r) => r.id === findId) ?? null) : null;
   const status = health?.status ?? null;
   const broken = ['slug_gone', 'auth'].includes(status);
 
@@ -231,6 +234,20 @@ function EntryRow({ entry, kind, health, portals, onEdit, editing, children }) {
             You can pause {entry.name} for now, or edit its link.
           </p>
           <div className="row">
+            {status === 'slug_gone' ? (
+              <button
+                type="button"
+                className="btn btn-sm"
+                disabled={finding && ['waiting', 'working'].includes(runState(finding))}
+                onClick={async () => {
+                  const run = await start('verify-portals', {});
+                  setFindId(run.id);
+                  announce(`Started: looking for ${entry.name}’s job board`);
+                }}
+              >
+                Find the right job board for {entry.name}
+              </button>
+            ) : null}
             <button type="button" className="btn2 btn-sm" onClick={() => toggle(false)}>
               Pause {entry.name}
             </button>
@@ -243,6 +260,12 @@ function EntryRow({ entry, kind, health, portals, onEdit, editing, children }) {
               </a>
             ) : null}
           </div>
+          {finding ? (
+            <div data-run-home>
+              <RunItem run={finding} headingLevel={4} takeFocus />
+            </div>
+          ) : null}
+          <p className="small muted">Finding the board asks Greenhouse, Lever and Ashby whether {entry.name} has one now. A few seconds; no AI. If one is found, use Edit the link to switch to it.</p>
         </div>
       ) : null}
       {error ? (
@@ -255,6 +278,44 @@ function EntryRow({ entry, kind, health, portals, onEdit, editing, children }) {
         <p>The app stops checking {entry.name} for new openings. Links already in To review stay. You can undo this right after, and a backup of your list is kept too.</p>
       </ConfirmDialog>
     </li>
+  );
+}
+
+/**
+ * Companies to skip: data/blacklist.md, read-only like the title filter (D-3).
+ * Checks for new openings leave these companies out, and a fit check refuses them.
+ */
+function SkipList() {
+  const skip = useResource('skipList');
+  const companies = skip.data?.companies ?? [];
+  return (
+    <section className="card" aria-labelledby="skip-h" id="skip">
+      <h2 id="skip-h" className="card-title">
+        Companies to skip
+      </h2>
+      {!skip.data ? (
+        <p className="muted">{skip.error ? skip.error.message : 'Loading…'}</p>
+      ) : companies.length ? (
+        <>
+          <p>Checks for new openings leave these out, and the assistant won’t check a job at them:</p>
+          <ul>
+            {companies.map((c) => (
+              <li key={c.company}>
+                <b>{c.company}</b>
+                {c.reason ? ` · ${c.reason}` : ''}
+                {c.since ? <span className="small muted"> · since {c.since}</span> : null}
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <p>None. Every company’s openings are kept.</p>
+      )}
+      <p className="small muted">
+        To change this list, {skip.data?.exists ? 'edit' : 'create'} <code>data/blacklist.md</code> in your workspace folder with your editor: a table with the columns Company, Since, Scope and
+        Reason. The app picks the change up by itself. <HelpLink topic="skip">About this list</HelpLink>
+      </p>
+    </section>
   );
 }
 
@@ -386,15 +447,26 @@ export function CompaniesPage() {
         </h2>
         <p className="muted">Visits every board you follow and records which ones work, without saving any openings. A few seconds; no AI.</p>
         {checkRun && (checking || runState(checkRun) !== 'done') ? <RunItem run={checkRun} takeFocus /> : null}
-        {checkRun && runState(checkRun) === 'done' ? <p className="notice ok">Checked {dateOf(checkRun)}. The status beside each company above is up to date.</p> : null}
+        {checkRun && runState(checkRun) === 'done' ? (
+          <p className={`notice ${checkRun.result?.findings?.length ? 'warn' : 'ok'}`} tabIndex={-1} data-run-focus>
+            {runTitle(checkRun)}, {dateOf(checkRun)}: {outcome(checkRun).text}
+            {checkRun.kind === 'verify-portals' ? ' The status beside each company above is up to date.' : ''}
+          </p>
+        ) : null}
         {!checking ? (
           <div className="row">
             <button type="button" className="btn2" onClick={() => start('verify-portals', {}).then((r) => announce(`Started: ${runTitle(r)}`))}>
               Check companies’ job boards
             </button>
+            <button type="button" className="btn2" onClick={() => start('validate-portals', {}).then((r) => announce(`Started: ${runTitle(r)}`))}>
+              Check the companies list for mistakes
+            </button>
+            <span className="hint inline">Reads your companies file for unknown board types, missing names and broken links. Changes nothing.</span>
           </div>
         ) : null}
       </section>
+
+      <SkipList />
     </>
   );
 }

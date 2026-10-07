@@ -51,6 +51,20 @@ export const TOPICS = {
       'Come back here and use Check again on Today or in Workspace. If Claude Code is installed somewhere unusual, set JSC_CLAUDE_BIN to its path before starting the app.',
     ],
   },
+  'own-design': {
+    title: 'Make your own design',
+    body: [
+      'A design is one HTML file. Copy one of the designs in the templates folder of the app, change its layout and fonts, and save it in config/cv/templates/ in your workspace folder under a new name, such as my-design.html.',
+      'It appears in My CV › Design marked Yours, with the screening check’s result like every other design. Keep the text as real text (no images of text, no tables for layout) and it will pass.',
+    ],
+  },
+  skip: {
+    title: 'Companies to skip',
+    body: [
+      'data/blacklist.md lists companies you never want to apply to, as a table with the columns Company, Since, Scope and Reason. Checks for new openings leave them out, and the assistant won’t check a job there.',
+      'The app shows the list on Companies but doesn’t change it; edit the file with your editor and the page updates by itself.',
+    ],
+  },
   files: {
     title: 'Files in your workspace folder',
     body: [

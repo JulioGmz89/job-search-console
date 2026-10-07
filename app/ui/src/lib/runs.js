@@ -24,7 +24,7 @@ export const RUN_NAMES = Object.freeze({
   reconcile: 'Remove links already in Applications',
   'reconcile-auto': 'Tidy To review',
   'verify-pipeline': 'Check my list for problems',
-  'validate-portals': "Check companies' job boards",
+  'validate-portals': 'Check the companies list for mistakes',
   'verify-portals': "Check companies' job boards",
   'merge-tracker': 'Add to Applications',
   'mark-pdf-ready': 'Mark the CV as ready',
@@ -100,7 +100,7 @@ export function explainFailure(run) {
     };
   }
   if (/blacklist|skip list/i.test(error)) {
-    return { what: 'This company is on your list of companies to skip, so the job was not checked.', todo: 'Remove the company from data/blacklist.md if you want to check it.', retry: false };
+    return { what: 'This company is on your list of companies to skip, so the job was not checked.', todo: 'It is listed under Companies › Companies to skip. Remove it from data/blacklist.md if you want to check it.', retry: false };
   }
   if (/cv-missing|no cv\.md/i.test(error)) {
     return { what: 'Your CV is missing, so there was nothing to compare the job with.', todo: 'Add your CV in My CV › Content, then try again.', retry: true };

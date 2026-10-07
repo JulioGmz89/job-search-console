@@ -67,6 +67,9 @@ export function TopBar({ activity, onActivity, activityRef, panelOpen }) {
         <a className="topbar-link" href="#/workspace" aria-current={route.page === 'workspace' ? 'page' : undefined}>
           Workspace
         </a>
+        <a className="topbar-link" href="#/help" aria-current={route.page === 'help' ? 'page' : undefined}>
+          Help
+        </a>
       </div>
     </header>
   );

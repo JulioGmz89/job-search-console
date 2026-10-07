@@ -186,3 +186,15 @@ test('a check names what it found (R-final-03)', async () => {
   assert.equal(outcome({ kind: 'verify-pipeline', status: 'succeeded', exitCode: 0, result: { findings: [], total: 0, clean: true } }).text, 'No problems found.');
   assert.match(outcome({ kind: 'verify-pipeline', status: 'succeeded', exitCode: 0, result: { findings: [], total: 0, clean: false } }).text, /Technical details/);
 });
+
+test('Workspace lists fit reports with no application, not older checks of one (R-reports-list)', async () => {
+  const { reportsNotInApplications } = await import('./reports.js');
+  const rows = [{ id: 1, reportId: 5, report: { url: 'https://jobs.lever.co/a/1' } }];
+  const reports = [
+    { id: 5, url: 'https://jobs.lever.co/a/1' },
+    { id: 2, url: 'https://jobs.lever.co/a/1/' },
+    { id: 7, url: 'https://jobs.lever.co/b/9' },
+    { id: 9, url: null },
+  ];
+  assert.deepEqual(reportsNotInApplications(reports, rows).map((r) => r.id), [9, 7]);
+});

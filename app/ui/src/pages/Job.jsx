@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { fetchReport } from '../api.js';
+import { fetchReport, fetchStatusHistory } from '../api.js';
 import { Documents } from '../components/Documents.jsx';
 import { RunItem } from '../components/RunItem.jsx';
 import { saveStatus, StatusControl, WhenDialog } from '../components/StatusControl.jsx';
@@ -28,6 +28,22 @@ const LISTS = [
 ];
 
 /** The report, refetched whenever the tracker or a run for it changes. */
+/** The row's recorded status changes (status-log.tsv), refetched with the tracker. */
+function useStatusHistory(rowId, version) {
+  const [entries, setEntries] = useState([]);
+  useEffect(() => {
+    if (!rowId) return undefined;
+    let live = true;
+    fetchStatusHistory(rowId)
+      .then((h) => live && setEntries(h.entries ?? []))
+      .catch(() => live && setEntries([]));
+    return () => {
+      live = false;
+    };
+  }, [rowId, version]);
+  return entries;
+}
+
 function useReport(reportId, version) {
   const [state, setState] = useState({ report: null, error: null });
   useEffect(() => {
@@ -41,6 +57,85 @@ function useReport(reportId, version) {
     };
   }, [reportId, version]);
   return state;
+}
+
+/** The fit report itself: score, facts, lists and the sanitized sections. */
+function ReportBody({ report, score }) {
+  const machine = report.machine ?? {};
+  return (
+    <div className="card">
+      <p>
+        <b>Fit {fit(score)} / 5.</b> The assistant compares the posting with your CV and profile, part by part, and scores the match from 1 to 5; 4 and up is a strong fit, under 3
+        usually means skip.
+      </p>
+      {FACTS.some(([k]) => machine[k]) ? (
+        <dl className="facts">
+          {FACTS.filter(([k]) => machine[k]).map(([k, label]) => (
+            <div key={k} className="contents">
+              <dt>{label}</dt>
+              <dd>{String(machine[k])}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+      {LISTS.filter(([k]) => machine[k]?.length).map(([k, label]) => (
+        <p key={k}>
+          <b>{label}:</b> {machine[k].map(String).join(', ')}
+        </p>
+      ))}
+      <div className="prose">
+        {report.sections.map((section) => (
+          <section key={section.title} aria-label={section.title}>
+            <h3>{section.title}</h3>
+            {/* Sanitized on the server (services/reports.js), the one choke point for posting content. */}
+            <div dangerouslySetInnerHTML={{ __html: section.html }} />
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A fit report with no row in Applications: never merged, or its row removed
+ * (R-reports-list). Readable, with the way back into Applications.
+ */
+function ReportOnly({ reportId, back }) {
+  const { start } = useRuns();
+  const { report, error } = useReport(reportId, 'once');
+  if (!report) return <PageHead title={error ? 'Fit report not found' : 'Loading…'} back={back} lead={error ? error.message : null} />;
+  const machine = report.machine ?? {};
+  const title = [machine.company ?? report.header?.company, machine.role ?? report.header?.role].filter(Boolean).join(' — ') || `Fit report ${reportId}`;
+  return (
+    <>
+      <PageHead title={title} docTitle={title} back={back} lead={`Fit report ${reportId}${report.header?.date ? ` · ${shortDate(report.header.date)}` : ''}`} />
+      <div className="notice info stack-sm">
+        <p>This fit report isn’t in your Applications. It was never added, or its application was merged into another one or removed.</p>
+        {report.url ? (
+          <div className="row">
+            <button
+              type="button"
+              className="btn2 btn-sm"
+              onClick={async () => {
+                const run = await start('evaluate', { url: report.url, autoPdf: false });
+                announce(`Started: ${runTitle(run)}`);
+              }}
+            >
+              Check fit again and add it to Applications
+            </button>
+            <CostNote />
+            <a href={report.url} target="_blank" rel="noopener noreferrer">
+              Open the posting ↗<span className="visually-hidden"> (opens in a new tab)</span>
+            </a>
+          </div>
+        ) : null}
+      </div>
+      <section aria-labelledby="rep-h" className="stack" id="report">
+        <h2 id="rep-h">Fit report</h2>
+        <ReportBody report={report} score={machine.score ?? report.score ?? null} />
+      </section>
+    </>
+  );
 }
 
 /**
@@ -63,7 +158,9 @@ export function JobPage({ params }) {
 
   const runs = row ? runsForJob(list, { reportId: row.reportId, url: row.report?.url }) : [];
   const finishedCount = runs.filter((r) => ['done', 'failed'].includes(runState(r))).length;
-  const { report, error } = useReport(row?.reportId, `${pipeline.data ? pipeline.at ?? '' : ''}-${finishedCount}-${pipeline.data?.rows?.length}`);
+  const version = `${pipeline.data ? pipeline.at ?? '' : ''}-${finishedCount}-${pipeline.data?.rows?.length}-${row?.status ?? ''}`;
+  const { report, error } = useReport(row?.reportId, version);
+  const changes = useStatusHistory(row?.id, version);
 
   useEffect(() => {
     if (anchor && report) document.getElementById(anchor === 'cover' ? 'documents' : anchor)?.scrollIntoView();
@@ -72,6 +169,8 @@ export function JobPage({ params }) {
   const back = <a href="#/applications">← Applications</a>;
   if (!pipeline.data) return <PageHead title="Loading…" back={back} />;
   if (!row) {
+    // A fit report with no Applications row (R-reports-list) is still readable.
+    if (params.reportId) return <ReportOnly reportId={params.reportId} back={back} />;
     return (
       <>
         <PageHead title="Job not found" back={back} lead="It is not in your applications. It may have been merged into another application or removed from your list." />
@@ -150,6 +249,15 @@ export function JobPage({ params }) {
           </span>
           <StatusControl row={row} statuses={pipeline.data.statuses} />
         </div>
+        {/* Beside the status it sets, in view on arrival (UI-job-sent). */}
+        {statusId === 'evaluated' ? (
+          <div className="row">
+            <button type="button" className="btn2 btn-sm" onClick={() => setAskSent(true)}>
+              I’ve sent my application
+            </button>
+            <span className="hint inline">Sets the status to Applied, with the date you sent it.</span>
+          </div>
+        ) : null}
         <div className="row" id="check-again" data-run-home>
           {checking ? (
             <RunItem run={checking} headingLevel={3} takeFocus />
@@ -172,50 +280,11 @@ export function JobPage({ params }) {
       <section aria-labelledby="docs-h" className="stack" id="documents">
         <h2 id="docs-h">Documents</h2>
         {report ? <Documents row={row} report={report} openCover={anchor === 'cover'} /> : <p className="muted">{error ? `Could not load the report: ${error.message}` : 'Loading…'}</p>}
-        {statusId === 'evaluated' ? (
-          <div className="row">
-            <button type="button" className="btn2" onClick={() => setAskSent(true)}>
-              I’ve sent my application
-            </button>
-            <span className="hint inline">Sets the status to Applied, with the date you sent it.</span>
-          </div>
-        ) : null}
       </section>
 
       <section aria-labelledby="rep-h" className="stack" id="report">
         <h2 id="rep-h">Fit report</h2>
-        {report ? (
-          <div className="card">
-            <p>
-              <b>Fit {fit(row.score)} / 5.</b> The assistant compares the posting with your CV and profile, part by part, and scores the match from 1 to 5; 4 and up is a strong fit, under 3
-              usually means skip.
-            </p>
-            {FACTS.some(([k]) => machine[k]) ? (
-              <dl className="facts">
-                {FACTS.filter(([k]) => machine[k]).map(([k, label]) => (
-                  <div key={k} className="contents">
-                    <dt>{label}</dt>
-                    <dd>{String(machine[k])}</dd>
-                  </div>
-                ))}
-              </dl>
-            ) : null}
-            {LISTS.filter(([k]) => machine[k]?.length).map(([k, label]) => (
-              <p key={k}>
-                <b>{label}:</b> {machine[k].map(String).join(', ')}
-              </p>
-            ))}
-            <div className="prose">
-              {report.sections.map((section) => (
-                <section key={section.title} aria-label={section.title}>
-                  <h3>{section.title}</h3>
-                  {/* Sanitized on the server (services/reports.js), the one choke point for posting content. */}
-                  <div dangerouslySetInnerHTML={{ __html: section.html }} />
-                </section>
-              ))}
-            </div>
-          </div>
-        ) : null}
+        {report ? <ReportBody report={report} score={row.score} /> : null}
       </section>
 
       <section aria-labelledby="his-h" className="stack" id="history">
@@ -228,6 +297,12 @@ export function JobPage({ params }) {
                 <a href={`#/activity/${r.id}`}>{runTitle(r)}</a> — {runState(r) === 'done' ? 'done' : runState(r)}, {shortDate(r.endedAt ?? r.queuedAt)}
               </li>
             ))}
+          {changes.map((c, i) => (
+            <li key={`${c.date}-${i}`}>
+              {shortDate(c.date)} · {c.from && c.from !== c.to ? `${statusLabel(c.from)} → ${statusLabel(c.to)}` : statusLabel(c.to)}
+              {c.source && !['set-status', 'web'].includes(c.source) ? <span className="muted"> · by {c.source}</span> : null}
+            </li>
+          ))}
           <li>
             {shortDate(row.date)} · added to Applications · now {statusLabel(statusId)}
           </li>

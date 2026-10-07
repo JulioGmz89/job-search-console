@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { checkAgent, fetchRun } from '../api.js';
 import { RunItem } from '../components/RunItem.jsx';
 import { reload, setResource, useResource } from '../data.js';
-import { plural } from '../lib/labels.js';
+import { jobName, plural, shortDate } from '../lib/labels.js';
+import { reportsNotInApplications } from '../lib/reports.js';
 import { runState } from '../lib/runs.js';
 import { useRuns } from '../runs.jsx';
 import { announce } from '../shell/announce.jsx';
@@ -162,6 +163,8 @@ export function WorkspacePage() {
   const anchor = useAnchor();
   const [checking, setChecking] = useState(false);
   const { list } = useRuns();
+  const reports = useResource('reports');
+  const pipeline = useResource('pipeline');
 
   useEffect(() => {
     if (anchor && workspace.data) document.getElementById(anchor)?.scrollIntoView();
@@ -170,6 +173,7 @@ export function WorkspacePage() {
   if (!workspace.data) return <PageHead title="Workspace" lead={workspace.error ? workspace.error.message : 'Loading…'} />;
   const { dataRoot, counts, issues, files } = workspace.data;
   const problems = issues.filter((i) => i.level !== 'info');
+  const loose = reports.data && pipeline.data ? reportsNotInApplications(reports.data.reports, pipeline.data.rows) : [];
   const check = agent.data?.check;
   const busyAgents = list.filter((r) => r.lane === 'agent' && runState(r) === 'working');
 
@@ -215,6 +219,23 @@ export function WorkspacePage() {
           </ul>
         ) : (
           <p>No problems found.</p>
+        )}
+        <h3 id="loose-h">Fit reports not in Applications ({loose.length})</h3>
+        {loose.length ? (
+          <>
+            <p className="small muted">Checks whose job never reached Applications, or whose application was merged or removed. They are kept, and you can read each one.</p>
+            <ul aria-labelledby="loose-h">
+              {loose.slice(0, 20).map((rep) => (
+                <li key={rep.id}>
+                  {jobName({ company: rep.machine?.company, role: rep.machine?.role }) || rep.title} · fit report {rep.id}
+                  {rep.date ? `, ${shortDate(rep.date)}` : ''} · <a href={`#/applications/report/${rep.id}`}>Open<span className="visually-hidden"> fit report {rep.id}</span></a>
+                </li>
+              ))}
+            </ul>
+            {loose.length > 20 ? <p className="small muted">and {loose.length - 20} more, in the reports folder.</p> : null}
+          </>
+        ) : (
+          <p className="small">None: every fit report belongs to an application.</p>
         )}
       </section>
 

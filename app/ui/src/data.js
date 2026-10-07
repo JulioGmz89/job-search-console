@@ -16,6 +16,7 @@ import * as api from './api.js';
 /** name → how to fetch it, and which changed paths make it stale. */
 const RESOURCES = {
   pipeline: { fetch: api.fetchPipeline, on: /^(data\/applications\.md|data\/pdf-index\.tsv|data\/status-log\.tsv|reports\/|output\/)/ },
+  reports: { fetch: api.fetchReports, on: /^(reports\/|data\/applications\.md)/ },
   workspace: { fetch: api.fetchWorkspace, on: /^(cv\.md|portals\.yml|config\/|data\/|reports\/|output\/|voice-dna\.md)/ },
   inbox: { fetch: api.fetchInbox, on: /^data\/(pipeline\.md|scan-)/ },
   portals: { fetch: api.fetchPortals, on: /^(portals\.yml|data\/portal-health\.tsv)/ },
@@ -26,6 +27,7 @@ const RESOURCES = {
   samples: { fetch: api.fetchWritingSamples, on: /^writing-samples\// },
   style: { fetch: api.fetchCvStyle, on: /^config\/(cv\/|profile\.yml)/ },
   documents: { fetch: api.fetchCvDocuments, on: /^(output\/|data\/pdf-index\.tsv)/ },
+  skipList: { fetch: api.fetchSkipList, on: /^data\/blacklist\.md$/ },
   templates: { fetch: api.fetchCvTemplates, on: /^config\/cv\/templates\// },
   design: { fetch: api.fetchDesignCheck, on: /^(config\/cv\/|output\/)/ },
   skills: { fetch: api.fetchSkills, on: /^(data\/skills\/|cv\.md$|reports\/)/ },

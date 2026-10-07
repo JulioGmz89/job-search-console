@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { addAvoidWord, pdfUrl, removeAvoidWord, restoreVoice, saveVoice } from '../../api.js';
+import { addAvoidWord, fetchWritingSample, pdfUrl, removeAvoidWord, restoreVoice, saveVoice } from '../../api.js';
 import { useLeaveGuard } from '../../components/LeaveGuard.jsx';
 import { RunItem } from '../../components/RunItem.jsx';
 import { ConfirmDialog, CostNote, HelpLink } from '../../components/ui.jsx';
@@ -10,6 +10,36 @@ import { runState, runTitle } from '../../lib/runs.js';
 import { runsForJob, useRuns } from '../../runs.jsx';
 import { announce } from '../../shell/announce.jsx';
 import { offerUndo } from '../../shell/undo.jsx';
+
+/** One writing sample, its text read on Open (UI-cv-samples). */
+function Sample({ sample }) {
+  const [state, setState] = useState(null);
+  return (
+    <details
+      onToggle={(event) => {
+        if (event.currentTarget.open && state === null) {
+          fetchWritingSample(sample.name)
+            .then((r) => setState({ text: r.text, truncated: r.truncated }))
+            .catch((e) => setState({ error: e.message }));
+        }
+      }}
+    >
+      <summary>
+        Open <span className="mono">{sample.name}</span> <span className="small muted">· changed {shortDate(sample.modified)}</span>
+      </summary>
+      {state === null ? <p className="small muted">Loading…</p> : null}
+      {state?.error ? <p className="small">{state.error}</p> : null}
+      {state?.text !== undefined ? (
+        <>
+          <pre className="log" tabIndex={0} aria-label={`Text of ${sample.name}`}>
+            {state.text}
+          </pre>
+          {state.truncated ? <p className="small muted">Only the start is shown; the file is long.</p> : null}
+        </>
+      ) : null}
+    </details>
+  );
+}
 
 /** Words to avoid: one chip per word, added and removed one at a time (F-002). */
 function Words({ words }) {
@@ -251,16 +281,6 @@ export function WritingSection() {
     <div className="stack">
       <Words words={voice.data.words ?? []} />
 
-      <section className="card" aria-labelledby="apply-h">
-        <h2 id="apply-h" className="card-title">
-          When rules apply
-        </h2>
-        <p>
-          These rules apply to the next tailored CV or letter. Already-made documents keep their wording. <HelpLink topic="rules">About writing rules</HelpLink>
-        </p>
-        <RemakeList voice={voice.data} />
-      </section>
-
       <details className="card" open={!voice.data.exists}>
         <summary>All rules</summary>
         <form className="stack-sm" noValidate onSubmit={saveAll}>
@@ -314,7 +334,7 @@ export function WritingSection() {
           <ul>
             {samples.data.samples.map((s) => (
               <li key={s.name}>
-                <span className="mono">{s.name}</span> <span className="small muted">· changed {shortDate(s.modified)}</span>
+                <Sample sample={s} />
               </li>
             ))}
           </ul>
@@ -324,6 +344,16 @@ export function WritingSection() {
         <p className="small">
           To add one, put a text or Markdown file in the <span className="mono">writing-samples</span> folder of your workspace{samples.data?.path ? ` (${samples.data.path})` : ''}. It appears here by itself.
         </p>
+      </section>
+
+      <section className="card" aria-labelledby="apply-h">
+        <h2 id="apply-h" className="card-title">
+          When rules apply
+        </h2>
+        <p>
+          These rules apply to the next tailored CV or letter. Already-made documents keep their wording. <HelpLink topic="rules">About writing rules</HelpLink>
+        </p>
+        <RemakeList voice={voice.data} />
       </section>
 
       {leaveDialog}
