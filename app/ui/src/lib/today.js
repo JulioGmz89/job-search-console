@@ -47,7 +47,7 @@ export function newFromChecks(pending, runs, lastSeen) {
 export function brokenBoards(companies, health = {}) {
   return companies
     .filter((c) => c.enabled && BROKEN_BOARD.has(String(health[c.name]?.status ?? '').toLowerCase()))
-    .map((c) => ({ ...c, since: health[c.name].timestamp }));
+    .map((c) => ({ ...c, since: health[c.name].since ?? health[c.name].timestamp }));
 }
 
 /**

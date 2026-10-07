@@ -107,7 +107,7 @@ export function Field({ id, label, hint = null, error = null, children, required
  * dialog: focus is trapped inside, Escape cancels, and focus returns to what
  * opened it (F-020).
  */
-export function ConfirmDialog({ isOpen, title, children, confirmLabel, cancelLabel = 'Cancel', danger = false, onConfirm, onCancel, busy = false }) {
+export function ConfirmDialog({ isOpen, title, children, confirmLabel, cancelLabel = 'Cancel', danger = false, onConfirm, onCancel, busy = false, focusConfirm = !danger }) {
   return (
     <ModalOverlay isOpen={isOpen} onOpenChange={(open) => !open && onCancel()} isDismissable className="modal-overlay">
       <Modal className="modal">
@@ -118,7 +118,7 @@ export function ConfirmDialog({ isOpen, title, children, confirmLabel, cancelLab
           <div className="stack-sm">{children}</div>
           <div className="row dialog-actions">
             {/* A destructive choice is never the default: focus starts on Cancel. */}
-            <AriaButton className={danger ? 'btn-danger' : 'btn'} onPress={onConfirm} isDisabled={busy} autoFocus={!danger}>
+            <AriaButton className={danger ? 'btn-danger' : 'btn'} onPress={onConfirm} isDisabled={busy} autoFocus={focusConfirm}>
               {confirmLabel}
             </AriaButton>
             <AriaButton className="btn2" onPress={onCancel} autoFocus={danger}>

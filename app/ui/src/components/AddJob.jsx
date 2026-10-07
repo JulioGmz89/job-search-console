@@ -51,6 +51,7 @@ export function AddJob({ idPrefix = 'add', headingId = null }) {
     setSaved(null);
     if (!url.trim()) {
       setError('Paste the link to the job posting, starting with https://');
+      announce('Paste the link to the job posting, starting with https://', { assertive: true });
       return;
     }
     if (evaluate && blocked) {
@@ -73,6 +74,7 @@ export function AddJob({ idPrefix = 'add', headingId = null }) {
       setUrl('');
     } catch (e) {
       setError(e.message);
+      announce(e.message, { assertive: true });
     } finally {
       setBusy(false);
     }
@@ -97,7 +99,10 @@ export function AddJob({ idPrefix = 'add', headingId = null }) {
             type="url"
             value={url}
             placeholder="https://…/jobs/123"
-            onChange={(e) => setUrl(e.target.value)}
+            onChange={(e) => {
+              setUrl(e.target.value);
+              setError(null);
+            }}
             aria-invalid={error ? true : undefined}
             aria-describedby={`${fieldId}-hint${error ? ` ${fieldId}-err` : ''}`}
           />
@@ -112,7 +117,7 @@ export function AddJob({ idPrefix = 'add', headingId = null }) {
           </p>
         </div>
         <details>
-          <summary>Also make a tailored CV if the fit is {fit(threshold)} or more</summary>
+          <summary>Also make a tailored CV if the fit is {agent.data ? fit(threshold) : '…'} or more</summary>
           <label className="check">
             <input type="checkbox" checked={autoPdf} onChange={(e) => setAutoPdf(e.target.checked)} />
             Make a tailored CV right after the check when the fit is {fit(threshold)} or more (about 3 more minutes). Change the number in{' '}

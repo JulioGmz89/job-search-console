@@ -40,7 +40,11 @@ function useFocusOnChange(key, ref) {
       first.current = false;
       return;
     }
-    ref.current?.focus();
+    // Only when the user was here (or focus was lost with the old state);
+    // never pull them out of a field they are typing in elsewhere.
+    const active = document.activeElement;
+    const card = ref.current?.closest('.card');
+    if (!active || active === document.body || card?.contains(active)) ref.current?.focus();
   }, [key, ref]);
 }
 
@@ -136,6 +140,7 @@ function CvCard({ row, report }) {
           <button type="button" className="btn2" disabled={Boolean(block)} onClick={() => setConfirm('again')}>
             Make it again
           </button>
+          <CostNote minutes="3" />
           {doc && madeIn && madeIn !== design ? (
             <button type="button" className="btn2" onClick={() => go('cv-render', { documentId: doc.id, template: design })}>
               Update the layout to {design}
@@ -226,7 +231,10 @@ function CoverCard({ row, report, openForm = false }) {
         id={`cl-${key}`}
         rows={2}
         value={answers[key]}
-        onChange={(e) => setAnswers({ ...answers, [key]: e.target.value })}
+        onChange={(e) => {
+          setAnswers({ ...answers, [key]: e.target.value });
+          setErrors((x) => ({ ...x, [key]: undefined }));
+        }}
         aria-invalid={errors[key] ? true : undefined}
         aria-describedby={errors[key] ? `cl-${key}-err` : undefined}
       />

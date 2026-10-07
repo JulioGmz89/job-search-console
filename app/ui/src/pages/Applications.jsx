@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Cell, Column, Row, Table, TableBody, TableHeader } from 'react-aria-components';
 
 import { AddJob } from '../components/AddJob.jsx';
@@ -19,6 +19,7 @@ const FITS = [
 ];
 
 const STORE = 'jsc-applications-filters';
+const SCROLL = 'jsc-applications-scroll';
 /** Filters survive going to a job and coming back (ia.md §2.2): kept per tab. */
 function readFilters() {
   const fromUrl = /[?&]status=([\w-]+)/.exec(window.location.hash)?.[1] ?? null;
@@ -57,6 +58,30 @@ export function ApplicationsPage() {
   const { start, list } = useRuns();
   const [filters, setFiltersState] = useState(readFilters);
   const [moved, setMoved] = useState({});
+  // A filter that came from a link (Today › Review them) is remembered too.
+  const [initialFilters] = useState(filters);
+  useEffect(() => writeFilters(initialFilters), [initialFilters]);
+  // Coming back from a job restores where the list was (ia.md §2.2).
+  const loaded = Boolean(pipeline.data);
+  useEffect(() => {
+    if (!loaded) return undefined;
+    let y;
+    try {
+      y = Number(window.sessionStorage.getItem(SCROLL) ?? 0);
+    } catch {
+      y = 0;
+    }
+    if (y) window.scrollTo(0, y);
+    const save = () => {
+      try {
+        window.sessionStorage.setItem(SCROLL, String(window.scrollY));
+      } catch {
+        // Without storage the list simply opens at the top.
+      }
+    };
+    window.addEventListener('scroll', save, { passive: true });
+    return () => window.removeEventListener('scroll', save);
+  }, [loaded]);
   const setFilters = (change) => {
     const next = { ...filters, ...change };
     setFiltersState(next);
@@ -214,7 +239,7 @@ export function ApplicationsPage() {
                   <Column id="fit" allowsSorting>
                     Fit
                   </Column>
-                  <Column id="reco" className="hide-md">
+                  <Column id="reco">
                     Recommendation
                   </Column>
                   <Column id="status" allowsSorting>
@@ -248,7 +273,7 @@ export function ApplicationsPage() {
                           {left ? <span className="rowmsg">Moved to {statusLabel(moved[row.id])}</span> : null}
                         </Cell>
                         <Cell className="num">{fit(row.score)}</Cell>
-                        <Cell className="hide-md">{row.report?.decision ?? '—'}</Cell>
+                        <Cell>{row.report?.decision ?? '—'}</Cell>
                         <Cell>
                           <StatusControl row={row} statuses={statuses} onSaved={(id) => setMoved((m) => ({ ...m, [row.id]: id }))} />
                         </Cell>

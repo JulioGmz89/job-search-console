@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
 
-import { fetchReport, setRowStatus } from '../api.js';
+import { fetchReport } from '../api.js';
 import { Documents } from '../components/Documents.jsx';
 import { RunItem } from '../components/RunItem.jsx';
-import { StatusControl } from '../components/StatusControl.jsx';
+import { saveStatus, StatusControl, WhenDialog } from '../components/StatusControl.jsx';
 import { ConfirmDialog, CostNote, HelpLink } from '../components/ui.jsx';
-import { reload, useResource } from '../data.js';
+import { useResource } from '../data.js';
 import { fit, jobName, shortDate, statusLabel } from '../lib/labels.js';
 import { mergeInfo, mergeText, needsAttention, runState, runTitle } from '../lib/runs.js';
 import { latest, runsForJob, useRuns } from '../runs.jsx';
 import { announce } from '../shell/announce.jsx';
 import { PageHead, useAnchor } from '../shell/router.jsx';
-import { offerUndo } from '../shell/undo.jsx';
 
 const CLOSED = new Set(['rejected', 'discarded', 'skip', 'hired', 'offer']);
 
@@ -53,6 +52,7 @@ export function JobPage({ params }) {
   const { list, start } = useRuns();
   const anchor = useAnchor();
   const [confirmAgain, setConfirmAgain] = useState(false);
+  const [askSent, setAskSent] = useState(false);
   const rows = pipeline.data?.rows ?? [];
   const row = params.id ? rows.find((r) => r.id === params.id) : rows.find((r) => r.reportId === params.reportId);
 
@@ -100,16 +100,11 @@ export function JobPage({ params }) {
     }
   };
 
-  const sent = async () => {
-    const before = statusId;
-    const today = new Date();
-    const on = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    await setRowStatus(row.id, 'applied', { on });
-    await reload('pipeline');
-    offerUndo(`${name} set to Applied today`, async () => {
-      await setRowStatus(row.id, before);
-      await reload('pipeline');
-    });
+  const sent = async (extra) => {
+    setAskSent(false);
+    await saveStatus(row, 'applied', extra);
+    // The button goes away with the status; focus moves to the status it set.
+    setTimeout(() => document.querySelector('#summary .status-control button')?.focus(), 0);
   };
 
   return (
@@ -179,10 +174,10 @@ export function JobPage({ params }) {
         {report ? <Documents row={row} report={report} openCover={anchor === 'cover'} /> : <p className="muted">{error ? `Could not load the report: ${error.message}` : 'Loading…'}</p>}
         {statusId === 'evaluated' ? (
           <div className="row">
-            <button type="button" className="btn2" onClick={sent}>
+            <button type="button" className="btn2" onClick={() => setAskSent(true)}>
               I’ve sent my application
             </button>
-            <span className="hint inline">Sets the status to Applied, dated today.</span>
+            <span className="hint inline">Sets the status to Applied, with the date you sent it.</span>
           </div>
         ) : null}
       </section>
@@ -239,6 +234,7 @@ export function JobPage({ params }) {
         </ul>
       </section>
 
+      <WhenDialog isOpen={askSent} row={row} onConfirm={sent} onCancel={() => setAskSent(false)} />
       <ConfirmDialog
         isOpen={confirmAgain}
         title={`Check ${name} again?`}

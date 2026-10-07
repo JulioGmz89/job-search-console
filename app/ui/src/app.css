@@ -356,3 +356,4 @@ main { padding-bottom: 6rem; }
   .search[data-unfolded="true"] .search-input { width: 100%; }
 }
 @media (max-width: 600px) { .panel { left: 0; right: 0; width: auto; } }
+.prose table { display: block; max-width: 100%; overflow-x: auto; }

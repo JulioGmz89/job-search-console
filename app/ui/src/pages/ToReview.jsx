@@ -139,6 +139,15 @@ export function ToReviewPage() {
   const workspace = useResource('workspace');
   const { list, start, retry, track } = useRuns();
   const [selected, setSelected] = useState([]);
+  // Checks started on this page: when one finishes its link leaves the list,
+  // so its result is shown here instead, where the user was (WP-T2-04).
+  const [startedHere, setStartedHere] = useState([]);
+  const justRef = useRef(null);
+  const justChecked = startedHere.map((id) => list.find((r) => r.id === id)).filter((r) => r && ['done', 'failed'].includes(runState(r)));
+  const justCount = justChecked.length;
+  useEffect(() => {
+    if (justCount) justRef.current?.focus();
+  }, [justCount]);
   const [confirm, setConfirm] = useState(null);
   const [error, setError] = useState(null);
 
@@ -157,6 +166,7 @@ export function ToReviewPage() {
       try {
         const run = await start('evaluate', { url, autoPdf: false });
         track(run);
+        setStartedHere((ids) => [...ids, run.id]);
       } catch (e) {
         setError(e.message);
       }
@@ -203,6 +213,16 @@ export function ToReviewPage() {
         </p>
       ) : null}
 
+      {justChecked.length ? (
+        <section aria-labelledby="just-h" className="stack-sm">
+          <h2 id="just-h" tabIndex={-1} ref={justRef}>
+            Just checked ({justChecked.length})
+          </h2>
+          {justChecked.map((r) => (
+            <RunItem key={r.id} run={r} headingLevel={3} />
+          ))}
+        </section>
+      ) : null}
       <section aria-labelledby="tr-h" className="stack-sm">
         <div className="row between">
           <h2 id="tr-h">

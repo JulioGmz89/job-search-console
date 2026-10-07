@@ -33,7 +33,10 @@ function EntryForm({ kind, entry = null, providers = [], scanMethods = [], onSav
   const heading = useRef(null);
   useEffect(() => heading.current?.focus(), []);
   const id = entry ? `edit-${kind}-${entry.index}` : `new-${kind}`;
-  const set = (key) => (e) => setDraft({ ...draft, [key]: e.target.value });
+  const set = (key) => (e) => {
+    setDraft({ ...draft, [key]: e.target.value });
+    setErrors((x) => ({ ...x, [key]: undefined }));
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -185,7 +188,7 @@ function EntryRow({ entry, kind, health, portals, onEdit, editing, children }) {
             <span className="badge neutral">Paused</span>
           ) : broken ? (
             <span className="badge fail">
-              {BOARD_HEALTH[status]} since {shortDate(health.timestamp)}
+              {BOARD_HEALTH[status]} since {shortDate(health.since ?? health.timestamp)}
             </span>
           ) : status ? (
             <span className="small muted">
@@ -247,7 +250,7 @@ function EntryRow({ entry, kind, health, portals, onEdit, editing, children }) {
       ) : null}
       {children}
       <ConfirmDialog isOpen={confirm} title={`Stop following ${entry.name}?`} confirmLabel="Stop following" danger onConfirm={remove} onCancel={() => setConfirm(false)}>
-        <p>The app stops checking {entry.name} for new openings. Links already in To review stay. You can undo this right after; the previous file is also kept as portals.yml.bak.</p>
+        <p>The app stops checking {entry.name} for new openings. Links already in To review stay. You can undo this right after, and a backup of your list is kept too.</p>
       </ConfirmDialog>
     </li>
   );
@@ -278,7 +281,7 @@ function Filters({ filters }) {
         .
       </p>
       <p className="small muted">
-        To change these, edit <span className="mono">title_filter</span> in portals.yml with your editor; the app picks the change up by itself. <HelpLink topic="files">Files in your workspace folder</HelpLink>
+        To change these, edit the title filter in your companies file (portals.yml) with your editor; the app picks the change up by itself. <HelpLink topic="files">Files in your workspace folder</HelpLink>
       </p>
     </section>
   );
@@ -292,6 +295,7 @@ export function CompaniesPage() {
   const portals = useResource('portals');
   const { list, start } = useRuns();
   const [form, setForm] = useState(null);
+  const [scanId, setScanId] = useState(null);
   const followButton = useRef(null);
 
   if (!portals.data) return <PageHead title="Companies you follow" lead={portals.error ? portals.error.message : 'Loading…'} />;
@@ -306,6 +310,7 @@ export function CompaniesPage() {
   };
   const scan = async () => {
     const run = await start('scan', {});
+    setScanId(run.id);
     announce(`Started: ${runTitle(run)}`);
   };
 
@@ -340,6 +345,7 @@ export function CompaniesPage() {
           Check for new openings
         </button>
       </PageHead>
+      {scanId && list.find((r) => r.id === scanId) ? <RunItem run={list.find((r) => r.id === scanId)} headingLevel={2} /> : null}
       {broken.length ? (
         <p className="notice attn">
           {plural(broken.length, 'job board needs', 'job boards need')} you: {broken.map((c) => c.name).join(', ')}. Use <b>Fix</b> below.
