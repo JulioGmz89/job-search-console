@@ -109,3 +109,33 @@ the app. Every data criterion is met. The step most likely to stop a first-timer
 **step 8**: the card they were watching disappears with the result, and they must notice
 "(fit 4.1)" in a new "Waiting for you" section, or the "Activity · 1 done" button, to find
 it. A P2 who does not will believe the check failed or went nowhere.
+
+---
+
+## Re-check after the fix
+
+**W8-first-job-02: closed.** Re-checked on 2026-10-07 by `heuristic-evaluator` in a fresh
+EMPTY sandbox at http://127.0.0.1:4402/, Chromium via Playwright, 1280 × 800.
+
+1. Set-up as in `tasks.md` T1: pasted Alex Rivera's CV into "Your CV" → **Save my CV**;
+   "Company name" `Kestrel Media`, "Careers page link"
+   `https://job-boards.greenhouse.io/kestrelmedia` → **Follow company**. "You’re set up" appeared
+   with focus on it, and "Check your first job" below it.
+2. Pasted `https://job-boards.greenhouse.io/kestrelmedia/jobs/4134913` into "Link to the job
+   posting" → **Check fit now**.
+3. While running (snapshots at about 1 s and 5 s): **one** card, under the button inside "Check
+   your first job": "Working · Oct 7, 07:06 · 1 s so far · Check fit ·
+   greenhouse.io/kestrelmedia, job 4134913", a progress bar, "Usually 2–5 min. You can leave
+   this page; it carries on.", **Cancel**, with focus on its title. No "Working now" section
+   appeared, so the running check is shown only once (W8-first-job-01 is also no longer seen).
+4. When the check finished (8 s), the "Check your first job" section stayed on Today, and the
+   same card turned into "Done · Oct 7, 07:06 · took 8 s · Check fit · Kestrel Media — Senior
+   Backend Engineer · Fit 4.1 / 5. The fit report is ready. · then: added to Applications ·
+   **Open the job**", with keyboard focus on **Open the job** (link to `#/applications/1`). It
+   was still there 3 s later. "Waiting for you · 1 job reviewed but not applied · Best: Kestrel
+   Media — Senior Backend Engineer (fit 4.1)" appeared below, as before.
+
+Remaining nit, not filed: the result card gives "Fit 4.1 / 5" but not the recommendation
+("Apply"), which the job page leads with; Applications' card behaves the same.
+
+- **Evidence:** app/ux/m8/evidence/W8-first-job-02-recheck.png
