@@ -27,7 +27,7 @@
  * - `lane` and `exclusive` tell the queue how a kind may overlap with others.
  */
 
-import { parseProgress, readPortalHealth, scanArgs } from '../services/scanner.js';
+import { parseProgress, readLastScanRun, readPortalHealth, scanArgs } from '../services/scanner.js';
 import { parseFetchProgress } from '../skills/cli.js';
 import { buildSkillsCvSpec, buildSkillsExtractSpec } from '../skills/extract-spec.js';
 import { buildCoverSpec, buildEvaluateSpec, buildPdfSpec } from './agent-specs.js';
@@ -99,7 +99,16 @@ export const RUN_KINDS = Object.freeze({
       } catch {
         // No health file: nothing to say.
       }
-      return { result: { ...(run.result ?? {}), added, unreachable, preview: run.dryRun === true }, ...(run.dryRun ? {} : { next: ['skills-fetch-auto'] }) };
+      // How many companies the check reached (data/scan-runs.tsv), so a check
+      // that reached none cannot read as "every board answered" (H8-today-02).
+      let checked = null;
+      try {
+        const last = readLastScanRun({ root: ctx.root });
+        if (last && Date.parse(last.timestamp) >= (run.startedAt ?? 0) - 1000) checked = last.companies ?? null;
+      } catch {
+        // No record: unknown.
+      }
+      return { result: { ...(run.result ?? {}), added, unreachable, checked, preview: run.dryRun === true }, ...(run.dryRun ? {} : { next: ['skills-fetch-auto'] }) };
     },
     // scan.mjs writes data/scan-runs.tsv, data/portal-health.tsv and reads
     // data/blacklist.md as bare relative paths, so they follow the cwd, not

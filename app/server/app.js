@@ -193,6 +193,38 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
    * would buy nothing and go stale exactly when it matters. (M3 adds file
    * watching for push updates.)
    */
+  /**
+   * A job's documents, even after its fit was checked again (H8-job-01).
+   *
+   * Every check writes a new report, and upstream's merge-tracker.mjs points
+   * the tracker row at it; the tailored CV and the letter stay tied to the
+   * earlier report (pdf-index.tsv, the covers record). So a report without
+   * documents of its own falls back to the newest earlier report for the same
+   * posting link that has them. Nothing on disk changes.
+   */
+  const reportsForLink = (report, reports) =>
+    report?.url ? [report, ...reports.filter((r) => r.id !== report.id && r.url === report.url).sort((a, b) => b.id - a.id)] : report ? [report] : [];
+  const pdfFor = (report, reports) => {
+    for (const r of reportsForLink(report, reports)) {
+      const pdf = resolveReportPdf(r.id, { root });
+      if (pdf) return { ...pdf, reportId: r.id };
+    }
+    return null;
+  };
+  const coverFor = (report, reports) => {
+    for (const r of reportsForLink(report, reports)) {
+      const cover = resolveReportCover(r.id, { root });
+      if (cover) return { ...cover, reportId: r.id };
+    }
+    return null;
+  };
+  /** The same, for a route that only has a report id. */
+  const byReportId = (id, find) => {
+    const { reports } = listReports({ root });
+    const report = reports.find((r) => r.id === Number.parseInt(id, 10)) ?? null;
+    return report ? find(report, reports) : null;
+  };
+
   const load = () => {
     const pipeline = readPipeline({ root });
     const { reports, issues: reportIssues } = listReports({ root });
@@ -219,9 +251,9 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
             }
           : null,
         hasReport: report !== null,
-        pdf: report?.pdf?.exists ? { format: report.pdf.format } : null,
+        pdf: report && pdfFor(report, reports) ? { format: report.pdf?.format ?? null } : null,
         // Today's "replied without a tailored CV or letter" needs both documents per row.
-        cover: report ? resolveReportCover(report.id, { root }) !== null : false,
+        cover: report ? coverFor(report, reports) !== null : false,
       };
     });
 
@@ -336,8 +368,10 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     // The row carries tracker-only facts (status, applied date in notes) that
     // the report file itself does not know about.
     const row = readPipeline({ root }).rows.find((r) => r.reportId === report.id) ?? null;
-    const cover = resolveReportCover(report.id, { root });
-    const pdf = resolveReportPdf(report.id, { root });
+    const { reports } = listReports({ root });
+    const listed = reports.find((r) => r.id === report.id) ?? report;
+    const cover = coverFor(listed, reports);
+    const pdf = pdfFor(listed, reports);
     // The ATS verdict the console recorded when it rendered this PDF (M5); none for older PDFs.
     const ats = pdf ? readAtsRecord(resolveDataRoot(root), pdf.fileName) : null;
     // When the PDF was written, to the second: the document card compares it with
@@ -345,9 +379,12 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     const pdfModified = pdf ? (await stat(pdf.absolutePath)).mtime.toISOString() : null;
     return {
       ...report,
-      pdf: report.pdf ? { ...report.pdf, modified: pdfModified, fileName: pdf?.fileName ?? null } : report.pdf,
+      // `fromReport`: the documents belong to an earlier check of the same posting.
+      pdf: pdf
+        ? { ...(report.pdf ?? {}), exists: true, modified: pdfModified, fileName: pdf.fileName, fromReport: pdf.reportId === report.id ? null : pdf.reportId }
+        : report.pdf,
       ats: ats ? { verdict: ats.verdict, score: ats.score, issues: ats.issues, checkedAt: ats.checkedAt, template: ats.template ?? null } : null,
-      cover: cover ? { path: cover.path, date: cover.date } : null,
+      cover: cover ? { path: cover.path, date: cover.date, fromReport: cover.reportId === report.id ? null : cover.reportId } : null,
       tracker: row
         ? { id: row.id, status: row.status, statusId: row.statusId, date: row.date, notes: row.notes }
         : null,
@@ -355,7 +392,7 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
   });
 
   app.get('/api/reports/:id/pdf', async (request, reply) => {
-    const pdf = resolveReportPdf(request.params.id, { root });
+    const pdf = byReportId(request.params.id, pdfFor);
     if (!pdf) return reply.code(404).send({ error: 'No PDF for this report' });
 
     const { size } = await stat(pdf.absolutePath);
@@ -371,7 +408,7 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
 
   /** The cover letter PDF, tracked by the console rather than pdf-index.tsv (see services/covers.js). */
   app.get('/api/reports/:id/cover', async (request, reply) => {
-    const cover = resolveReportCover(request.params.id, { root });
+    const cover = byReportId(request.params.id, coverFor);
     if (!cover) return reply.code(404).send({ error: 'No cover letter for this report' });
 
     const { size } = await stat(cover.absolutePath);

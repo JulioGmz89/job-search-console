@@ -265,3 +265,28 @@ test('first run: the first evaluation in an empty folder lands in Applications',
   assert.match(readFileSync(join(root, 'data', 'applications.md'), 'utf-8'), /^# Applications Tracker/);
   delete process.env.FAKE_CLAUDE_SCENARIO;
 });
+
+test('checking a job again keeps its tailored CV and letter in view (H8-job-01)', async () => {
+  const { cpSync } = await import('node:fs');
+  const root = mkdtempSync(join(tmpdir(), 'jsc-m8-recheck-'));
+  scratches.push(root);
+  cpSync(join(dirname(FAKE_CLAUDE), '..', '..', '..', '..', 'ux', 'sandbox', 'seeds', 'populated'), root, { recursive: true });
+  // What a second check of report 12's posting leaves behind: a new report for
+  // the same link, and the tracker row pointing at it (merge-tracker.mjs).
+  const old = readFileSync(join(root, 'reports', '012-cobaltfreight-2026-08-25.md'), 'utf-8');
+  const { writeFileSync } = await import('node:fs');
+  writeFileSync(join(root, 'reports', '041-cobaltfreight-2026-10-07.md'), old);
+  const tracker = join(root, 'data', 'applications.md');
+  writeFileSync(tracker, readFileSync(tracker, 'utf-8').replace('[012](../reports/012-cobaltfreight-2026-08-25.md)', '[041](../reports/041-cobaltfreight-2026-10-07.md)'));
+
+  const app = buildApp({ root, serveUi: false, watch: false });
+  apps.push(app);
+  const get = async (url) => app.inject({ method: 'GET', url });
+  const report = (await get('/api/reports/41')).json();
+  assert.equal(report.pdf.exists, true);
+  assert.equal(report.pdf.fromReport, 12, 'the CV belongs to the earlier check');
+  assert.equal((await get('/api/reports/41/pdf')).statusCode, 200);
+  const row = (await get('/api/pipeline')).json().rows.find((r) => r.id === 12);
+  assert.equal(row.reportId, 41);
+  assert.ok(row.pdf, 'the row still shows its CV');
+});
