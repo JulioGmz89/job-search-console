@@ -75,12 +75,15 @@ portals.yml.bak
 app/ux/.shots-tmp/
 # The scripted axe pass re-creates these on every run; findings keep their own evidence.
 app/ux/a11y/shots/
+app/ux/m8/a11y/shots/
 # Real-user session recordings are never committed (PROJECT_PLAN.md §12.5); only notes are.
 app/ux/sessions/**/*.webm
 app/ux/sessions/**/*.mkv
 app/ux/sessions/**/*.m4a
 app/ux/sessions/**/*.wav
 app/ux/sessions/**/*.mp3
+app/ux/sessions/**/*.mp4
+app/ux/sessions/**/*.mov
 modes/_profile.md
 modes/_custom.md
 modes/_brief.md
