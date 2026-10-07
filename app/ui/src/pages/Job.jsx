@@ -150,7 +150,7 @@ export function JobPage({ params }) {
           </span>
           <StatusControl row={row} statuses={pipeline.data.statuses} />
         </div>
-        <div className="row">
+        <div className="row" id="check-again" data-run-home>
           {checking ? (
             <RunItem run={checking} headingLevel={3} />
           ) : (

@@ -152,3 +152,37 @@ test('outcomes never claim more than the run knows (H8-today-02, H8-activity-01)
   assert.equal(isBoard({ careersUrl: 'https://job-boards.greenhouse.io/kestrelmedia' }), true);
   assert.equal(isBoard({ careersUrl: 'https://kestrelmedia.example.com/careers' }), false);
 });
+
+test('Today warns about a followed careers page no check can read (H8-today-01)', async () => {
+  const { unreadableLinks, todayCards } = await import('./today.js');
+  const companies = [
+    { name: 'Kestrel Media', enabled: true, careersUrl: 'https://kestrelmedia.example.com/careers' },
+    { name: 'Lumen Grid', enabled: true, careersUrl: 'https://jobs.lever.co/lumengrid' },
+    { name: 'Paused Co', enabled: false, careersUrl: 'https://paused.example.com/jobs' },
+    { name: 'Searched Co', enabled: true, scanMethod: 'websearch', careersUrl: 'https://searched.example.com' },
+  ];
+  assert.deepEqual(unreadableLinks(companies).map((c) => c.name), ['Kestrel Media']);
+  assert.deepEqual(unreadableLinks(companies, { 'Kestrel Media': { status: 'reachable' } }), [], 'once a check reads it, no warning');
+  const cards = todayCards({ companies });
+  assert.equal(cards.needs.count, 1);
+  assert.deepEqual(cards.needs.links.map((c) => c.name), ['Kestrel Media']);
+});
+
+test('a re-check finds its row however the link was written (R-final-02)', async () => {
+  const { sameLink } = await import('./labels.js');
+  assert.equal(sameLink('https://job-boards.greenhouse.io/kestrelmedia/jobs/4134913', 'https://Job-Boards.greenhouse.io/kestrelmedia/jobs/4134913/'), true);
+  assert.equal(sameLink('https://jobs.lever.co/a/1?utm_source=x#apply', 'https://jobs.lever.co/a/1'), true);
+  assert.equal(sameLink('https://jobs.lever.co/a/1', 'https://jobs.lever.co/a/2'), false);
+  assert.equal(sameLink(undefined, undefined), false);
+});
+
+test('a check names what it found (R-final-03)', async () => {
+  const { outcome } = await import('./runs.js');
+  const portals = outcome({ kind: 'verify-portals', status: 'failed', exitCode: 1, reportsFindings: true, result: { findings: ['Juniper Mobility: board not found'], total: 1 } });
+  assert.equal(portals.text, 'Found 1 problem: Juniper Mobility: board not found.');
+  assert.equal(portals.open.href, '#/companies');
+  const many = outcome({ kind: 'verify-pipeline', status: 'failed', exitCode: 1, result: { findings: ['a', 'b', 'c', 'd'], total: 5 } });
+  assert.equal(many.text, 'Found 5 problems: a; b; c; and 2 more.');
+  assert.equal(outcome({ kind: 'verify-pipeline', status: 'succeeded', exitCode: 0, result: { findings: [], total: 0, clean: true } }).text, 'No problems found.');
+  assert.match(outcome({ kind: 'verify-pipeline', status: 'succeeded', exitCode: 0, result: { findings: [], total: 0, clean: false } }).text, /Technical details/);
+});

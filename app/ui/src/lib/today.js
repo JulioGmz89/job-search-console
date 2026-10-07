@@ -4,6 +4,7 @@
  * health record, and every card has a permanent home elsewhere.
  */
 
+import { isBoard } from './boards.js';
 import { isTopLevel, needsAttention } from './runs.js';
 
 /**
@@ -51,6 +52,16 @@ export function brokenBoards(companies, health = {}) {
 }
 
 /**
+ * Followed companies whose link is a careers page, not a job board the
+ * scanner reads, and that no check has read yet: checks find nothing there
+ * until the link is changed (H8-today-01).
+ */
+export function unreadableLinks(companies, health = {}) {
+  const read = new Set(['reachable', 'empty']);
+  return companies.filter((c) => c.enabled && c.scanMethod !== 'websearch' && !isBoard(c) && !read.has(String(health[c.name]?.status ?? '').toLowerCase()));
+}
+
+/**
  * The card groups, in ia.md's fixed order. Empty groups are left out.
  *
  * @param {object} data
@@ -68,6 +79,7 @@ export function todayCards({ runs = [], dismissed = [], rows = [], issues = [], 
   const failures = runs.filter((r) => needsAttention(r, runs, dismissed));
   const unreadable = issues.filter((i) => i.code === 'row-unparseable');
   const boards = brokenBoards(companies, health);
+  const links = unreadableLinks(companies, health).filter((c) => !boards.some((b) => b.name === c.name));
   const designFails = design?.verdict === 'fail';
 
   const fresh = newFromChecks(pending, runs, lastSeen);
@@ -78,7 +90,7 @@ export function todayCards({ runs = [], dismissed = [], rows = [], issues = [], 
   const working = runs.filter((r) => isTopLevel(r) && (r.status === 'running' || r.status === 'queued'));
 
   return {
-    needs: { failures, unreadable, boards, designFails, count: failures.length + (unreadable.length ? 1 : 0) + boards.length + (designFails ? 1 : 0) },
+    needs: { failures, unreadable, boards, links, designFails, count: failures.length + (unreadable.length ? 1 : 0) + boards.length + links.length + (designFails ? 1 : 0) },
     fresh,
     waiting: { replied, reviewed },
     working,

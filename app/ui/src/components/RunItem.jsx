@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { fetchRun } from '../api.js';
 import { useResource } from '../data.js';
@@ -63,6 +63,7 @@ const BADGE = {
  */
 export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }) {
   const { list, retry, cancel } = useRuns();
+  const design = useResource('design');
   const rowForReport = useRowForReport();
   const pipelineRows = useResource('pipeline').data?.rows ?? [];
   const state = runState(run);
@@ -72,14 +73,19 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
   // When this card leaves the page with focus inside it (its run finished and the
   // page shows the result instead), focus goes to the place it belonged to (A8-01):
   // the nearest [data-run-home], else its card, else the page heading.
-  useEffect(() => {
+  // A layout effect: its cleanup runs before React takes the card out of the
+  // page, while focus is still inside it (R-final-06).
+  useLayoutEffect(() => {
     const article = articleRef.current;
     return () => {
       if (!article?.contains(document.activeElement)) return;
       const home = article.parentElement?.closest('[data-run-home]') ?? article.parentElement?.closest('.card') ?? null;
+      const homeId = home?.id || null;
       setTimeout(() => {
         if (document.activeElement && document.activeElement !== document.body) return;
-        const target = home?.isConnected ? home.querySelector('a[href], button:not([disabled])') : null;
+        // The home may itself have been drawn again; find it by its id then.
+        const place = home?.isConnected ? home : homeId ? document.getElementById(homeId) : null;
+        const target = place?.querySelector('[data-run-focus]') ?? place?.querySelector('a[href], button:not([disabled])') ?? null;
         (target ?? document.querySelector('main h1'))?.focus();
       }, 0);
     };
@@ -98,11 +104,15 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
   const [tone, badge] = state === 'failed' && retried ? ['neutral', 'Failed, tried again'] : BADGE[state];
   const active = list.filter((r) => r.status === 'running').length;
 
+  // A fit check that would make its tailored CV in a design that fails the
+  // screening check doesn't, and says so before the click (R-final-07).
+  const skipCv = run.kind === 'evaluate' && run.meta?.autoPdf !== false && design.data?.verdict === 'fail';
+
   const doRetry = async () => {
     setBusy(true);
     setError(null);
     try {
-      const again = await retry(run.id);
+      const again = await retry(run.id, skipCv ? { autoPdf: false } : undefined);
       setJustRetried(true);
       announce(`Started again: ${title}`);
       onRetried?.(again);
@@ -174,6 +184,12 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
           <p>
             <b>What to do:</b> {why.todo}
           </p>
+          {why.retry && skipCv ? (
+            <p className="small">
+              Your CV design fails the screening check, so this try won’t make a tailored CV by itself. Choose a design that passes in{' '}
+              <a href="#/my-cv/design">My CV › Design</a>, then make the CV from the job’s page.
+            </p>
+          ) : null}
           <div className="row">
             {why.retry ? (
               <button type="button" className="btn btn-sm" onClick={doRetry} disabled={busy}>

@@ -114,7 +114,7 @@ export const saveProfile = (fields) => request('PUT', '/api/profile', { fields }
 /** `refresh`: re-find the CLI and ask it again ("Check again"). */
 export const checkAgent = () => get('/api/agent/status?refresh=1');
 
-export const retryRun = (id) => request('POST', `/api/runs/${id}/retry`);
+export const retryRun = (id, options) => request('POST', `/api/runs/${id}/retry`, options);
 
 export const removeInboxUrl = (url) => request('DELETE', '/api/inbox/urls', { url });
 export const restoreInboxLine = (line) => request('POST', '/api/inbox/urls/restore', { line });

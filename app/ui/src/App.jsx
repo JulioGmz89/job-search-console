@@ -102,7 +102,7 @@ function Shell() {
       <main id="main" tabIndex={-1}>
         <Page params={route.params} />
       </main>
-      <ActivityPanel open={panelOpen} onClose={closePanel} />
+      <ActivityPanel open={panelOpen} onClose={closePanel} onStepAside={() => setPanelOpen(false)} />
       <UndoBar />
       <LiveRegions />
     </>

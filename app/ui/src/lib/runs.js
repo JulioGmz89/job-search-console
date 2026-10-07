@@ -208,11 +208,23 @@ export function outcome(run, { rowForReport = () => null, all = [], rows = [] } 
       return { text: 'The skills analysis is up to date.', open: { href: '#/skills/learn', label: 'Open Skills' } };
     case 'verify-pipeline':
     case 'validate-portals':
-    case 'verify-portals':
+    case 'verify-portals': {
+      // What it found, in words, when the server could read it from the output (R-final-03).
+      const found = run.result?.findings ?? [];
+      if (found.length) {
+        const total = run.result.total ?? found.length;
+        const shown = found.slice(0, 3).join('; ');
+        return {
+          text: `Found ${plural(total, 'problem')}: ${shown}${total > 3 ? `; and ${total - 3} more` : ''}.`,
+          open: run.kind === 'verify-pipeline' ? { href: '#/workspace#health', label: 'Open Workspace' } : { href: '#/companies', label: 'Open Companies' },
+        };
+      }
+      if (run.result?.clean && run.exitCode === 0) return { text: 'No problems found.', open: null };
       // Only exit 1 is a known verdict; otherwise the output says what it found (H8-activity-01).
       return run.exitCode === 1
         ? { text: 'Found problems. Technical details shows what they are.', open: { href: '#/workspace#health', label: 'Open Workspace' } }
         : { text: 'Finished. Technical details shows what it found.', open: null };
+    }
     default:
       return { text: 'Done.', open: null };
   }

@@ -142,7 +142,9 @@ function CvStep() {
 
 function CompanyStep() {
   const portals = useResource('portals');
-  const { start } = useRuns();
+  const { list, start } = useRuns();
+  const [scanId, setScanId] = useState(null);
+  const scanRun = scanId ? (list.find((r) => r.id === scanId) ?? null) : null;
   const [name, setName] = useState('');
   const [link, setLink] = useState('');
   const [errors, setErrors] = useState({});
@@ -207,6 +209,7 @@ function CompanyStep() {
               className="btn2 btn-sm"
               onClick={async () => {
                 const run = await start('scan', {});
+                setScanId(run.id);
                 announce(`Started: ${runTitle(run)}`);
               }}
             >
@@ -214,6 +217,11 @@ function CompanyStep() {
             </button>
             <span className="hint inline">A few seconds · no AI involved</span>
           </div>
+          {scanRun ? (
+            <div data-run-home>
+              <RunItem run={scanRun} headingLevel={4} />
+            </div>
+          ) : null}
         </div>
       ) : (
         <>
@@ -361,7 +369,7 @@ function FailureCard({ run, onDismiss }) {
 }
 
 /** Set-up was finished on this visit: say so, and keep focus on something real (WP-T1). */
-function SetupDone({ cvSummary, company, onClose }) {
+function SetupDone({ cvSummary, company, readable, onClose }) {
   const ref = useRef(null);
   useEffect(() => ref.current?.focus(), []);
   return (
@@ -374,6 +382,12 @@ function SetupDone({ cvSummary, company, onClose }) {
         <li>✓ Your CV: {cvSummary} · <a href="#/my-cv/content">Edit in My CV</a></li>
         <li>
           ✓ Following <b>{company}</b> · <a href="#/companies">Companies you follow</a>
+          {readable ? null : (
+            <p className="notice warn">
+              The app doesn’t recognise this link as a job board it can read, so checks may find nothing at {company}. If the company posts its jobs on Greenhouse, Lever
+              or Ashby, use that link instead (<a href="#/companies">Companies</a> › Edit).
+            </p>
+          )}
         </li>
         <li>✓ AI assistant ready</li>
       </ul>
@@ -403,6 +417,8 @@ export function TodayPage() {
   const cv = useResource('cv');
   const { list, start } = useRuns();
   const [ackd, setAckd] = useState([]);
+  // The check started from this page, shown with its result where it was clicked (H8-today-02).
+  const [scanId, setScanId] = useState(null);
   const [justSetUp, setJustSetUp] = useState(false);
   const firstJobVisit = useRef(false);
   const openedAt = useRef(Date.now());
@@ -474,8 +490,10 @@ export function TodayPage() {
   if (noJobs) firstJobVisit.current = true;
   const showFirstJob = noJobs || firstJobVisit.current;
   // A check shown in that section is not shown again under Working now (W8-first-job-01).
-  const workingElsewhere = working.filter((r) => !shownInline.has(r.id));
-  const firstCompany = (portals.data?.companies ?? []).find((c) => c.enabled)?.name ?? '';
+  const workingElsewhere = working.filter((r) => !shownInline.has(r.id) && r.id !== scanId);
+  const scanRun = scanId ? (list.find((r) => r.id === scanId) ?? null) : null;
+  const firstFollowed = (portals.data?.companies ?? []).find((c) => c.enabled);
+  const firstCompany = firstFollowed?.name ?? '';
 
   return (
     <>
@@ -483,7 +501,7 @@ export function TodayPage() {
         title={greeting(cv.data?.summary?.name)}
         lead={`${needs.count ? `${plural(needs.count, 'thing needs', 'things need')} you. ` : 'Nothing needs you right now. '}Here is what changed and what is waiting.`}
       />
-      {justSetUp ? <SetupDone cvSummary={cvSummaryText(cv.data?.summary)} company={firstCompany} onClose={() => setJustSetUp(false)} /> : null}
+      {justSetUp ? <SetupDone cvSummary={cvSummaryText(cv.data?.summary)} company={firstCompany} readable={!firstFollowed || isBoard(firstFollowed) || firstFollowed.scanMethod === 'websearch'} onClose={() => setJustSetUp(false)} /> : null}
 
       {needs.count || retrying.length ? (
         <section aria-labelledby="needs-h" className="stack">
@@ -527,6 +545,20 @@ export function TodayPage() {
               </div>
             </article>
           ) : null}
+          {needs.links.map((c) => (
+            <article className="card attn" key={c.name} aria-labelledby={`link-${c.index ?? c.name}`}>
+              <Tag tone="attn">Needs you · a link the app can’t read</Tag>
+              <h3 id={`link-${c.index ?? c.name}`}>{c.name}’s link isn’t a job board the app can read</h3>
+              <p>
+                Checks for new openings will find nothing at {c.name}. If the company posts its jobs on Greenhouse, Lever or Ashby, use that link instead.
+              </p>
+              <div className="row">
+                <a className="btn2" href="#/companies">
+                  Fix {c.name}’s link
+                </a>
+              </div>
+            </article>
+          ))}
           {needs.boards.map((c) => (
             <article className="card attn" key={c.name} aria-labelledby={`board-${c.index}`}>
               <Tag tone="attn">Needs you · a job board isn’t working</Tag>
@@ -635,6 +667,7 @@ export function TodayPage() {
                 className="btn2"
                 onClick={async () => {
                   const run = await start('scan', {});
+                  setScanId(run.id);
                   announce(`Started: ${runTitle(run)}`);
                 }}
               >
@@ -643,6 +676,11 @@ export function TodayPage() {
             </div>
           </article>
         )}
+        {scanRun ? (
+          <div data-run-home>
+            <RunItem run={scanRun} headingLevel={3} />
+          </div>
+        ) : null}
       </section>
 
       {waiting.replied.length || waiting.reviewed.length ? (

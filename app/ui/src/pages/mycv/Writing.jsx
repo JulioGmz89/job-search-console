@@ -123,7 +123,7 @@ function RemakeList({ voice }) {
   const documents = useResource('documents');
   const { list, start } = useRuns();
   const rows = (pipeline.data?.rows ?? []).filter((r) => r.pdf).sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
-  const docFor = (row) => (documents.data?.documents ?? []).find((d) => d.reportId === row.reportId) ?? null;
+  const docFor = (row) => (documents.data?.documents ?? []).find((d) => d.reportId === (row.pdf?.reportId ?? row.reportId)) ?? null;
   const rulesAt = voice.modified ? Date.parse(voice.modified) : 0;
 
   if (!rows.length) return <p className="small muted">You have no tailored CVs yet. They are made from a job’s page, under Documents.</p>;

@@ -7,7 +7,7 @@ import { ConfirmDialog, EmptyState, HelpLink } from '../components/ui.jsx';
 import { reload, useResource } from '../data.js';
 import { plural, shortDate } from '../lib/labels.js';
 import { runState, runTitle } from '../lib/runs.js';
-import { boardType, PROVIDER_NAMES } from '../lib/boards.js';
+import { boardType, isBoard, PROVIDER_NAMES } from '../lib/boards.js';
 import { BOARD_HEALTH, brokenBoards } from '../lib/today.js';
 import { latest, useRuns } from '../runs.jsx';
 import { announce } from '../shell/announce.jsx';
@@ -194,6 +194,8 @@ function EntryRow({ entry, kind, health, portals, onEdit, editing, children }) {
             <span className="small muted">
               {BOARD_HEALTH[status] ?? status} · last checked {shortDate(health.timestamp)}
             </span>
+          ) : !isBoard(entry) && entry.scanMethod !== 'websearch' ? (
+            <span className="badge warn">This link isn’t a job board the app can read · checks find nothing here</span>
           ) : (
             <span className="small muted">Not checked yet</span>
           )}

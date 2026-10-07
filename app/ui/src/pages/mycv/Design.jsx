@@ -388,7 +388,7 @@ export function DesignSection() {
             ) : null}
           </div>
           {doc && !doc.sample ? (
-            <div className="stack-sm">
+            <div className="stack-sm" id="relayout" data-run-home>
               {lastRelay && ['waiting', 'working', 'failed'].includes(runState(lastRelay)) ? <RunItem run={lastRelay} headingLevel={3} /> : null}
               <div className="row">
                 <button type="button" className="btn2 btn-sm" onClick={updateThis} disabled={relaying.some((r) => r.meta?.documentId === documentId)}>
@@ -397,7 +397,7 @@ export function DesignSection() {
                 <span className="hint inline">A few seconds · no AI · wording unchanged</span>
               </div>
               {lastRelay && runState(lastRelay) === 'done' ? (
-                <p className="small">
+                <p className="small" tabIndex={-1} data-run-focus>
                   Laid out again {shortDate(lastRelay.endedAt)} in {designName(lastRelay.result?.template ?? chosen, templates.data?.templates)}: {verdictWords(lastRelay.result?.ats)}.
                   {doc.reportId ? (
                     <>

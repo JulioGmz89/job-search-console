@@ -78,3 +78,19 @@ export function jobName(item) {
   if (company && role) return `${company} — ${role}`;
   return company ?? role ?? item.url ?? '';
 }
+
+/** Whether two job links point at the same posting: case, a trailing slash, the fragment and tracking parameters don't count (R-final-02). */
+export function sameLink(a, b) {
+  const norm = (u) => {
+    try {
+      const url = new URL(String(u ?? '').trim());
+      url.hash = '';
+      for (const k of [...url.searchParams.keys()]) if (/^(utm_|gh_src|ref$|source$)/i.test(k)) url.searchParams.delete(k);
+      return `${url.host.toLowerCase()}${url.pathname.replace(/\/+$/, '')}${url.search}`;
+    } catch {
+      return null;
+    }
+  };
+  const x = norm(a);
+  return x !== null && x === norm(b);
+}

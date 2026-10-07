@@ -12,7 +12,7 @@ import { UndoButton, useUndo } from './undo.jsx';
  * content. Focus moves in when it opens; Escape closes it and focus returns
  * to the Activity button.
  */
-export function ActivityPanel({ open, onClose }) {
+export function ActivityPanel({ open, onClose, onStepAside }) {
   const { list } = useRuns();
   const today = useResource('today');
   const undo = useUndo();
@@ -37,6 +37,15 @@ export function ActivityPanel({ open, onClose }) {
       role="dialog"
       aria-modal="false"
       aria-labelledby="panel-h"
+      // Focus that leaves the panel for the page would land under it; the panel
+      // steps aside instead (R-final-08). The Activity button, a dialog and the
+      // Undo bar don't count: they are never under it.
+      onBlur={(event) => {
+        const to = event.relatedTarget;
+        if (!to || event.currentTarget.contains(to)) return;
+        if (to.closest('.activity-btn, .modal-overlay, .undo-bar')) return;
+        onStepAside?.();
+      }}
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
           event.stopPropagation();

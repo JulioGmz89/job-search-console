@@ -5,7 +5,7 @@ import { AddJob } from '../components/AddJob.jsx';
 import { StatusControl } from '../components/StatusControl.jsx';
 import { ActionMenu, ConfirmDialog, EmptyState, Notice } from '../components/ui.jsx';
 import { useResource } from '../data.js';
-import { fit, jobName, plural, shortDate, statusLabel } from '../lib/labels.js';
+import { fit, jobName, plural, sameLink, shortDate, statusLabel } from '../lib/labels.js';
 import { mergeInfo, runTitle } from '../lib/runs.js';
 import { useRuns } from '../runs.jsx';
 import { announce } from '../shell/announce.jsx';
@@ -151,7 +151,7 @@ export function ApplicationsPage() {
   const working = new Map(
     list
       .filter((r) => ['queued', 'running'].includes(r.status) && (r.meta?.reportId || r.meta?.url))
-      .map((r) => [Number(r.meta?.reportId ?? rows.find((x) => x.report?.url === r.meta?.url)?.reportId), r.kind === 'evaluate' ? 'Checking fit' : r.kind === 'pdf' ? 'Making the tailored CV' : r.kind === 'cover' ? 'Writing the letter' : 'Working']),
+      .map((r) => [Number(r.meta?.reportId ?? rows.find((x) => sameLink(x.report?.url ?? x.url, r.meta?.url))?.reportId), r.kind === 'evaluate' ? 'Checking fit' : r.kind === 'pdf' ? 'Making the tailored CV' : r.kind === 'cover' ? 'Writing the letter' : 'Working']),
   );
 
   const clear = (

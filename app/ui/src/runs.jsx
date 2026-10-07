@@ -83,8 +83,8 @@ export function RunsProvider({ children }) {
         upsert(run);
         return run;
       },
-      async retry(id) {
-        const run = await retryRun(id);
+      async retry(id, options) {
+        const run = await retryRun(id, options);
         upsert(run);
         return run;
       },
