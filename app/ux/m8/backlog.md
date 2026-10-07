@@ -30,8 +30,8 @@ This file adds no finding of its own. Every B8 item lists the source IDs it merg
 | 4 | 0 | — |
 | 3 | 0 | — |
 | 2 | 13 | B8-01 – B8-13 |
-| 1 | 62 | B8-14 – B8-75 |
-| **Total open** | **75** | |
+| 1 | 65 | B8-14 – B8-80, without B8-32 and B8-75 (closed below) |
+| **Total open** | **78** | |
 | Fixed, not re-verified (severity 2 or lower) | 16 | V-01 – V-16 |
 | Not a problem (0) | 10 | below |
 
@@ -39,6 +39,34 @@ This file adds no finding of its own. Every B8 item lists the source IDs it merg
 - All 22 M6 findings are closed (`closure.md`).
 - All 16 severity-3/4 IDs raised in M8 are closed (table below). The last ones were confirmed in `reviews/final-recheck.md` (verdict PASS, "Nothing open is severity 3 or 4") and by the 63dc6ac3 spot-check.
 - No M8 source raised a severity-3/4 finding after `final-recheck.md`. `a11y/manual.md` has none at 3 or 4. The walkthroughs of T7 and T8 have none. The only walkthrough severity-3 findings, W8-T9-01 and W8-first-job-02, were re-checked and closed.
+
+## After the synthesis: the discoverability build (added by hand)
+
+The build that answered the inventory's gaps (ac0c78da – 0e6cf2b9) had its own gate, `reviews/discoverability.md`, and a re-check, `reviews/discoverability-recheck.md`.
+
+**Severity 3, closed:**
+
+| ID | Problem | Closed by | Verified |
+|---|---|---|---|
+| R-disc-01 | Profile's sticky Save bar hid focused fields at 200% (WCAG 2.4.11) | ba7e1371 | discoverability-recheck.md (15 controls, 640×400) |
+| R-disc-02 | The report page's "Check fit again and add it to Applications" showed nothing | ba7e1371 | discoverability-recheck.md (run in place, then Open the job) |
+
+**Severity 2:**
+- Closed: R-disc-05 and R-disc-06 (ba7e1371).
+- Closed: R-disc-03 and R-disc-04 (2f206174). These were partly closed in the re-check; the maintainer spot-check of 2f206174 then saw "There is no companies list yet" on EMPTY, and focus on Juniper's answer during and after the run.
+
+**Severity 1, open (added to the totals below):**
+- B8-76: report 41's banner still says "isn't in your Applications" after the check added it.
+- B8-77: the retry's run card is titled "Read new postings", not the button's words.
+- B8-78: the "Let this page decide" hint still names profile.yml.
+- B8-79: an open writing-sample disclosure still reads "Open …".
+- B8-80: "When did you apply…?" opens with focus on Cancel. This is deliberate in the code (`focusConfirm={false}`); the maintainer should confirm.
+
+**Discoverability gaps the build answered.**
+- Closed: B8-32 (validate-portals has controls on Companies and in Workspace › Tidy up) and B8-75 (a report with no row opens as a report page).
+- Partly closed, and still open: B8-04 (History now shows status changes; notes are not shown, because the ledger has no note column) and B8-06 (samples open in the app; adding one still needs the folder).
+- B8-10 (the title filter) stays read-only by decision D-3.
+- See `scorecard.md` §4.
 
 ## M8-raised severity-3/4 findings, closed
 

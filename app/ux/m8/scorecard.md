@@ -21,7 +21,7 @@ M8 persona runs were made on 0a32cd5a (P1), 21e77352 (P2) and 5f430776 (P3). The
 | Task success, simulated | ≥ 90% | 21/27 = 77.8% | 27/27 = 100% | Yes |
 | Single Ease Question (simulated, indicative) | mean ≥ 5.5 per task (the target applies to real sessions) | 4.96 overall; T1 1.00, T8 3.67, T7 4.67 below 5.5 | 6.48 overall; every task ≥ 6.00 | Indicative only. The target needs real sessions. |
 | Steps vs expected (not a §12.6 target) | — | 299 steps / 27 runs = 11.07 mean | 227 / 27 = 8.41 mean | — |
-| Discoverability | every capability (100%) | 96/191 = 50.3% | 227/293 = 77.5% | No |
+| Discoverability | every capability (100%) | 96/191 = 50.3% | 283/305 = 92.8% re-measured (96.3% without plumbing); ≈ 95.1% after 0e6cf2b9, not re-measured | Not in full: 3 superseded API routes and the "Workspace" label await a maintainer decision |
 | axe serious/critical, light | 0 | 3 critical + 18 serious | 0 + 0 | Yes |
 | axe serious/critical, dark | 0 | 3 critical + 14 serious | 0 + 0 | Yes |
 | Open severity-3/4 findings | 0 | 22 | 0 | Yes |
@@ -114,33 +114,29 @@ This is not a §12.6 target; it is recorded for comparison.
 
 ## 4. Discoverability
 
-From `app/ux/m8/inventory.md` › Summary. A capability is discoverable when it is reachable in ≤ 3 interactions from Today **and** labelled in the user's own words.
+§12.6: "every capability reachable in ≤ 3 interactions from the page where a user would look for it, labelled in the user's own words". From `app/ux/m8/inventory.md` › Summary.
 
-| | Rows | yes | partly | no | no UI by design |
-|---|---|---|---|---|---|
-| Server routes | 51 | 37 | 5 | 4 | 5 |
-| Run kinds | 17 | 10 | 2 | 1 | 4 |
-| Config and data files | 18 | 11 | 4 | 2 | 1 |
-| UI actions | 207 | 169 | 35 | 2 | 1 |
-| **All** | **293** | **227** | **46** | **9** | **11** |
+**Re-measured at b7a7af1c**, after the discoverability build (ac0c78da, 0063ab11). Every row now records the page where a user would look for it.
 
-The inventory's totals check: 227 + 46 + 9 + 11 = 293.
+| Figure | M6 | M8 first measure (from Today, 63dc6ac3) | M8 re-measure (§12.6, b7a7af1c) |
+|---|---|---|---|
+| All rows | 96/191 = 50.3% | 227/291 = 78.0% (first reported as 227/293 = 77.5%; the tables held 291 rows) | **283/305 = 92.8%** |
+| Excluding the 11 plumbing rows | 49.7% | 80.5% | **283/294 = 96.3%** |
+| From Today (secondary) | 50.3% | 78.0% | 255/305 = 83.6% |
+| The 191 rows both inventories share | 50.3% | 134/191 = 70.2% | 171/191 = 89.5% (§12.6); 149/191 = 78.0% from Today |
 
-| Figure | M6 | M8 |
-|---|---|---|
-| All rows | 96/191 = 50.3% | **227/293 = 77.5%** |
-| The 191 rows both inventories share | 96/191 = 50.3% | 134/191 = 70.2% |
-| Excluding plumbing | (96 − 6)/(191 − 10) = 49.7% | 227/(293 − 11) = 227/282 = 80.5% |
+**After the re-measure.** Six of the 11 rows still short were changed but not re-measured:
+- Writing rules: Save and "Start from the example rules…" are in reach (shorter editor), and Save offers Undo (ba7e1371). This covers R-cv-voice-put, UI-cv-voice-save, UI-cv-voice-seed and R-cv-voice-restore.
+- "API endpoint" now reads "Job board's data link (API)" (ba7e1371). This covers UI-sources-form-api.
+- Section order lists the sections with Up, Down and Remove before an order is set (0e6cf2b9). This covers UI-cv-section-move and UI-cv-section-remove.
 
-- **Target (every capability): not met.**
-- The inventory gives these reasons ("Why it is not 100%"):
-  - My CV › Design depth: 15 "partly" rows.
-  - The job page is one click deeper than before (the cover-letter form is 4 interactions from Today).
-  - Fold placement: Profile's Save, and "I've sent my application".
-  - "More options" in the Follow form (by design).
-  - Two dropped M6 controls: validate-portals, and retrying failed fetches.
-  - The "Not built, against sitemap.md" list.
-- Inventory gaps that are also findings: B8-04 (status history), B8-06 (writing samples), B8-10 (title filter), B8-32 (validate-portals) and B8-75 (reports with no row).
+If those hold, the figure is **290/305 = 95.1%**, or **290/294 = 98.6%** excluding plumbing.
+
+**Still short, and why. These are maintainer decisions, not build work:**
+- **R-health, R-run-events, R-scan-summary.** These API routes are superseded in the UI: their facts reach the user through R-workspace, R-events and R-run, and R-inbox. sitemap.md doesn't mark them "no UI by design". Either retire them, or record in sitemap.md which routes serve them. Counted as surfaced, the figure would be 293/305, or 293/294 excluding plumbing.
+- **UI-shell-workspace.** "Workspace" is the approved IA's label (ia.md §1). The inventory judges it not to be in the user's words. Renaming it is an IA change for the maintainer (§12.7).
+
+**Target (every capability): not met in full.** It is met for every capability that has a UI, except the "Workspace" label.
 
 ## 5. axe serious/critical violations
 
@@ -154,7 +150,7 @@ From `app/ux/m8/a11y/axe-summary.md`:
 | light | 3 | 18 | 0 | 0 | 0 / 0 | 0, met |
 | dark | 3 | 14 | 0 | 0 | 0 / 0 | 0, met |
 
-- **Re-run on the final build (63dc6ac3):** `node app/ux/a11y/audit.mjs --out app/ux/m8/a11y` again reported 0 violations at every level in both schemes, all 35 views, 100% and 200% zoom. `a11y/axe-summary.md` is unchanged by it.
+- **Re-run on the final build (63dc6ac3), and again on 0e6cf2b9 after the discoverability build:** `node app/ux/a11y/audit.mjs --out app/ux/m8/a11y` again reported 0 violations at every level in both schemes, all 35 views, 100% and 200% zoom. `a11y/axe-summary.md` is unchanged by it.
 - `reviews/final-recheck.md` checked the new Today cards visually in dark at 320 px with no problem found. A re-run on 63dc6ac3 would make this figure current.
 
 ## 6. Open severity-3/4 findings
@@ -222,7 +218,7 @@ No participant notes and no `results.md` exist yet. `sessions.mjs score` writes 
 |---|---|
 | Every severity-3/4 finding closed | Met (0 open) |
 | Every top task meets its §12.6 target | Simulated success met (100% on every task). Real-user targets pending (stage B). |
-| axe zero serious or critical | Met in both schemes, re-checked on the final build (63dc6ac3). |
+| axe zero serious or critical | Met in both schemes, re-checked on 63dc6ac3 and on 0e6cf2b9. |
 | First-job acceptance run | Met |
 | ≥ 3 real people complete the sessions | Pending (stage B) |
-| Discoverability (§12.6) | Not met: 77.5% against 100% |
+| Discoverability (§12.6) | Not in full: 92.8% re-measured (96.3% without plumbing), ≈ 95.1% after the last fixes; what remains needs a maintainer decision (§4) |
