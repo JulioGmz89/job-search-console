@@ -121,7 +121,7 @@ export function ConfirmDialog({ isOpen, title, children, confirmLabel, cancelLab
             <AriaButton className={danger ? 'btn-danger' : 'btn'} onPress={onConfirm} isDisabled={busy} autoFocus={focusConfirm}>
               {confirmLabel}
             </AriaButton>
-            <AriaButton className="btn2" onPress={onCancel} autoFocus={danger}>
+            <AriaButton className="btn2" onPress={onCancel} autoFocus={danger || !focusConfirm}>
               {cancelLabel}
             </AriaButton>
           </div>

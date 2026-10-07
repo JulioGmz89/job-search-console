@@ -80,6 +80,7 @@ function Tool({ id, kind, title, description, preview = false, confirmLabel = 'A
                   setFull(null);
                   setStep(null);
                   announce('Nothing was changed.');
+                  setTimeout(() => document.querySelector(`#${id} .row button`)?.focus(), 0);
                 }}
               >
                 Don’t change anything

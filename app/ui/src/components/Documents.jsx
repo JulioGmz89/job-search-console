@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { coverUrl, pdfUrl } from '../api.js';
 import { useResource } from '../data.js';
+import { designName } from '../lib/designs.js';
 import { dateTime, jobName, shortDate } from '../lib/labels.js';
 import { runState, runTitle } from '../lib/runs.js';
 import { latest, runsForJob, useRuns } from '../runs.jsx';
@@ -53,6 +54,8 @@ function CvCard({ row, report }) {
   const style = useResource('style');
   const voice = useResource('voice');
   const documents = useResource('documents');
+  const templates = useResource('templates');
+  const designCheck = useResource('design');
   const block = useAgentBlock();
   const [confirm, setConfirm] = useState(null);
   const [error, setError] = useState(null);
@@ -63,7 +66,7 @@ function CvCard({ row, report }) {
   const lastPdf = latest(runs, 'pdf');
   const failed = lastPdf && runState(lastPdf) === 'failed' && !list.some((r) => r.retryOf === lastPdf.id) ? lastPdf : null;
   const pdf = report.pdf?.exists ? report.pdf : null;
-  const design = style.data?.style?.template ?? 'standard';
+  const design = designName(style.data?.style?.template ?? 'standard', templates.data?.templates);
   const madeIn = report.ats?.template ?? null;
   const doc = (documents.data?.documents ?? []).find((d) => d.reportId === report.id) ?? null;
   const rulesChanged = voice.data?.modified && pdf?.modified && Date.parse(voice.data.modified) > Date.parse(pdf.modified);
@@ -105,7 +108,7 @@ function CvCard({ row, report }) {
               <span className="mono">{pdf.fileName ?? pdf.path}</span>
               <br />
               Made {dateTime(pdf.modified ?? pdf.date)}
-              {madeIn ? ` · ${madeIn} design` : ''} ·{' '}
+              {madeIn ? ` · ${designName(madeIn, templates.data?.templates)} design` : ''} ·{' '}
               {voice.data?.exists ? (rulesChanged ? `written before your writing rules changed (${shortDate(voice.data.modified)})` : 'written under your current writing rules') : 'no writing rules set'}
             </p>
             {verdict ? (
@@ -141,8 +144,8 @@ function CvCard({ row, report }) {
             Make it again
           </button>
           <CostNote minutes="3" />
-          {doc && madeIn && madeIn !== design ? (
-            <button type="button" className="btn2" onClick={() => go('cv-render', { documentId: doc.id, template: design })}>
+          {doc && madeIn && madeIn !== style.data?.style?.template ? (
+            <button type="button" className="btn2" onClick={() => go('cv-render', { documentId: doc.id, template: style.data?.style?.template ?? 'standard' })}>
               Update the layout to {design}
             </button>
           ) : null}
@@ -158,7 +161,7 @@ function CvCard({ row, report }) {
       {!making && pdf ? (
         <p className="small muted">
           <b>Make it again</b> rewrites the CV for this role with your current CV and writing rules (AI, about 3 min).
-          {doc && madeIn && madeIn !== design ? ` Update the layout only re-draws it in ${design} (no AI, wording unchanged).` : ''}
+          {doc && madeIn && madeIn !== style.data?.style?.template ? ` Update the layout only re-draws it in ${design} (no AI, wording unchanged).` : ''}
         </p>
       ) : null}
       {block && !making ? <p className="small muted">{block}</p> : null}
@@ -172,11 +175,17 @@ function CvCard({ row, report }) {
         isOpen={confirm === 'again'}
         title={`Make the tailored CV for ${name} again?`}
         confirmLabel="Make it again"
+        focusConfirm={false}
         onConfirm={() => go('pdf', { reportId: report.id })}
         onCancel={() => setConfirm(null)}
       >
         <p>The assistant rewrites it with your current CV and writing rules, in your design ({design}). About 3 minutes; uses your Claude plan.</p>
         <p>The new PDF replaces the one made {shortDate(pdf?.modified ?? pdf?.date)}.</p>
+        {designCheck.data?.verdict === 'fail' ? (
+          <p className="notice attn">
+            Your design ({design}) fails the screening check: the new CV would lose part of its text for applicant-tracking systems. <a href="#/my-cv/design">Choose a design that passes</a> first.
+          </p>
+        ) : null}
       </ConfirmDialog>
     </section>
   );

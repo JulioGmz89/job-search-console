@@ -126,3 +126,15 @@ test('today: new openings are the ones a check added since the user last looked'
   assert.deepEqual(cards.waiting.reviewed.map((r) => r.id), [2, 1]);
   assert.deepEqual(cards.waiting.replied.map((r) => r.id), [3]);
 });
+
+test('a check that found problems is done, with its findings, not failed', async () => {
+  const { runState, outcome, needsAttention } = await import('./runs.js');
+  const found = { id: 'v', kind: 'verify-pipeline', status: 'failed', exitCode: 1, reportsFindings: true };
+  assert.equal(runState(found), 'done');
+  assert.equal(needsAttention(found, [found]), false);
+  assert.match(outcome(found).text, /Found problems/);
+  assert.equal(runState({ ...found, exitCode: 2 }), 'failed', 'a crash is still a failure');
+  const { designName } = await import('./designs.js');
+  assert.equal(designName('ats', [{ name: 'ats', displayName: 'ATS Friendly' }]), 'ATS Friendly');
+  assert.equal(designName('two-column'), 'Two column');
+});

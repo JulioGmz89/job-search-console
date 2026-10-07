@@ -56,6 +56,8 @@ export function runTitle(run) {
 
 /** 'waiting' | 'working' | 'done' | 'failed' | 'cancelled'. */
 export function runState(run) {
+  // A read-only check that exits 1 found problems; that is its answer, not a failure.
+  if (run?.status === 'failed' && run.reportsFindings && run.exitCode === 1) return 'done';
   switch (run?.status) {
     case 'queued':
       return 'waiting';
@@ -192,6 +194,12 @@ export function outcome(run, { rowForReport = () => null, all = [], rows = [] } 
     case 'skills-cv':
     case 'skills-fetch':
       return { text: 'The skills analysis is up to date.', open: { href: '#/skills/learn', label: 'Open Skills' } };
+    case 'verify-pipeline':
+    case 'validate-portals':
+    case 'verify-portals':
+      return run.exitCode === 1
+        ? { text: 'Found problems. Technical details shows what they are.', open: { href: '#/workspace#health', label: 'Open Workspace' } }
+        : { text: 'No problems found.', open: null };
     default:
       return { text: 'Done.', open: null };
   }

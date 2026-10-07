@@ -49,7 +49,14 @@ export function RunsProvider({ children }) {
       if (run.status === 'failed') announce(`${title} didn't finish. ${explainFailure(run).what}`, { assertive: true });
       else if (run.status === 'succeeded') announce(`${title}: ${outcome(run, { all: Object.values(known.current), rows: rowsRef.current }).text}`);
     }
-    if (TERMINAL.has(run.status)) reload('workspace');
+    if (TERMINAL.has(run.status)) {
+      reload('workspace');
+      // What a finished run changed, refetched now rather than on the watcher's next beat.
+      if (run.kind.startsWith('skills')) reload('skills');
+      if (['evaluate', 'pdf', 'cover', 'cv-render', 'merge-tracker', 'mark-pdf-ready'].includes(run.kind)) reload('pipeline');
+      if (['scan', 'reconcile', 'reconcile-auto', 'evaluate'].includes(run.kind)) reload('inbox');
+      if (['pdf', 'cv-render'].includes(run.kind)) reload('documents');
+    }
   }, []);
 
   useServerEvents({

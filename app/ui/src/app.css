@@ -357,3 +357,5 @@ main { padding-bottom: 6rem; }
 }
 @media (max-width: 600px) { .panel { left: 0; right: 0; width: auto; } }
 .prose table { display: block; max-width: 100%; overflow-x: auto; }
+.grid-2 > *, .grid-3 > *, .card { min-width: 0; }
+.mono { word-break: break-all; }

@@ -26,6 +26,7 @@ const RESOURCES = {
   samples: { fetch: api.fetchWritingSamples, on: /^writing-samples\// },
   style: { fetch: api.fetchCvStyle, on: /^config\/(cv\/|profile\.yml)/ },
   documents: { fetch: api.fetchCvDocuments, on: /^(output\/|data\/pdf-index\.tsv)/ },
+  templates: { fetch: api.fetchCvTemplates, on: /^config\/cv\/templates\// },
   design: { fetch: api.fetchDesignCheck, on: /^(config\/cv\/|output\/)/ },
   skills: { fetch: api.fetchSkills, on: /^(data\/skills\/|cv\.md$|reports\/)/ },
   agent: { fetch: api.fetchAgentStatus, on: /^(cv\.md|config\/profile\.yml|voice-dna\.md)$/ },

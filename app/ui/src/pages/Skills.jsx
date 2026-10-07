@@ -33,7 +33,7 @@ function SkillRow({ skill, n, max, goodFitOnly, rows, onStatus }) {
   const companies = [...byCompany.entries()].sort((a, b) => b[1].length - a[1].length);
   const rowFor = (reportId) => rows.find((r) => r.reportId === reportId) ?? null;
   return (
-    <div className="skill-row">
+    <div className="skill-row" id={`skill-${skill.id}`}>
       <div>
         <b>
           {n}. {skill.name}
@@ -92,7 +92,7 @@ function SkillRow({ skill, n, max, goodFitOnly, rows, onStatus }) {
         </details>
       </div>
       <div>
-        <ChoiceSelect label={`Your CV has ${skill.name}`} visibleLabel value={skill.status} options={STATUS} onChange={(status) => onStatus(skill, status)} />
+        <ChoiceSelect label={`${skill.name} on your CV`} visibleLabel value={skill.status} options={STATUS} onChange={(status) => onStatus(skill, status)} />
       </div>
     </div>
   );
@@ -110,6 +110,8 @@ export function SkillsPage({ params }) {
   const { list, track } = useRuns();
   const [goodFitOnly, setGoodFitOnly] = useState(false);
   const [showIgnored, setShowIgnored] = useState(false);
+  const [category, setCategory] = useState('');
+  const [find, setFind] = useState('');
   const [local, setLocal] = useState({});
   const [error, setError] = useState(null);
   const view = params.view ?? 'learn';
@@ -147,8 +149,13 @@ export function SkillsPage({ params }) {
     );
   }
 
-  const { rows, hidden, counted } = rankSkills(data, { view, goodFitOnly, showIgnored, statusById: local });
-  const max = Math.max(...rows.map((r) => r.count), 1);
+  const ranked = rankSkills(data, { view, goodFitOnly, showIgnored, statusById: local });
+  const { hidden, counted } = ranked;
+  const categories = [...new Set(ranked.rows.map((r) => r.category).filter(Boolean))].sort();
+  const words = find.trim().toLowerCase();
+  // Category and search narrow the list; the numbering keeps the rank in the full view.
+  const rows = ranked.rows.map((r, i) => ({ ...r, rank: i + 1 })).filter((r) => (!category || r.category === category) && (!words || r.name.toLowerCase().includes(words)));
+  const max = Math.max(...ranked.rows.map((r) => r.count), 1);
   const improving = list.find((r) => ['skills-extract', 'skills-cv', 'skills-fetch'].includes(r.kind) && ['waiting', 'working'].includes(runState(r)));
   const what = goodFitOnly ? 'good-fit postings' : 'postings';
 
@@ -157,7 +164,9 @@ export function SkillsPage({ params }) {
     setLocal((l) => ({ ...l, [skill.id]: status }));
     try {
       await setSkillOverride(skill.id, status);
-      reload('skills');
+      await reload('skills');
+      // The row may move or leave this view; focus goes to its select if still here, else the list.
+      setTimeout(() => (document.getElementById(`skill-${skill.id}`)?.querySelector('button') ?? document.getElementById('skills-list'))?.focus(), 0);
       announce(`${skill.name}: moved to ${STATUS_WORD[status]}`);
       offerUndo(`${skill.name} moved to ${STATUS_WORD[status]}`, async () => {
         // Back to what it was: the earlier override, or none (the CV's own reading).
@@ -177,6 +186,7 @@ export function SkillsPage({ params }) {
       const result = await startSkillsExtract(5);
       for (const run of [...(result.runs ?? []), ...(result.cv ? [result.cv] : [])]) track(run);
       announce(`Started improving the analysis: ${plural(result.batches, 'session')}.`);
+      setTimeout(() => document.querySelector('.notice .act-title a')?.focus(), 0);
     } catch (e) {
       setError(e.message);
     }
@@ -241,16 +251,34 @@ export function SkillsPage({ params }) {
           <input type="checkbox" checked={showIgnored} onChange={(e) => setShowIgnored(e.target.checked)} /> Show skills I ignored
         </label>
       </div>
+      <div className="row filters">
+        <div className="field narrow">
+          <label htmlFor="skills-category">Category</label>
+          <select id="skills-category" value={category} onChange={(e) => setCategory(e.target.value)}>
+            <option value="">All categories</option>
+            {categories.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="field grow">
+          <label htmlFor="skills-find">Find a skill</label>
+          <input id="skills-find" type="search" value={find} placeholder="e.g. Kubernetes" onChange={(e) => setFind(e.target.value)} />
+        </div>
+      </div>
       <p className="small" role="status">
         {goodFitOnly
           ? `Counting only the ${counted} postings whose fit is 4 or more: every number, the evidence and the order below use just those.${hidden ? ` ${plural(hidden, 'skill')} with no good-fit posting ${hidden === 1 ? 'is' : 'are'} hidden.` : ''}`
           : `Counting all ${counted} postings that have been read.`}
       </p>
-      <section className="card flush" aria-label={`${SKILL_VIEWS[view].label}: skills list`}>
+      <p className="small muted">Each bar’s length is how many {what} ask for the skill, against the most-asked one.</p>
+      <section className="card flush" id="skills-list" tabIndex={-1} aria-label={`${SKILL_VIEWS[view].label}: skills list`}>
         {rows.length ? (
-          rows.map((skill, i) => <SkillRow key={skill.id} skill={skill} n={i + 1} max={max} goodFitOnly={goodFitOnly} rows={pipeline.data?.rows ?? []} onStatus={onStatus} />)
+          rows.map((skill) => <SkillRow key={skill.id} skill={skill} n={skill.rank} max={max} goodFitOnly={goodFitOnly} rows={pipeline.data?.rows ?? []} onStatus={onStatus} />)
         ) : (
-          <p className="pad">No skills to show in this view{goodFitOnly ? ' with the fit filter on' : ''}.</p>
+          <p className="pad">No skills to show in this view{goodFitOnly || category || words ? ' with these filters' : ''}.</p>
         )}
       </section>
     </>
