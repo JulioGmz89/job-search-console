@@ -219,7 +219,7 @@ function CompanyStep() {
           </div>
           {scanRun ? (
             <div data-run-home>
-              <RunItem run={scanRun} headingLevel={4} />
+              <RunItem run={scanRun} headingLevel={4} takeFocus />
             </div>
           ) : null}
         </div>
@@ -678,7 +678,7 @@ export function TodayPage() {
         )}
         {scanRun ? (
           <div data-run-home>
-            <RunItem run={scanRun} headingLevel={3} />
+            <RunItem run={scanRun} headingLevel={3} takeFocus />
           </div>
         ) : null}
       </section>

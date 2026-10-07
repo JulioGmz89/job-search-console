@@ -347,7 +347,7 @@ export function CompaniesPage() {
           Check for new openings
         </button>
       </PageHead>
-      {scanId && list.find((r) => r.id === scanId) ? <RunItem run={list.find((r) => r.id === scanId)} headingLevel={2} /> : null}
+      {scanId && list.find((r) => r.id === scanId) ? <RunItem run={list.find((r) => r.id === scanId)} headingLevel={2} takeFocus /> : null}
       {broken.length ? (
         <p className="notice attn">
           {plural(broken.length, 'job board needs', 'job boards need')} you: {broken.map((c) => c.name).join(', ')}. Use <b>Fix</b> below.
@@ -385,7 +385,7 @@ export function CompaniesPage() {
           Check companies’ job boards
         </h2>
         <p className="muted">Visits every board you follow and records which ones work, without saving any openings. A few seconds; no AI.</p>
-        {checkRun && (checking || runState(checkRun) !== 'done') ? <RunItem run={checkRun} /> : null}
+        {checkRun && (checking || runState(checkRun) !== 'done') ? <RunItem run={checkRun} takeFocus /> : null}
         {checkRun && runState(checkRun) === 'done' ? <p className="notice ok">Checked {dateOf(checkRun)}. The status beside each company above is up to date.</p> : null}
         {!checking ? (
           <div className="row">

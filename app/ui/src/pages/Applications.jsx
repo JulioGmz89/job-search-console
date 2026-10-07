@@ -154,6 +154,8 @@ export function ApplicationsPage() {
       .map((r) => [Number(r.meta?.reportId ?? rows.find((x) => sameLink(x.report?.url ?? x.url, r.meta?.url))?.reportId), r.kind === 'evaluate' ? 'Checking fit' : r.kind === 'pdf' ? 'Making the tailored CV' : r.kind === 'cover' ? 'Writing the letter' : 'Working']),
   );
 
+  const workingKey = JSON.stringify([...working]);
+
   const clear = (
     <button type="button" className="btn-link" onClick={() => setFilters({ status: 'all', fit: 'any', text: '' })}>
       Clear filters
@@ -286,7 +288,8 @@ export function ApplicationsPage() {
                   </Column>
                   <Column id="actions">Actions</Column>
                 </TableHeader>
-                <TableBody items={shown}>
+                {/* React Aria redraws a row only when its item or these change (R-final-02). */}
+                <TableBody items={shown} dependencies={[workingKey, moved, JSON.stringify([...updated])]}>
                   {(row) => {
                     const left = moved[row.id] && !matches(row);
                     return (

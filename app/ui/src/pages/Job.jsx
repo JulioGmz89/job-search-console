@@ -152,7 +152,7 @@ export function JobPage({ params }) {
         </div>
         <div className="row" id="check-again" data-run-home>
           {checking ? (
-            <RunItem run={checking} headingLevel={3} />
+            <RunItem run={checking} headingLevel={3} takeFocus />
           ) : (
             <>
               <button type="button" className="btn2 btn-sm" onClick={() => (CLOSED.has(statusId) ? setConfirmAgain(true) : checkAgain())}>

@@ -58,7 +58,12 @@ function Tool({ id, kind, title, description, preview = false, confirmLabel = 'A
     }
   };
 
-  const found = full && full.reportsFindings && full.status === 'failed' && full.exitCode === 1;
+  // What the check found, in words, from its result (R-recheck-02); a check can
+  // find warnings and still exit 0.
+  const findings = full?.result?.findings ?? [];
+  const total = full?.result?.total ?? findings.length;
+  const clean = full?.result?.clean === true;
+  const found = Boolean(full && full.reportsFindings && ((full.status === 'failed' && full.exitCode === 1) || findings.length));
   const ok = full && (full.status === 'succeeded' || found);
   return (
     <section className="card" aria-labelledby={`${id}-h`} id={id}>
@@ -69,8 +74,16 @@ function Tool({ id, kind, title, description, preview = false, confirmLabel = 'A
       {ok ? (
         <div className="stack-sm" tabIndex={-1} ref={resultRef}>
           <p className={`notice ${found ? 'warn' : step === 'preview' ? 'info' : 'ok'}`}>
-            {step === 'preview' ? 'Preview — nothing has changed yet. This is what would change:' : found ? 'Found problems:' : 'Done:'}
+            {step === 'preview' ? 'Preview — nothing has changed yet. This is what would change:' : found ? (total ? `Found ${plural(total, 'problem')}:` : 'Found problems:') : clean ? 'No problems found.' : 'Done.'}
           </p>
+          {findings.length && !pairs(full).length ? (
+            <ul>
+              {findings.map((f) => (
+                <li key={f}>{f}</li>
+              ))}
+              {total > findings.length ? <li>and {total - findings.length} more (in Technical details)</li> : null}
+            </ul>
+          ) : null}
           {pairs(full).length ? (
             <ul>
               {pairs(full).map((p) => (
@@ -80,8 +93,8 @@ function Tool({ id, kind, title, description, preview = false, confirmLabel = 'A
               ))}
             </ul>
           ) : null}
-          <details open={!pairs(full).length}>
-            <summary>{pairs(full).length ? 'Technical details' : 'What it printed'}</summary>
+          <details open={!pairs(full).length && !findings.length && !clean}>
+            <summary>{pairs(full).length || findings.length || clean ? 'Technical details' : 'What it printed'}</summary>
             <pre className="log" tabIndex={0} aria-label={`${title}: output`}>
               {outputOf(full) || 'Nothing to report.'}
             </pre>

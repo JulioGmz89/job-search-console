@@ -61,7 +61,7 @@ const BADGE = {
  * One activity, in any of its states (ia.md §2.8). `heading` is the level of
  * its title; `link` makes the title a link to its own page.
  */
-export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }) {
+export function RunItem({ run, headingLevel = 3, link = true, onRetried = null, takeFocus = false }) {
   const { list, retry, cancel } = useRuns();
   const design = useResource('design');
   const rowForReport = useRowForReport();
@@ -70,6 +70,16 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
   const now = useNow(state === 'working');
   const [busy, setBusy] = useState(false);
   const articleRef = useRef(null);
+  // `takeFocus`: this card replaced the button that started it, or the result
+  // replaced it. While the run goes and just after, focus that fell to the
+  // page body comes here instead (R-recheck-01).
+  useLayoutEffect(() => {
+    if (!takeFocus) return;
+    const recent = state === 'waiting' || state === 'working' || Date.now() - (run.endedAt ?? 0) < 3000;
+    if (recent && (!document.activeElement || document.activeElement === document.body)) {
+      articleRef.current?.querySelector('.act-title a, button:not([disabled])')?.focus();
+    }
+  });
   // When this card leaves the page with focus inside it (its run finished and the
   // page shows the result instead), focus goes to the place it belonged to (A8-01):
   // the nearest [data-run-home], else its card, else the page heading.
