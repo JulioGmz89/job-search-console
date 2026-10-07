@@ -1,0 +1,16 @@
+{
+  "url": "http://127.0.0.1:4471/",
+  "state": "empty",
+  "startedAt": 1791352103972,
+  "root": "C:\\Users\\julio\\AppData\\Local\\Temp\\jsc-ux-empty-2yKnwV",
+  "scenario": "auto",
+  "delayMs": 8000,
+  "pid": 18308,
+  "flags": {
+    "task": "T1",
+    "state": "empty",
+    "delay": 8000,
+    "scenario": "auto",
+    "budget": 40
+  }
+}
