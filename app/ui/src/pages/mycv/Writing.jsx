@@ -15,21 +15,30 @@ import { offerUndo } from '../../shell/undo.jsx';
 function Words({ words }) {
   const [word, setWord] = useState('');
   const [error, setError] = useState(null);
+  const [saved, setSaved] = useState(null);
   const input = useRef(null);
 
   const add = async (e) => {
     e.preventDefault();
-    const value = word.trim();
-    if (!value) {
+    // "seamless, cutting-edge, robust" is three words, not one phrase (W8-T9-01).
+    const words = word.split(/[,;\n]+/).map((w) => w.trim()).filter(Boolean);
+    if (!words.length) {
       setError('Type a word or short phrase first.');
       return;
     }
     setError(null);
     try {
-      const result = await addAvoidWord(value);
+      const added = [];
+      for (const w of words) if ((await addAvoidWord(w)).added) added.push(w);
       await reload('voice');
       setWord('');
-      announce(result.added ? `Added “${value}” to the words to avoid.` : `“${value}” is already on the list.`);
+      const already = words.filter((w) => !added.includes(w));
+      setSaved(
+        [added.length ? `Added ${added.map((w) => `“${w}”`).join(', ')}` : null, already.length ? `${already.map((w) => `“${w}”`).join(', ')} ${already.length === 1 ? 'was' : 'were'} already on the list` : null]
+          .filter(Boolean)
+          .join('; ') + '.',
+      );
+      announce(`${added.length ? `Added ${added.join(', ')} to the words to avoid.` : ''} ${already.length ? `${already.join(', ')} already on the list.` : ''}`.trim());
       input.current?.focus();
     } catch (err) {
       setError(err.message);
@@ -88,7 +97,7 @@ function Words({ words }) {
             </p>
           ) : (
             <p className="hint" id="add-word-hint">
-              One word or phrase at a time. It is added under “Never write” in your rules; nothing else changes.
+              Separate several with commas. Each is added under “Never write” in your rules; nothing else changes.
             </p>
           )}
         </div>
@@ -96,6 +105,11 @@ function Words({ words }) {
           Add
         </button>
       </form>
+      {saved ? (
+        <p className="notice ok" role="status">
+          {saved}
+        </p>
+      ) : null}
     </section>
   );
 }
@@ -133,7 +147,7 @@ function RemakeList({ voice }) {
           const making = runs.find((r) => r.kind === 'pdf' && ['waiting', 'working'].includes(runState(r)));
           const name = jobName(row);
           return (
-            <li key={row.id} className="card review-item">
+            <li key={row.id} id={`remake-${row.id}`} className="card review-item">
               <div className="row between">
                 <span>
                   <a href={`#/applications/${row.id}#documents`}>
@@ -156,6 +170,7 @@ function RemakeList({ voice }) {
                       onClick={async () => {
                         const run = await start('pdf', { reportId: row.reportId });
                         announce(`Started: ${runTitle(run)}. About 3 minutes.`);
+                        setTimeout(() => document.getElementById(`remake-${row.id}`)?.querySelector('.act-title a')?.focus(), 0);
                       }}
                     >
                       Make it again<span className="visually-hidden"> for {name}</span>

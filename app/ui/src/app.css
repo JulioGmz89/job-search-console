@@ -359,3 +359,8 @@ main { padding-bottom: 6rem; }
 .prose table { display: block; max-width: 100%; overflow-x: auto; }
 .grid-2 > *, .grid-3 > *, .card { min-width: 0; }
 .mono { word-break: break-all; }
+
+/* ── walkthrough fixes (M8) ────────────────── */
+@media (max-width: 1440px) { .search .search-input { width: 15rem; } }
+@media (max-width: 1200px) { .search .search-input { width: 12rem; } }
+.undo-bar { left: auto; right: var(--space-4); }

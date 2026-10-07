@@ -404,6 +404,7 @@ export function TodayPage() {
   const { list, start } = useRuns();
   const [ackd, setAckd] = useState([]);
   const [justSetUp, setJustSetUp] = useState(false);
+  const firstJobVisit = useRef(false);
   const wasDone = useRef(null);
   const setupDone = workspace.data?.setup?.done;
   useEffect(() => {
@@ -465,6 +466,12 @@ export function TodayPage() {
   // retry ends, so Try again shows its progress where it was clicked.
   const retrying = list.filter((r) => runState(r) === 'failed' && list.some((x) => x.retryOf === r.id && ['waiting', 'working'].includes(runState(x))));
   const noJobs = (pipeline.data?.rows ?? []).length === 0;
+  // The first check's section stays for the visit, so its result and Open the job
+  // stay where the user started it (W8-first-job-02).
+  if (noJobs) firstJobVisit.current = true;
+  const showFirstJob = noJobs || firstJobVisit.current;
+  // A check shown in that section is not shown again under Working now (W8-first-job-01).
+  const workingElsewhere = working.filter((r) => !shownInline.has(r.id));
   const firstCompany = (portals.data?.companies ?? []).find((c) => c.enabled)?.name ?? '';
 
   return (
@@ -578,18 +585,18 @@ export function TodayPage() {
         </section>
       ) : null}
 
-      {working.length ? (
+      {workingElsewhere.length ? (
         <section aria-labelledby="work-h" className="stack">
           <h2 id="work-h" className="group-title">
             Working now
           </h2>
-          {working.map((r) => (
+          {workingElsewhere.map((r) => (
             <RunItem key={r.id} run={r} />
           ))}
         </section>
       ) : null}
 
-      {noJobs ? (
+      {showFirstJob ? (
         <section aria-labelledby="fj-h" className="card stack">
           <h2 id="fj-h" className="card-title">
             Check your first job

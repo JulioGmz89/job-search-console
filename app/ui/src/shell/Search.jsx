@@ -45,7 +45,7 @@ export function Search() {
 
   const all = useMemo(() => {
     const rows = pipeline.data?.rows ?? [];
-    const jobs = rows.map((r) => ({ id: `j-${r.id}`, label: jobName(r), href: `#/applications/${r.id}`, kind: 'Job' }));
+    const jobs = rows.map((r) => ({ id: `j-${r.id}`, label: jobName(r), href: `#/applications/${r.id}`, kind: 'Job', also: r.report?.url ?? '' }));
     const docs = rows.flatMap((r) => [
       ...(r.pdf ? [{ id: `cv-${r.id}`, label: `Tailored CV · ${jobName(r)}`, href: `#/applications/${r.id}#documents`, kind: 'Document' }] : []),
       ...(r.cover ? [{ id: `cl-${r.id}`, label: `Cover letter · ${jobName(r)}`, href: `#/applications/${r.id}#documents`, kind: 'Document' }] : []),
@@ -57,7 +57,8 @@ export function Search() {
   const items = useMemo(() => {
     const words = text.trim().toLowerCase().split(/\s+/).filter(Boolean);
     if (!words.length) return [];
-    return all.filter((i) => words.every((w) => i.label.toLowerCase().includes(w))).slice(0, 12);
+    // A pasted posting link finds its job too (W8-T2-01).
+    return all.filter((i) => words.every((w) => `${i.label} ${i.also ?? ''}`.toLowerCase().includes(w))).slice(0, 12);
   }, [all, text]);
 
   const shown = open && text.trim() !== '';
