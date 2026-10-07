@@ -626,6 +626,30 @@ function writePopulated(root) {
   write(root, 'data/applications.md', trackerMarkdown(tracked));
   for (const r of tracked) write(root, `reports/${r.report}`, reportMarkdown(r));
 
+  // set-status.mjs's transition ledger, beside the tracker, for Job › History:
+  // each row that moved on walked the usual path from Evaluated, three days a step.
+  const PATH = ['Evaluated', 'Applied', 'Responded', 'Interview', 'Offer', 'Hired'];
+  const ledger = [];
+  for (const r of tracked) {
+    const end = r.status === 'Rejected' ? 2 : PATH.indexOf(r.status);
+    if (end < 1) continue;
+    const steps = [...PATH.slice(0, end + 1), ...(r.status === 'Rejected' ? ['Rejected'] : [])];
+    const added = Math.round((Date.parse(r.date) - Date.parse(day(0))) / 86_400_000);
+    for (let s = 1; s < steps.length; s += 1) ledger.push(`${r.num}\t${day(Math.min(56, added + s * 3))}\t${steps[s - 1]}\t${steps[s]}\tset-status\t`);
+  }
+  write(root, 'data/status-log.tsv', `${ledger.join('\n')}\n`);
+
+  // scan.mjs's do-not-apply list (fictional companies, none of them followed).
+  write(root, 'data/blacklist.md', [
+    '# Companies to skip',
+    '',
+    '| Company | Since | Scope | Reason |',
+    '|---|---|---|---|',
+    `| Quarry Logistics | ${day(60).slice(0, 7)} | all | Withdrew an offer last year |`,
+    `| Tallow & Finch | ${day(30).slice(0, 7)} | all | Asked for unpaid take-home work |`,
+    '',
+  ].join('\n'));
+
   // Inbox: postings seen but not yet evaluated, one that failed, and the processed log.
   const pending = seen.slice(PLAN.length, PLAN.length + 12);
   const failed = seen[PLAN.length + 12];
