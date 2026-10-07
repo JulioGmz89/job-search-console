@@ -160,13 +160,17 @@ export function readLastScanRun({ root } = {}) {
  * page wants only the current state.
  *
  * @param {{root?: string}} [options]
- * @returns {Record<string, {status: string, timestamp: string}>}
+ * @returns {Record<string, {status: string, timestamp: string, since: string}>}
  */
 export function readPortalHealth({ root } = {}) {
   const health = {};
   for (const row of readTsv(portalHealthPath(root))) {
     if (!row.company) continue;
-    health[row.company] = { status: row.status, timestamp: row.timestamp };
+    const before = health[row.company];
+    // `since`: when the current status began, so "board not found since Sep 24"
+    // does not move to today each time the board is checked again.
+    const since = before && before.status === row.status ? before.since : row.timestamp;
+    health[row.company] = { status: row.status, timestamp: row.timestamp, since };
   }
   return health;
 }
