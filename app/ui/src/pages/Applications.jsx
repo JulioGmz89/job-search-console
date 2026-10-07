@@ -223,6 +223,24 @@ export function ApplicationsPage() {
                   ))}
                 </select>
               </div>
+              <div className="field narrow">
+                <label htmlFor="apps-sort">Sort by</label>
+                <select
+                  id="apps-sort"
+                  value={`${filters.sort.column}:${filters.sort.direction}`}
+                  onChange={(e) => {
+                    const [column, direction] = e.target.value.split(':');
+                    setFilters({ sort: { column, direction } });
+                  }}
+                >
+                  <option value="fit:descending">Best fit first</option>
+                  <option value="checked:descending">Newest first</option>
+                  <option value="checked:ascending">Oldest first</option>
+                  <option value="job:ascending">Company A–Z</option>
+                  <option value="status:ascending">Status</option>
+                  <option value="number:ascending">Number</option>
+                </select>
+              </div>
               <div className="field grow">
                 <label htmlFor="apps-search">Search</label>
                 <input id="apps-search" type="search" value={filters.text} placeholder="Company, role or note" onChange={(e) => setFilters({ text: e.target.value })} />

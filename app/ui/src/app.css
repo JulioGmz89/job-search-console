@@ -364,3 +364,9 @@ main { padding-bottom: 6rem; }
 @media (max-width: 1440px) { .search .search-input { width: 15rem; } }
 @media (max-width: 1200px) { .search .search-input { width: 12rem; } }
 .undo-bar { left: auto; right: var(--space-4); }
+
+/* ── accessibility pass fixes (M8) ─────────── */
+/* A8-04: the label is the visible control for a hidden file input. */
+label.file-button:has(+ input:focus-visible) { outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-offset); }
+/* A8-05: a moved row is marked by its background, not by fading its text. */
+.apps-table tr.moved td { opacity: 1; background: var(--surface-2); }

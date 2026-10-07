@@ -490,11 +490,8 @@ export function TodayPage() {
           <h2 id="needs-h" className="group-title">
             Needs you
           </h2>
-          {needs.failures.map((r) => (
+          {[...needs.failures, ...retrying].map((r) => (
             <FailureCard key={r.id} run={r} onDismiss={dismiss} />
-          ))}
-          {retrying.map((r) => (
-            <RunItem key={r.id} run={r} headingLevel={3} />
           ))}
           {needs.unreadable.length ? (
             <article className="card attn" aria-labelledby="unread-h">

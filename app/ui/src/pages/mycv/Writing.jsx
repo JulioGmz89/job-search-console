@@ -147,7 +147,7 @@ function RemakeList({ voice }) {
           const making = runs.find((r) => r.kind === 'pdf' && ['waiting', 'working'].includes(runState(r)));
           const name = jobName(row);
           return (
-            <li key={row.id} id={`remake-${row.id}`} className="card review-item">
+            <li key={row.id} id={`remake-${row.id}`} className="card review-item" data-run-home>
               <div className="row between">
                 <span>
                   <a href={`#/applications/${row.id}#documents`}>

@@ -315,7 +315,7 @@ export function DesignSection() {
 
         </div>
 
-        <section className="stack-sm design-preview" aria-labelledby="preview-h">
+        <section className="stack-sm design-preview" aria-labelledby="preview-h" data-run-home>
           <div className="row between">
             <h2 id="preview-h" className="card-title">
               Preview
@@ -362,7 +362,7 @@ export function DesignSection() {
             </div>
           ) : null}
           {previewError ? <p className="notice attn">{previewError}</p> : null}
-          {preview ? <iframe className="doc" src={cvPreviewUrl(preview.id)} title={`Preview of ${doc ? docLabel(doc) : 'your CV'} in the ${chosenName} design`} /> : <div className="preview-empty muted">{rendering ? 'Drawing your CV…' : 'No CV to preview yet.'}</div>}
+          {preview ? <iframe className="doc" tabIndex={-1} src={cvPreviewUrl(preview.id)} title={`Preview of ${doc ? docLabel(doc) : 'your CV'} in the ${chosenName} design`} /> : <div className="preview-empty muted">{rendering ? 'Drawing your CV…' : 'No CV to preview yet.'}</div>}
           <div className="stack-sm">
             <div className="row">
               <button type="button" className="btn" disabled={!dirty} onClick={() => (chosenAts?.verdict === 'fail' ? setConfirm('fail') : makeDefault())}>

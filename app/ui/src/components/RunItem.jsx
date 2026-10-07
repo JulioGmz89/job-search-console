@@ -68,6 +68,22 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
   const state = runState(run);
   const now = useNow(state === 'working');
   const [busy, setBusy] = useState(false);
+  const articleRef = useRef(null);
+  // When this card leaves the page with focus inside it (its run finished and the
+  // page shows the result instead), focus goes to the place it belonged to (A8-01):
+  // the nearest [data-run-home], else its card, else the page heading.
+  useEffect(() => {
+    const article = articleRef.current;
+    return () => {
+      if (!article?.contains(document.activeElement)) return;
+      const home = article.parentElement?.closest('[data-run-home]') ?? article.parentElement?.closest('.card') ?? null;
+      setTimeout(() => {
+        if (document.activeElement && document.activeElement !== document.body) return;
+        const target = home?.isConnected ? home.querySelector('a[href], button:not([disabled])') : null;
+        (target ?? document.querySelector('main h1'))?.focus();
+      }, 0);
+    };
+  }, []);
   const [error, setError] = useState(null);
   const retried = list.find((r) => r.retryOf === run.id) ?? null;
   const retriedRef = useRef(null);
@@ -121,7 +137,7 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
   const started = run.startedAt ?? run.queuedAt;
 
   return (
-    <article className={`act ${state === 'failed' && !retried ? 'failed' : state}`} aria-labelledby={`act-${run.id}`}>
+    <article ref={articleRef} className={`act ${state === 'failed' && !retried ? 'failed' : state}`} aria-labelledby={`act-${run.id}`}>
       <div className="row between">
         <span className="row">
           <span className={`badge ${tone}`}>{badge}</span>

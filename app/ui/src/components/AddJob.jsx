@@ -39,7 +39,10 @@ export function AddJob({ idPrefix = 'add', headingId = null }) {
   // When the check finishes, focus moves to its result (ia.md §3 "Focus").
   const finished = run && ['succeeded', 'failed', 'cancelled'].includes(run.status);
   useEffect(() => {
-    if (finished) resultRef.current?.querySelector('a.btn, button.btn')?.focus();
+    if (!finished) return;
+    const active = document.activeElement;
+    // Only when the user is still here (or focus was lost); never out of the search or another field.
+    if (!active || active === document.body || resultRef.current?.contains(active)) resultRef.current?.querySelector('a.btn, button.btn')?.focus();
   }, [finished]);
   // The button the user pressed stays, but the news is below it: take focus there.
   useEffect(() => {

@@ -72,6 +72,16 @@ function Shell() {
     activityButton.current?.focus();
   }, []);
 
+  // Escape closes the panel even when focus is on the page beneath it (A8-03).
+  useEffect(() => {
+    if (!panelOpen) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape' && !document.querySelector('.modal-overlay')) closePanel();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [panelOpen, closePanel]);
+
   // A link inside the panel goes to another page; the panel steps aside.
   useEffect(() => setPanelOpen(false), [route.page, route.params.id]);
 
