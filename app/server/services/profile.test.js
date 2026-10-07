@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { after, test } from 'node:test';
 
 import { readProfile } from '../agents/profile.js';
-import { readCvContent, readProfileForm, summarizeCv, writeCvContent, writeProfileForm } from './profile.js';
+import { readCvContent, readProfileForm, releaseDesignKeys, restoreDesignKeys, summarizeCv, writeCvContent, writeProfileForm } from './profile.js';
 
 const scratches = [];
 after(() => scratches.forEach((dir) => rmSync(dir, { recursive: true, force: true })));
@@ -100,4 +100,23 @@ test('invalid values are refused with the field named', () => {
   assert.throws(() => writeProfileForm({ root, fields: { autoPdfThreshold: '7' } }), (e) => e.code === 'profile-invalid' && e.detail[0].field === 'autoPdfThreshold');
   assert.throws(() => writeProfileForm({ root, fields: { spendTier: 'max' } }), (e) => e.code === 'profile-invalid');
   assert.throws(() => writeProfileForm({ root, fields: { password: 'x' } }), (e) => e.code === 'profile-invalid');
+});
+
+test('My CV › Design can take over the design from profile.yml, with Undo', () => {
+  const root = workspace();
+  mkdirSync(join(root, 'config'));
+  const yml = '# mine\ncandidate:\n  full_name: Alex Rivera # keep\nstyle:\n  accent: "#000"\ncv:\n  template: ats\n  sections: [summary, skills]\n';
+  writeFileSync(join(root, 'config', 'profile.yml'), yml);
+  assert.equal(readProfile({ root }).hasStyle, true);
+  assert.deepEqual(releaseDesignKeys({ root }), { removed: ['style', 'section order'] });
+  const after1 = readFileSync(join(root, 'config', 'profile.yml'), 'utf-8');
+  assert.match(after1, /# mine/);
+  assert.match(after1, /full_name: Alex Rivera # keep/);
+  assert.match(after1, /template: ats/);
+  const profile = readProfile({ root });
+  assert.equal(profile.hasStyle, false);
+  assert.equal(profile.hasCvSections, false);
+  assert.deepEqual(releaseDesignKeys({ root }), { removed: [] }, 'nothing left to remove');
+  restoreDesignKeys({ root });
+  assert.equal(readFileSync(join(root, 'config', 'profile.yml'), 'utf-8'), yml);
 });

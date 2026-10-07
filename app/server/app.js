@@ -43,9 +43,10 @@ import { listCvDocuments } from './services/cvdocs.js';
 import { getPreview, listThemes, renderPreview, thumbPath } from './services/cvrender.js';
 import { addAvoidWord, listCvTemplates, listWritingSamples, readStyle, readVoice, removeAvoidWord, restoreVoice, writeStyle, writeVoice } from './services/cvstyle.js';
 import { appendInboxUrl, readInbox, removeInboxUrl, restoreInboxLine } from './services/inbox.js';
+import { readSkipList, readStatusHistory, readWritingSample } from './services/ledgers.js';
 import { repoRoot, resolveDataRoot } from './services/paths.js';
 import { readPipeline, SCORE_BANDS } from './services/pipeline.js';
-import { readCvContent, readProfileForm, writeCvContent, writeProfileForm } from './services/profile.js';
+import { readCvContent, readProfileForm, releaseDesignKeys, restoreDesignKeys, writeCvContent, writeProfileForm } from './services/profile.js';
 import { createEntry, deleteEntry, readPortals, updateEntry } from './services/portals.js';
 import { listReports, readReport, resolveReportPdf } from './services/reports.js';
 import { readFirstSeen, readLastScanRun, readPortalHealth } from './services/scanner.js';
@@ -360,6 +361,16 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     };
   });
 
+  /** A job's recorded status changes, from set-status.mjs's ledger (Job › History). */
+  app.get('/api/pipeline/:id/history', async (request, reply) => {
+    const rowId = Number.parseInt(request.params.id, 10);
+    if (!Number.isInteger(rowId) || rowId < 1) return reply.code(400).send({ error: 'Expected an application number', code: 'id-invalid' });
+    return readStatusHistory({ root, rowId });
+  });
+
+  /** data/blacklist.md, read-only (Companies › Companies to skip). */
+  app.get('/api/skip-list', async () => readSkipList({ root }));
+
   app.get('/api/reports', async () => {
     const { reports, issues } = load();
     return { reports, issues };
@@ -445,6 +456,23 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     }
   });
 
+  /** Let My CV › Design decide: drop profile.yml's own style and section order (Undo below). */
+  app.post('/api/profile/design/release', async (request, reply) => {
+    try {
+      return { ...releaseDesignKeys({ root }), style: readStyle({ root }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.post('/api/profile/design/restore', async (request, reply) => {
+    try {
+      return { ...restoreDesignKeys({ root }), style: readStyle({ root }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
   // ── CV Studio: style tokens, voice rules, templates, samples ───────
 
   app.get('/api/cv/style', async () => readStyle({ root }));
@@ -499,6 +527,15 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
   app.get('/api/cv/templates', async () => listCvTemplates({ root }));
 
   app.get('/api/cv/writing-samples', async () => listWritingSamples({ root }));
+
+  /** One sample's text, for My CV › Writing rules › Open. */
+  app.get('/api/cv/writing-samples/:name', async (request, reply) => {
+    try {
+      return readWritingSample({ root, name: request.params.name });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
 
   // ── CV Studio, M5: documents, live preview, the theme gallery ──────
 

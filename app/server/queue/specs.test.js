@@ -141,6 +141,7 @@ test('read-only checks say what they found, in words (R-final-03)', () => {
   assert.deepEqual(portals, { findings: ['Juniper Mobility: board not found'], total: 1, clean: false });
   const pipeline = summarizeFindings(lines('⚠️  Possible duplicates: #4, #24 (Driftwood Analytics)', '📊 Pipeline Health: 0 errors, 1 warnings'));
   assert.deepEqual(pipeline.findings, ['Possible duplicates: #4, #24 (Driftwood Analytics)']);
+  assert.deepEqual(summarizeFindings(lines('  ❌ Juniper Mobility — greenhouse/junipermobility (slug not found) — HTTP 404 → try lever/juniper')).findings, ['Juniper Mobility: board not found; its board may now be lever/juniper']);
   assert.equal(summarizeFindings(lines('✅ Statuses', '🟢 Pipeline is clean!')).clean, true);
   assert.equal(summarizeFindings(lines('something unrecognised')).clean, false, 'silence is not a clean bill');
 });

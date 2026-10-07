@@ -54,13 +54,16 @@ export function summarizeFindings(lines = []) {
     if (CLEAN.test(raw)) clean = true;
     const icon = raw.match(FINDING);
     if (!icon) continue;
+    // verify-portals ends a moved board's line with "→ try ats/slug"; keep it in words.
+    const suggestion = raw.match(/→\s*try\s+(\S+)/u)?.[1] ?? null;
     const plain = raw
+      .replace(/\s*→\s*try\s+\S+.*$/u, '')
       .slice(icon[0].length)
       .replace(/\s+—\s+HTTP \d+.*$/u, '')
       .replace(/^(.+?)\s+—\s+[\w-]+\/[\w.-]+\s+\(([^)]+)\)(.*)$/u, '$1: $2$3')
       .replace(/slug not found/gi, 'board not found')
       .trim();
-    if (plain) found.push(plain);
+    if (plain) found.push(suggestion ? `${plain}; its board may now be ${suggestion}` : plain);
   }
   return { findings: found.slice(0, MAX_FINDINGS), total: found.length, clean: clean && found.length === 0 };
 }

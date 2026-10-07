@@ -211,3 +211,44 @@ export function writeProfileForm({ root, fields } = {}) {
   atomicWrite(path, normalizeText(doc.toString({ lineWidth: 0 })));
   return readProfileForm({ root });
 }
+
+// ── handing the CV design over to My CV › Design ─────────────────────
+
+/** profile.yml keys that override the Design page, as `[path, words]`. */
+const DESIGN_KEYS = [
+  [['style'], 'style'],
+  [['cv', 'sections'], 'section order'],
+];
+
+const designBackupPath = (root) => `${profilePath(resolveDataRoot(root))}.design.bak`;
+
+/**
+ * Remove profile.yml's own design settings so My CV › Design decides
+ * (UI-cv-profile-warning). Everything else in the file is kept, comments too;
+ * the file as it was is kept beside it for Undo.
+ *
+ * @returns {{removed: string[]}}
+ */
+export function releaseDesignKeys({ root } = {}) {
+  const { path, exists, text, doc } = loadDocument(root);
+  if (!exists) return { removed: [] };
+  if (doc.errors.length) {
+    throw new ProfileError('profile.yml does not parse; fix it in your editor first', { code: 'profile-unparseable', status: 422 });
+  }
+  const removed = DESIGN_KEYS.filter(([keyPath]) => doc.hasIn(keyPath)).map(([keyPath, words]) => {
+    doc.deleteIn(keyPath);
+    return words;
+  });
+  if (!removed.length) return { removed };
+  atomicWrite(designBackupPath(root), text);
+  atomicWrite(path, normalizeText(doc.toString({ lineWidth: 0 })));
+  return { removed };
+}
+
+/** Undo `releaseDesignKeys`: put back profile.yml as it was. */
+export function restoreDesignKeys({ root } = {}) {
+  const backup = designBackupPath(root);
+  if (!existsSync(backup)) throw new ProfileError('There is nothing to put back', { code: 'no-backup', status: 409 });
+  atomicWrite(profilePath(resolveDataRoot(root)), readFileSync(backup, 'utf-8'));
+  return { restored: true };
+}
