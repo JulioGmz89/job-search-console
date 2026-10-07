@@ -33,6 +33,38 @@ import { buildSkillsCvSpec, buildSkillsExtractSpec } from '../skills/extract-spe
 import { buildCoverSpec, buildEvaluateSpec, buildPdfSpec } from './agent-specs.js';
 import { buildCvRenderSpec } from './cv-specs.js';
 
+const FINDING = /^\s*(❌|⚠️)\s*/u;
+const CLEAN = /pipeline is clean|no problems found|all .* (ok|valid)/i;
+const MAX_FINDINGS = 8;
+
+/**
+ * What a read-only check found, in words, from the ❌ and ⚠️ lines it prints
+ * (R-final-03). Board probes read "Juniper Mobility: board not found", not the
+ * engine's "greenhouse/junipermobility (slug not found) — HTTP 404". `clean`
+ * is only set when the check itself said so.
+ *
+ * @param {{text: string}[]} lines
+ * @returns {{findings: string[], total: number, clean: boolean}}
+ */
+export function summarizeFindings(lines = []) {
+  const found = [];
+  let clean = false;
+  for (const { text } of lines) {
+    const raw = String(text ?? '');
+    if (CLEAN.test(raw)) clean = true;
+    const icon = raw.match(FINDING);
+    if (!icon) continue;
+    const plain = raw
+      .slice(icon[0].length)
+      .replace(/\s+—\s+HTTP \d+.*$/u, '')
+      .replace(/^(.+?)\s+—\s+[\w-]+\/[\w.-]+\s+\(([^)]+)\)(.*)$/u, '$1: $2$3')
+      .replace(/slug not found/gi, 'board not found')
+      .trim();
+    if (plain) found.push(plain);
+  }
+  return { findings: found.slice(0, MAX_FINDINGS), total: found.length, clean: clean && found.length === 0 };
+}
+
 /** Argv for the skills fetch worker (`skills/cli.js`): only flags it validates itself. */
 function skillsFetchArgs(options = {}) {
   const args = ['fetch'];
@@ -150,6 +182,7 @@ export const RUN_KINDS = Object.freeze({
     // Exits non-zero when it FINDS something, which is the check working.
     reportsFindings: true,
     args: () => [],
+    after: (run) => ({ result: summarizeFindings(run.lines) }),
   },
   'validate-portals': {
     script: 'validate-portals.mjs',
@@ -163,6 +196,7 @@ export const RUN_KINDS = Object.freeze({
     // Exits non-zero when it FINDS something, which is the check working.
     reportsFindings: true,
     args: () => [],
+    after: (run) => ({ result: summarizeFindings(run.lines) }),
   },
   'verify-portals': {
     script: 'verify-portals.mjs',
@@ -176,6 +210,7 @@ export const RUN_KINDS = Object.freeze({
     // Exits non-zero when it FINDS something, which is the check working.
     reportsFindings: true,
     args: () => [],
+    after: (run) => ({ result: summarizeFindings(run.lines) }),
   },
 
   // ── the skills layer (M4) ───────────────────────────────────────────

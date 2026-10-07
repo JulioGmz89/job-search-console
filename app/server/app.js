@@ -251,7 +251,11 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
             }
           : null,
         hasReport: report !== null,
-        pdf: report && pdfFor(report, reports) ? { format: report.pdf?.format ?? null } : null,
+        // `reportId`: the check the CV was made from, which may be an earlier one (R-final-01).
+        pdf: (() => {
+          const found = report ? pdfFor(report, reports) : null;
+          return found ? { format: report.pdf?.format ?? null, reportId: found.reportId } : null;
+        })(),
         // Today's "replied without a tailored CV or letter" needs both documents per row.
         cover: report ? coverFor(report, reports) !== null : false,
       };
@@ -877,11 +881,13 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
         ?? (failed.kind === 'evaluate' && failed.meta?.url ? { kind: 'evaluate', options: { url: failed.meta.url, autoPdf: failed.meta.autoPdf !== false } } : null)
         ?? (failed.kind === 'pdf' && failed.meta?.reportId ? { kind: 'pdf', options: { reportId: failed.meta.reportId } } : null);
       if (!again) return reply.code(422).send({ error: 'This run cannot be repeated from here', code: 'retry-unsupported' });
-      const spec = buildSpec(again.kind, again.options, specContext);
+      // The UI asks for no automatic tailored CV when the design fails screening (R-final-07).
+      const options = again.kind === 'evaluate' && request.body?.autoPdf === false ? { ...again.options, autoPdf: false } : again.options;
+      const spec = buildSpec(again.kind, options, specContext);
       if (spec.confirmRequired) {
         return reply.code(409).send({ error: 'Preview it again, then confirm', code: 'confirm-required' });
       }
-      return reply.code(202).send(runner.start({ ...spec, request: again, retryOf: failed.id }));
+      return reply.code(202).send(runner.start({ ...spec, request: { ...again, options }, retryOf: failed.id }));
     } catch (error) {
       return fail(reply, error);
     }

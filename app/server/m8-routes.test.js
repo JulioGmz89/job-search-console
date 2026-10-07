@@ -134,8 +134,11 @@ test('a failed check is named after its job, kept across restarts, and Try again
   assert.equal(failed.status, 'failed');
   assert.deepEqual(failed.request, { kind: 'evaluate', options: { url, autoPdf: true } });
 
-  const notFailed = await call('POST', `/api/runs/${failed.id}/retry`);
+  // Try again can skip the automatic tailored CV (R-final-07); the failed run's own request is untouched.
+  const notFailed = await call('POST', `/api/runs/${failed.id}/retry`, { autoPdf: false });
   assert.equal(notFailed.status, 202);
+  assert.deepEqual(notFailed.body.request, { kind: 'evaluate', options: { url, autoPdf: false } });
+  assert.equal(notFailed.body.meta.autoPdf, false);
   const retried = await until(notFailed.body.id);
   assert.equal(retried.retryOf, failed.id);
   assert.equal(retried.status, 'succeeded', retried.error ?? '');

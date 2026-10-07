@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 
 import { repoRoot } from '../services/paths.js';
-import { buildSpec, describeKinds, internalSpec, RUN_KINDS, SpecError } from './specs.js';
+import { buildSpec, describeKinds, internalSpec, RUN_KINDS, SpecError, summarizeFindings } from './specs.js';
 
 test('every script kind names a script that exists upstream', () => {
   for (const [kind, def] of Object.entries(RUN_KINDS)) {
@@ -133,4 +133,14 @@ test('describeKinds is the UI vocabulary and carries no argv builders', () => {
     assert.equal(kind.args, undefined);
     assert.equal(kind.parseProgress, undefined);
   }
+});
+
+test('read-only checks say what they found, in words (R-final-03)', () => {
+  const lines = (...texts) => texts.map((text) => ({ text }));
+  const portals = summarizeFindings(lines('verify-portals: portals.yml', '  ✅ Kestrel Media — greenhouse/kestrelmedia (12 jobs)', '  ❌ Juniper Mobility — greenhouse/junipermobility (slug not found) — HTTP 404'));
+  assert.deepEqual(portals, { findings: ['Juniper Mobility: board not found'], total: 1, clean: false });
+  const pipeline = summarizeFindings(lines('⚠️  Possible duplicates: #4, #24 (Driftwood Analytics)', '📊 Pipeline Health: 0 errors, 1 warnings'));
+  assert.deepEqual(pipeline.findings, ['Possible duplicates: #4, #24 (Driftwood Analytics)']);
+  assert.equal(summarizeFindings(lines('✅ Statuses', '🟢 Pipeline is clean!')).clean, true);
+  assert.equal(summarizeFindings(lines('something unrecognised')).clean, false, 'silence is not a clean bill');
 });
