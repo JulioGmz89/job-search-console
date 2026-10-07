@@ -12,5 +12,4 @@ Counts are distinct (rule, view) pairs per colour scheme, at any zoom.
 
 ## Views skipped
 
-- populated/search-results/light/200: could not open: locator.fill: Timeout 30000ms exceeded.
-- populated/search-results/dark/200: could not open: locator.fill: Timeout 30000ms exceeded.
+None.

@@ -416,7 +416,8 @@
     "m6": null,
     "scheme": "light",
     "zoom": "200",
-    "skipped": "could not open: locator.fill: Timeout 30000ms exceeded."
+    "screenshot": "shots/populated-search-results-light-200.png",
+    "violations": []
   },
   {
     "key": "populated/today/dark/100",
@@ -835,7 +836,8 @@
     "m6": null,
     "scheme": "dark",
     "zoom": "200",
-    "skipped": "could not open: locator.fill: Timeout 30000ms exceeded."
+    "screenshot": "shots/populated-search-results-dark-200.png",
+    "violations": []
   },
   {
     "key": "empty/today-setup/light/100",
