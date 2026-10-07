@@ -10,6 +10,13 @@ import { announce } from '../shell/announce.jsx';
 import { PageHead, useAnchor } from '../shell/router.jsx';
 
 /** The useful part of a script's output for a person: no blank lines, the end of it. */
+/** The duplicate finder's "Remove #23 (Co — Role, 3.4) → kept #13 (4.1)" lines, as pairs. */
+const pairs = (run) =>
+  (run?.lines ?? [])
+    .map((l) => /Remove #(\d+) \((.+), ([^,()]+)\) → kept #(\d+) \(([^)]+)\)/.exec(l.text))
+    .filter(Boolean)
+    .map(([, remove, name, fit, keep, keepFit]) => ({ remove, name, fit, keep, keepFit }));
+
 const outputOf = (run) => (run?.lines ?? []).map((l) => l.text).filter((t) => t.trim()).slice(-40).join('\n');
 
 /**
@@ -64,9 +71,21 @@ function Tool({ id, kind, title, description, preview = false, confirmLabel = 'A
           <p className={`notice ${found ? 'warn' : step === 'preview' ? 'info' : 'ok'}`}>
             {step === 'preview' ? 'Preview — nothing has changed yet. This is what would change:' : found ? 'Found problems:' : 'Done:'}
           </p>
-          <pre className="log" tabIndex={0} aria-label={`${title}: output`}>
-            {outputOf(full) || 'Nothing to report.'}
-          </pre>
+          {pairs(full).length ? (
+            <ul>
+              {pairs(full).map((p) => (
+                <li key={p.remove}>
+                  Application #{p.remove} ({p.name}, fit {p.fit}) would be merged into #{p.keep} (fit {p.keepFit}), keeping the higher fit, the furthest status and every note.
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <details open={!pairs(full).length}>
+            <summary>{pairs(full).length ? 'Technical details' : 'What it printed'}</summary>
+            <pre className="log" tabIndex={0} aria-label={`${title}: output`}>
+              {outputOf(full) || 'Nothing to report.'}
+            </pre>
+          </details>
           {step === 'preview' ? (
             <div className="row">
               <button type="button" className="btn" onClick={() => go(false, full.id)}>

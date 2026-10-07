@@ -107,6 +107,7 @@ function CvCard({ row, report }) {
             <p>
               <span className="mono">{pdf.fileName ?? pdf.path}</span>
               <br />
+              {pdf.fromReport ? <>From your earlier check of this posting (report #{pdf.fromReport}). </> : null}
               Made {dateTime(pdf.modified ?? pdf.date)}
               {madeIn ? ` · ${designName(madeIn, templates.data?.templates)} design` : ''} ·{' '}
               {voice.data?.exists ? (rulesChanged ? `written before your writing rules changed (${shortDate(voice.data.modified)})` : 'written under your current writing rules') : 'no writing rules set'}
@@ -127,9 +128,17 @@ function CvCard({ row, report }) {
             )}
           </>
         ) : (
-          <p>
-            Your CV rewritten for this role, in your design ({design}). <CostNote minutes="3" />
-          </p>
+          <>
+            <p>
+              Your CV rewritten for this role, in your design ({design}). <CostNote minutes="3" />
+            </p>
+            {designCheck.data?.verdict === 'fail' ? (
+              <p className="notice attn">
+                Your design ({design}) fails the screening check: a CV made with it would lose part of its text for applicant-tracking systems.{' '}
+                <a href="#/my-cv/design">Choose a design that passes</a> first.
+              </p>
+            ) : null}
+          </>
         )}
       </div>
       {!making && pdf ? (

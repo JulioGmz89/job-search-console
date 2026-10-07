@@ -138,3 +138,17 @@ test('a check that found problems is done, with its findings, not failed', async
   assert.equal(designName('ats', [{ name: 'ats', displayName: 'ATS Friendly' }]), 'ATS Friendly');
   assert.equal(designName('two-column'), 'Two column');
 });
+
+test('outcomes never claim more than the run knows (H8-today-02, H8-activity-01)', async () => {
+  const { outcome } = await import('./runs.js');
+  const scan = (result) => outcome({ kind: 'scan', status: 'succeeded', result });
+  assert.match(scan({ added: [], unreachable: [], checked: 0 }).text, /No company could be checked/);
+  assert.doesNotMatch(scan({ added: [], unreachable: [], checked: 0 }).text, /Every board answered/);
+  assert.match(scan({ added: [], unreachable: [], checked: 12 }).text, /Every board answered/);
+  assert.match(scan({ added: [], unreachable: [{ company: 'Juniper Mobility', status: 'slug_gone' }], checked: 12 }).text, /Juniper Mobility: the job board couldn’t be reached \(board not found\)/);
+  assert.equal(outcome({ kind: 'dedup', status: 'succeeded', dryRun: true }).text, 'Preview only: nothing was changed.');
+  assert.doesNotMatch(outcome({ kind: 'verify-portals', status: 'succeeded', exitCode: 0 }).text, /No problems/);
+  const { isBoard } = await import('./boards.js');
+  assert.equal(isBoard({ careersUrl: 'https://job-boards.greenhouse.io/kestrelmedia' }), true);
+  assert.equal(isBoard({ careersUrl: 'https://kestrelmedia.example.com/careers' }), false);
+});

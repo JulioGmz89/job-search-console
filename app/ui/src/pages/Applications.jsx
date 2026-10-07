@@ -3,7 +3,7 @@ import { Cell, Column, Row, Table, TableBody, TableHeader } from 'react-aria-com
 
 import { AddJob } from '../components/AddJob.jsx';
 import { StatusControl } from '../components/StatusControl.jsx';
-import { ActionMenu, EmptyState, Notice } from '../components/ui.jsx';
+import { ActionMenu, ConfirmDialog, EmptyState, Notice } from '../components/ui.jsx';
 import { useResource } from '../data.js';
 import { fit, jobName, plural, shortDate, statusLabel } from '../lib/labels.js';
 import { mergeInfo, runTitle } from '../lib/runs.js';
@@ -124,7 +124,14 @@ export function ApplicationsPage() {
     });
   const filtering = filters.status !== 'all' || filters.fit !== 'any' || words.length > 0;
 
-  const act = async (row, action) => {
+  const [confirmAct, setConfirmAct] = useState(null);
+  const act = async (row, action, confirmed = false) => {
+    // A paid action from a menu is confirmed with its cost first (H8-applications-01).
+    if (['cv', 'check'].includes(action) && !confirmed) {
+      setConfirmAct({ row, action });
+      return;
+    }
+    setConfirmAct(null);
     try {
       if (action === 'cv') {
         const run = await start('pdf', { reportId: row.reportId });
@@ -139,6 +146,13 @@ export function ApplicationsPage() {
       announce(`Could not start it: ${e.message}`, { assertive: true });
     }
   };
+
+  // What is running for each job, said on its row.
+  const working = new Map(
+    list
+      .filter((r) => ['queued', 'running'].includes(r.status) && (r.meta?.reportId || r.meta?.url))
+      .map((r) => [Number(r.meta?.reportId ?? rows.find((x) => x.report?.url === r.meta?.url)?.reportId), r.kind === 'evaluate' ? 'Checking fit' : r.kind === 'pdf' ? 'Making the tailored CV' : r.kind === 'cover' ? 'Writing the letter' : 'Working']),
+  );
 
   const clear = (
     <button type="button" className="btn-link" onClick={() => setFilters({ status: 'all', fit: 'any', text: '' })}>
@@ -272,6 +286,11 @@ export function ApplicationsPage() {
                             </span>
                           ) : null}
                           {left ? <span className="rowmsg">Moved to {statusLabel(moved[row.id])}</span> : null}
+                          {working.get(row.reportId) ? (
+                            <span className="rowmsg working" role="status">
+                              {working.get(row.reportId)}… <a href="#/activity">Activity</a>
+                            </span>
+                          ) : null}
                         </Cell>
                         <Cell className="num">{fit(row.score)}</Cell>
                         <Cell>{row.report?.decision ?? '—'}</Cell>
@@ -306,6 +325,20 @@ export function ApplicationsPage() {
           )}
         </>
       ) : null}
+      <ConfirmDialog
+        isOpen={confirmAct !== null}
+        title={confirmAct ? `${confirmAct.action === 'cv' ? 'Make the tailored CV for' : 'Check the fit of'} ${jobName(confirmAct.row)}?` : ''}
+        confirmLabel={confirmAct?.action === 'cv' ? 'Make tailored CV' : 'Check fit again'}
+        focusConfirm={false}
+        onConfirm={() => act(confirmAct.row, confirmAct.action, true)}
+        onCancel={() => setConfirmAct(null)}
+      >
+        <p>
+          {confirmAct?.action === 'cv'
+            ? 'The assistant rewrites your CV for this role. About 3 minutes; uses your Claude plan.'
+            : 'The assistant reads the posting again and writes a new fit report. 2–5 minutes; uses your Claude plan. Your tailored CV and letter for this job stay.'}
+        </p>
+      </ConfirmDialog>
     </>
   );
 }

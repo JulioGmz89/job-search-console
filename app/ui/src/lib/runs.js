@@ -151,6 +151,8 @@ export function mergeText(merge) {
  */
 export function outcome(run, { rowForReport = () => null, all = [], rows = [] } = {}) {
   const result = run?.result ?? {};
+  // A preview changes nothing, whatever kind it is; a scan's preview names what it found.
+  if (run?.dryRun && run.kind !== 'scan') return { text: 'Preview only: nothing was changed.', open: null };
   const reportId = result.reportId ?? run?.meta?.reportId ?? null;
   const row = reportId !== null ? rowForReport(Number(reportId)) : null;
   const jobHref = row ? `#/applications/${row.id}` : reportId !== null ? `#/applications/report/${reportId}` : null;
@@ -184,9 +186,15 @@ export function outcome(run, { rowForReport = () => null, all = [], rows = [] } 
       const added = result.added ?? [];
       const names = added.slice(0, 4).map((a) => `${a.company} — ${a.title}`).join('; ');
       const down = result.unreachable ?? [];
-      const problems = down.length
-        ? ` ${down.map((d) => d.company).join(', ')}: the job board couldn’t be reached${down.some((d) => d.status === 'slug_gone') ? ' (board not found)' : ''}. Fix it in Companies.`
-        : ' Every board answered.';
+      // Never "every board answered" for a check that reached no company (H8-today-02).
+      const problems =
+        result.checked === 0
+          ? ' No company could be checked: their links aren’t job boards the app can read. Check the links in Companies.'
+          : down.length
+            ? ` ${down.map((d) => d.company).join(', ')}: the job board couldn’t be reached${down.some((d) => d.status === 'slug_gone') ? ' (board not found)' : ''}. Fix it in Companies.`
+            : result.unreachable
+              ? ' Every board answered.'
+              : '';
       const text = result.preview
         ? `Preview, nothing saved: ${plural(added.length, 'new opening')} would be added${names ? `: ${names}` : ''}.`
         : added.length
@@ -201,9 +209,10 @@ export function outcome(run, { rowForReport = () => null, all = [], rows = [] } 
     case 'verify-pipeline':
     case 'validate-portals':
     case 'verify-portals':
+      // Only exit 1 is a known verdict; otherwise the output says what it found (H8-activity-01).
       return run.exitCode === 1
         ? { text: 'Found problems. Technical details shows what they are.', open: { href: '#/workspace#health', label: 'Open Workspace' } }
-        : { text: 'No problems found.', open: null };
+        : { text: 'Finished. Technical details shows what it found.', open: null };
     default:
       return { text: 'Done.', open: null };
   }

@@ -319,7 +319,7 @@ export function CompaniesPage() {
       <ul className="plain stack-sm">
         {entries.map((entry) => (
           <EntryRow
-            key={`${kind}-${entry.index}`}
+            key={`${kind}-${entry.name}`}
             entry={entry}
             kind={kind}
             health={health[entry.name]}

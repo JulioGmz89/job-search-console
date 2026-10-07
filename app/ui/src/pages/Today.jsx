@@ -10,7 +10,7 @@ import { isTopLevel, outcome, runState, runTitle } from '../lib/runs.js';
 import { todayCards } from '../lib/today.js';
 import { useRuns } from '../runs.jsx';
 import { announce } from '../shell/announce.jsx';
-import { boardType } from '../lib/boards.js';
+import { boardType, isBoard } from '../lib/boards.js';
 import { cvSummaryText, readTextFile } from '../lib/cvtext.js';
 import { PageHead } from '../shell/router.jsx';
 import { offerUndo } from '../shell/undo.jsx';
@@ -190,10 +190,17 @@ function CompanyStep() {
       {done ? (
         <div className="stack-sm">
           <p id="co-saved" tabIndex={-1} ref={savedRef}>
-            Following <b>{following[0].name}</b> · {boardType(following[0])} job board recognised from the link
+            Following <b>{following[0].name}</b>
+            {isBoard(following[0]) ? ` · ${boardType(following[0])} job board recognised from the link` : ''}
             {following.length > 1 ? ` · and ${plural(following.length - 1, 'other company', 'other companies')}` : ''}. The first check for new openings shows whether it answers.{' '}
             <a href="#/companies">Companies you follow</a>
           </p>
+          {isBoard(following[0]) ? null : (
+            <p className="notice warn">
+              The app doesn’t recognise this link as a job board it can read, so checks may find nothing at {following[0].name}. If the company posts its jobs on Greenhouse,
+              Lever or Ashby, use that link instead (<a href="#/companies">Companies</a> › Edit).
+            </p>
+          )}
           <div className="row">
             <button
               type="button"
@@ -437,7 +444,7 @@ export function TodayPage() {
   });
   const rowForReport = (id) => pipeline.data?.rows?.find((r) => r.reportId === id) ?? null;
   const finished = list.filter(
-    (r) => r.status === 'succeeded' && isTopLevel(r) && ['evaluate', 'pdf', 'cover', 'scan', 'cv-render'].includes(r.kind) && !dismissed.includes(r.id) && !ackd.includes(r.id) && !shownInline.has(r.id) && (r.endedAt ?? 0) > (lastSeenRef.current ? Date.parse(lastSeenRef.current) : 0),
+    (r) => r.status === 'succeeded' && isTopLevel(r) && ['evaluate', 'pdf', 'cover', 'cv-render'].includes(r.kind) && !dismissed.includes(r.id) && !ackd.includes(r.id) && !shownInline.has(r.id) && (r.endedAt ?? 0) > (lastSeenRef.current ? Date.parse(lastSeenRef.current) : 0),
   );
 
   const dismiss = async (run) => {
