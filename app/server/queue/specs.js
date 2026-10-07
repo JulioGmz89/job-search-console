@@ -27,11 +27,63 @@
  * - `lane` and `exclusive` tell the queue how a kind may overlap with others.
  */
 
-import { parseProgress, scanArgs } from '../services/scanner.js';
+import { parseProgress, readLastScanRun, readPortalHealth, scanArgs } from '../services/scanner.js';
 import { parseFetchProgress } from '../skills/cli.js';
 import { buildSkillsCvSpec, buildSkillsExtractSpec } from '../skills/extract-spec.js';
 import { buildCoverSpec, buildEvaluateSpec, buildPdfSpec } from './agent-specs.js';
 import { buildCvRenderSpec } from './cv-specs.js';
+
+const FINDING = /^\s*(❌|⚠️)\s*/u;
+const CLEAN = /pipeline is clean|no problems found|all .* (ok|valid)|^0 errors, 0 warnings$/i;
+const MAX_FINDINGS = 8;
+
+/**
+ * What a read-only check found, in words, from the ❌ and ⚠️ lines it prints
+ * (R-final-03). Board probes read "Juniper Mobility: board not found", not the
+ * engine's "greenhouse/junipermobility (slug not found) — HTTP 404". `clean`
+ * is only set when the check itself said so.
+ *
+ * @param {{text: string}[]} lines
+ * @returns {{findings: string[], total: number, clean: boolean}}
+ */
+export function summarizeFindings(lines = []) {
+  const found = [];
+  let clean = false;
+  for (const { text } of lines) {
+    const raw = String(text ?? '');
+    if (CLEAN.test(raw)) clean = true;
+    // validate-portals prints "error: <path>: <message>" and "warning: …", or
+    // "validate-portals failed: file not found: …" when there is no list yet.
+    const plainLine = raw.match(/^(?:error|warning): (.+)$/u)?.[1] ?? null;
+    if (plainLine) {
+      found.push(
+        plainLine
+          .replace(/^tracked_companies\[(\d+)\]/u, (_, n) => `Company ${Number(n) + 1} in your list`)
+          .replace(/^search_queries\[(\d+)\]/u, (_, n) => `Job-board search ${Number(n) + 1}`)
+          .replace(/\.api:/u, ', its data link (API):')
+          .replace(/\.careers_url:/u, ', its careers page link:'),
+      );
+      continue;
+    }
+    if (/^validate-portals failed: file not found/u.test(raw)) {
+      found.push('There is no companies list yet: follow a company first.');
+      continue;
+    }
+    const icon = raw.match(FINDING);
+    if (!icon) continue;
+    // verify-portals ends a moved board's line with "→ try ats/slug"; keep it in words.
+    const suggestion = raw.match(/→\s*try\s+(\S+)/u)?.[1] ?? null;
+    const plain = raw
+      .replace(/\s*→\s*try\s+\S+.*$/u, '')
+      .slice(icon[0].length)
+      .replace(/\s+—\s+HTTP \d+.*$/u, '')
+      .replace(/^(.+?)\s+—\s+[\w-]+\/[\w.-]+\s+\(([^)]+)\)(.*)$/u, '$1: $2$3')
+      .replace(/slug not found/gi, 'board not found')
+      .trim();
+    if (plain) found.push(suggestion ? `${plain}; its board may now be ${suggestion}` : plain);
+  }
+  return { findings: found.slice(0, MAX_FINDINGS), total: found.length, clean: clean && found.length === 0 };
+}
 
 /** Argv for the skills fetch worker (`skills/cli.js`): only flags it validates itself. */
 function skillsFetchArgs(options = {}) {
@@ -81,7 +133,35 @@ export const RUN_KINDS = Object.freeze({
     parseProgress,
     // New postings mean new text to read for the skills analysis (M4). Only a
     // real scan chains it: a dry run added nothing to the inbox.
-    after: (run) => (run.dryRun ? {} : { next: ['skills-fetch-auto'] }),
+    // The openings this check added, by name, so To review and Today can say
+    // which ones are new without comparing dates (T4).
+    after: (run, ctx = {}) => {
+      const added = (run.lines ?? [])
+        .map((line) => parseProgress(line.text))
+        .filter((p) => p?.type === 'offer')
+        .map(({ company, title, location }) => ({ company, title, location }));
+      // Boards this check recorded as not answering, from data/portal-health.tsv
+      // (which scan.mjs writes), so the result itself says what went wrong.
+      let unreachable = [];
+      try {
+        const since = run.startedAt ?? 0;
+        unreachable = Object.entries(readPortalHealth({ root: ctx.root }))
+          .filter(([, h]) => !['reachable', 'empty'].includes(h.status) && Date.parse(h.timestamp) >= since - 1000)
+          .map(([company, h]) => ({ company, status: h.status }));
+      } catch {
+        // No health file: nothing to say.
+      }
+      // How many companies the check reached (data/scan-runs.tsv), so a check
+      // that reached none cannot read as "every board answered" (H8-today-02).
+      let checked = null;
+      try {
+        const last = readLastScanRun({ root: ctx.root });
+        if (last && Date.parse(last.timestamp) >= (run.startedAt ?? 0) - 1000) checked = last.companies ?? null;
+      } catch {
+        // No record: unknown.
+      }
+      return { result: { ...(run.result ?? {}), added, unreachable, checked, preview: run.dryRun === true }, ...(run.dryRun ? {} : { next: ['skills-fetch-auto'] }) };
+    },
     // scan.mjs writes data/scan-runs.tsv, data/portal-health.tsv and reads
     // data/blacklist.md as bare relative paths, so they follow the cwd, not
     // CAREER_OPS_ROOT. A confined app (tests, the UX sandbox) must launch it
@@ -122,6 +202,7 @@ export const RUN_KINDS = Object.freeze({
     // Exits non-zero when it FINDS something, which is the check working.
     reportsFindings: true,
     args: () => [],
+    after: (run) => ({ result: summarizeFindings(run.lines) }),
   },
   'validate-portals': {
     script: 'validate-portals.mjs',
@@ -135,6 +216,7 @@ export const RUN_KINDS = Object.freeze({
     // Exits non-zero when it FINDS something, which is the check working.
     reportsFindings: true,
     args: () => [],
+    after: (run) => ({ result: summarizeFindings(run.lines) }),
   },
   'verify-portals': {
     script: 'verify-portals.mjs',
@@ -148,6 +230,7 @@ export const RUN_KINDS = Object.freeze({
     // Exits non-zero when it FINDS something, which is the check working.
     reportsFindings: true,
     args: () => [],
+    after: (run) => ({ result: summarizeFindings(run.lines) }),
   },
 
   // ── the skills layer (M4) ───────────────────────────────────────────
@@ -374,6 +457,9 @@ export function buildSpec(kind, options = {}, ctx = {}) {
       ? {
           hooks: {
             after: (run, hookCtx) => {
+              // A check that found problems, or could not start (no portals.yml),
+              // still says what it found; it chains nothing (R-disc-03).
+              if (hookCtx.provisional.status === 'failed' && def.reportsFindings) return { result: def.after(run, hookCtx).result };
               if (hookCtx.provisional.status !== 'succeeded') return {};
               const outcome = def.after(run, hookCtx);
               // Post-steps name the next kind; the spec is built here so the

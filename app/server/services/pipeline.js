@@ -20,7 +20,8 @@
  * and `app.js` still strips `rawLine` before it can cross the wire.
  */
 
-import { readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 
 import {
   extractTrackerReportNumbers,
@@ -28,7 +29,8 @@ import {
   resolveColumns,
 } from '../../../tracker-parse.mjs';
 
-import { loadStates, trackerPath } from './paths.js';
+import { resolveTrackerPathForWrite } from '../../../path-resolver.mjs';
+import { loadStates, resolveDataRoot, trackerPath } from './paths.js';
 
 /** Tracker "no data" sentinels. Upstream uses an em dash; hyphen appears too. */
 const EMPTY_CELLS = new Set(['—', '-', '', 'n/a', 'N/A']);
@@ -76,6 +78,29 @@ function parseScore(value) {
 }
 
 /**
+ * A row the parser could not read, in words a person can act on (F-021): which
+ * application it seems to be and what is wrong with it. Best effort — the row
+ * is malformed by definition — so every field may be null.
+ *
+ * @param {string} line - The raw tracker line.
+ * @param {string[]} lines - The whole file, for the header's column count.
+ * @returns {{number: number|null, company: string|null, problem: string, message: string}}
+ */
+export function describeUnparseable(line, lines) {
+  const cellsOf = (text) => text.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+  const cells = cellsOf(line);
+  const header = lines.find((l) => /^\|\s*#\s*\|/.test(l));
+  const expected = header ? cellsOf(header).length : null;
+  const number = /^\d+$/.test(cells[0] ?? '') ? Number(cells[0]) : null;
+  const company = cells.slice(1).find((c) => c && !EMPTY_CELLS.has(c) && !/^\d{4}-\d{2}-\d{2}$/.test(c) && !/^[\d.,/]+$/.test(c)) ?? null;
+  const problem = expected !== null && cells.length !== expected
+    ? `it has ${cells.length} columns instead of ${expected}, so the score and status are in the wrong places`
+    : 'the score or the status could not be read';
+  const who = [company, number !== null ? `#${number}` : null].filter(Boolean).join(' ');
+  return { number, company, problem, message: `${who || 'An application'}: ${problem}.` };
+}
+
+/**
  * Read and normalize the whole tracker.
  *
  * Never throws on bad data. A single malformed row must not blank the whole
@@ -120,7 +145,7 @@ export function readPipeline({ root } = {}) {
       // Header and separator rows return null by design; only flag lines that
       // look like they were meant to be data.
       if (!/^\|\s*(#|-{3,}|:?-)/.test(line) && line.replace(/[|\s]/g, '') !== '') {
-        issues.push({ level: 'warn', code: 'row-unparseable', line: index + 1 });
+        issues.push({ level: 'warn', code: 'row-unparseable', line: index + 1, ...describeUnparseable(line, lines) });
       }
       return;
     }
@@ -177,4 +202,25 @@ export function readPipeline({ root } = {}) {
   });
 
   return { trackerPath: path, columns, rows, issues, statuses: states };
+}
+
+/** Upstream's own empty tracker (AGENTS.md: "If data/applications.md doesn't exist, create it"). */
+export const EMPTY_TRACKER = '# Applications Tracker\n\n| # | Date | Company | Role | Score | Status | PDF | Report | Notes |\n|---|------|---------|------|-------|--------|-----|--------|-------|\n';
+
+/**
+ * Create the tracker when there is none, exactly as upstream's instructions
+ * do. `merge-tracker.mjs` never creates it ("Nothing to merge into"), so on a
+ * first run the first evaluation would never reach Applications.
+ *
+ * @param {{root?: string}} [options]
+ * @returns {boolean} true when the file was created.
+ */
+export function ensureTracker({ root } = {}) {
+  // The read resolver falls back to the legacy root applications.md when there
+  // is none; a new tracker goes where upstream's writers put it.
+  if (existsSync(trackerPath(root))) return false;
+  const path = resolveTrackerPathForWrite(resolveDataRoot(root));
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, EMPTY_TRACKER, { encoding: 'utf-8', flag: 'wx' });
+  return true;
 }

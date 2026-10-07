@@ -172,9 +172,10 @@ export async function main(argv, deps = {}) {
 }
 
 /** Check the finished PDF against the guardrail, record the verdict, and say it loudly. */
-async function defaultAts({ root, pdfPath, html, payload, log }) {
+async function defaultAts({ root, pdfPath, html, payload, template = null, log }) {
   const result = await checkAts({ html, pdf: readFileSync(pdfPath), payload });
-  writeAtsRecord(root, basename(pdfPath), result);
+  // The design is recorded with the verdict, so a document card can say which design made it.
+  writeAtsRecord(root, basename(pdfPath), { ...result, template });
   const critical = result.issues.filter((i) => i.severity === 'critical');
   const warnings = result.issues.filter((i) => i.severity === 'warning');
   if (result.verdict === 'fail') {
@@ -255,7 +256,7 @@ export async function renderDocument(args, { spawnFn = spawn, root = getCareerOp
       return 1;
     }
     try {
-      await ats({ root, pdfPath: pdf, html: rendered.themedHtml, payload: doc.payload, log });
+      await ats({ root, pdfPath: pdf, html: rendered.themedHtml, payload: doc.payload, template: style.template, log });
     } catch (error) {
       console.error(`⚠️  The ATS check could not run: ${error.message}`);
     }

@@ -111,3 +111,13 @@ test('a missing tracker is an empty dashboard, not a crash', () => {
   assert.equal(result.issues[0].code, 'tracker-missing');
   assert.equal(result.issues[0].level, 'info');
 });
+
+test('an unreadable row is described in words: which application and what is wrong', async () => {
+  const { describeUnparseable } = await import('./pipeline.js');
+  const lines = ['| # | Date | Company | Role | Score | Status | PDF | Report | Notes |', '|---|---|---|---|---|---|---|---|---|'];
+  const bad = '| 57 | 2026-10-01 | Quarry Systems | Backend Engineer | 4.0/5 | Applied | ❌ | [057](x.md) | note | extra |';
+  const described = describeUnparseable(bad, [...lines, bad]);
+  assert.equal(described.number, 57);
+  assert.equal(described.company, 'Quarry Systems');
+  assert.match(described.message, /^Quarry Systems #57: it has 10 columns instead of 9/);
+});

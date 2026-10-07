@@ -75,7 +75,8 @@ export function readProfile({ root }) {
   }
 
   const threshold = Number(doc.cv?.auto_pdf_score_threshold);
-  const name = doc.candidate?.name ?? doc.name ?? null;
+  // Upstream's layout is candidate.full_name (profile.example.yml, cv-sync-check.mjs); name is an older spelling.
+  const name = doc.candidate?.full_name ?? doc.candidate?.name ?? doc.name ?? null;
   const location = doc.location?.current ?? doc.location?.city ?? doc.candidate?.location ?? null;
   return {
     ...base,

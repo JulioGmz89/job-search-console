@@ -18,6 +18,7 @@ import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
+import { rankSkills } from '../ui/src/lib/skills.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const { values: opts } = parseArgs({
@@ -109,19 +110,51 @@ const CHECKS = {
   },
   async T6() {
     const skills = await api('/api/skills');
-    const top = (skills?.lists?.learn ?? []).slice(0, 3).map((id) => skills.skills.find((s) => s.id === id)).filter(Boolean);
-    const named = top.find((s) => new RegExp(`\\b${s.name.replace(/[.+]/g, '\\$&')}\\b`, 'i').test(answer));
+    const index = skills?.postings ?? {};
+    // Three rankings a tester can have seen (tasks.md T6, decision D-3): the server's
+    // learn list, and the page's order with and without the good-fit filter.
+    const fromList = (skills?.lists?.learn ?? []).slice(0, 3).map((id) => skills.skills.find((s) => s.id === id)).filter(Boolean)
+      .map((s) => ({ ...s, count: s.demand, postings: s.postings.map((p) => ({ ...index[p.id], id: p.id })) }));
+    const rankings = [
+      { name: 'lists.learn', top: fromList },
+      { name: 'page order', top: rankSkills(skills, { view: 'learn' }).rows.slice(0, 3) },
+      { name: 'page order, fit 4 and up', top: rankSkills(skills, { view: 'learn', goodFitOnly: true }).rows.slice(0, 3) },
+    ];
+    const mentions = (s) => new RegExp(`\\b${s.name.replace(/[.+]/g, '\\$&')}\\b`, 'i').test(answer);
+    const numbers = [...answer.matchAll(/\b(\d{1,3})\b/g)].map((m) => Number(m[1]));
+    let named = null;
     let evidence = false;
-    let detail = `top 3: ${top.map((s) => `${s.name} (demand ${s.demand})`).join(', ')}`;
-    if (named) {
-      const companies = new Set(named.postings.map((p) => skills.postings[p.id]?.company).filter(Boolean));
-      const numbers = [...answer.matchAll(/\b(\d{1,3})\b/g)].map((m) => Number(m[1]));
-      evidence = numbers.some((n) => Math.abs(n - named.demand) <= 1) || [...companies].some((c) => answer.includes(c));
-      detail += `; named ${named.name}; companies wanting it: ${[...companies].slice(0, 6).join(', ')}`;
+    for (const { name, top } of rankings) {
+      for (const s of top.filter(mentions)) {
+        named ??= `${s.name} (${name})`;
+        const full = skills.skills.find((k) => k.id === s.id);
+        const companies = new Set([...s.postings.map((p) => p.company), ...(full?.postings ?? []).map((p) => index[p.id]?.company)].filter(Boolean));
+        const counts = [s.count, full?.demand].filter((n) => typeof n === 'number');
+        if (numbers.some((n) => counts.some((c) => Math.abs(n - c) <= 1)) || [...companies].some((c) => answer.includes(c))) {
+          evidence = true;
+          named = `${s.name} (${name})`;
+        }
+      }
     }
+    const detail = rankings.map(({ name, top }) => `${name}: ${top.map((s) => `${s.name} ${s.count}`).join(', ')}`).join('; ');
     return [
-      { check: 'the answer names one of the top three skills to learn', kind: 'answer', pass: Boolean(named), detail },
-      { check: 'the answer cites matching evidence (demand ±1 or a company)', kind: 'answer', pass: evidence, detail: 'demand count or a company from its postings' },
+      { check: 'the answer names one of the top three skills to learn', kind: 'answer', pass: Boolean(named), detail: `${detail}${named ? `; named ${named}` : ''}` },
+      { check: 'the answer cites matching evidence (count ±1 or a company)', kind: 'answer', pass: evidence, detail: 'count or a company from the postings counted' },
+    ];
+  },
+  async 'first-job'() {
+    // The M8 end-to-end task: empty workspace to a first evaluated job, in the app.
+    const status = await api('/api/agent/status');
+    const portals = await api('/api/portals');
+    const runs = await allRuns();
+    const { rows = [] } = (await api('/api/pipeline')) ?? {};
+    const evaluated = runs.filter((r) => r.kind === 'evaluate' && r.status === 'succeeded');
+    const withReport = rows.filter((r) => r.hasReport);
+    return [
+      { check: 'cv.md exists', kind: 'data', pass: status?.cvPresent === true, detail: `cvPresent=${status?.cvPresent}` },
+      { check: 'portals.yml follows an enabled company', kind: 'data', pass: Boolean(portals?.exists) && (portals?.companies ?? []).some((c) => c.enabled !== false), detail: `exists=${portals?.exists}` },
+      { check: 'an evaluation succeeded', kind: 'data', pass: evaluated.length > 0, detail: evaluated.map((r) => r.id).join(', ') || 'none' },
+      { check: 'the tracker has a row with a report', kind: 'data', pass: withReport.length > 0, detail: withReport.map((r) => `${r.id} ${r.company}`).join(', ') || 'no rows' },
     ];
   },
   async T7() {

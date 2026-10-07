@@ -1,0 +1,292 @@
+/**
+ * runs.js — runs in the user's words (ia.md §2.8, global pattern "Run feedback").
+ *
+ * The queue speaks in kinds, exit codes and log lines. Every surface that shows
+ * a run (Activity, Today, a job page, a document card) names it by what it is
+ * about, says what happened and what to do, and only keeps the codes for
+ * "Technical details". Pure functions, tested with node --test.
+ */
+
+import { fit, plural } from './labels.js';
+
+/** What each kind does, as a short verb phrase; internal follow-ups included. */
+export const RUN_NAMES = Object.freeze({
+  evaluate: 'Check fit',
+  pdf: 'Tailored CV',
+  cover: 'Cover letter',
+  scan: 'Check for new openings',
+  'cv-render': 'Update design',
+  'skills-extract': 'Improve the skills analysis',
+  'skills-cv': "Read your CV's skills",
+  'skills-fetch': 'Read new postings',
+  'skills-fetch-auto': 'Read new postings',
+  dedup: 'Find duplicate applications',
+  reconcile: 'Remove links already in Applications',
+  'reconcile-auto': 'Tidy To review',
+  'verify-pipeline': 'Check my list for problems',
+  'validate-portals': 'Check the companies list for mistakes',
+  'verify-portals': "Check companies' job boards",
+  'merge-tracker': 'Add to Applications',
+  'mark-pdf-ready': 'Mark the CV as ready',
+});
+
+/** How long the assistant usually takes, said beside every button that starts it. */
+export const AGENT_KINDS = new Set(['evaluate', 'pdf', 'cover', 'skills-extract', 'skills-cv']);
+
+/** Runs nobody asked for by name: shown nested under the run that started them. */
+export const FOLLOW_UP_KINDS = new Set(['merge-tracker', 'reconcile-auto', 'skills-fetch-auto', 'mark-pdf-ready']);
+
+/**
+ * A run the user started, as opposed to one the app chained after it (the
+ * merge into Applications, the automatic tailored CV, laying out its PDF).
+ * Only these are listed and announced; the others are told as "then: …"
+ * under their parent (ia.md §2.8).
+ */
+export const isTopLevel = (run) => !run?.parentId && !FOLLOW_UP_KINDS.has(run?.kind);
+
+/** "Check fit · Driftwood Analytics — Data Engineer". */
+export function runTitle(run) {
+  const name = RUN_NAMES[run?.kind] ?? run?.label ?? 'Activity';
+  if (run?.subject) return `${name} · ${run.subject}`;
+  if (run?.result?.company) return `${name} · ${[run.result.company, run.result.role].filter(Boolean).join(' — ')}`;
+  if (run?.kind === 'scan') return name;
+  if (run?.kind === 'cv-render' && run.meta?.documentId) return `${name} · ${run.meta.documentId}`;
+  return name;
+}
+
+/** 'waiting' | 'working' | 'done' | 'failed' | 'cancelled'. */
+export function runState(run) {
+  // A read-only check that exits 1 found problems; that is its answer, not a failure.
+  if (run?.status === 'failed' && run.reportsFindings && run.exitCode === 1) return 'done';
+  switch (run?.status) {
+    case 'queued':
+      return 'waiting';
+    case 'running':
+      return 'working';
+    case 'succeeded':
+      return 'done';
+    case 'cancelled':
+      return 'cancelled';
+    default:
+      return 'failed';
+  }
+}
+
+/**
+ * What happened and what to do, in words, for a failed run.
+ *
+ * @returns {{what: string, todo: string, retry: boolean}} `retry`: whether Try again is offered.
+ */
+export function explainFailure(run) {
+  const error = String(run?.error ?? '');
+  const agent = AGENT_KINDS.has(run?.kind);
+  const again = agent ? 'Try again. It usually works the second time and uses your Claude plan again.' : 'Try again.';
+
+  if (/exited without writing reports|instead of report/i.test(error)) {
+    return {
+      what: 'The assistant opened the posting but stopped before writing the fit report. This is usually temporary — a slow page or a session that ended early.',
+      todo: again,
+      retry: true,
+    };
+  }
+  if (/timed out/i.test(error)) {
+    return { what: 'It took longer than the time limit and was stopped.', todo: `${again} If it times out again, open the posting to check it still loads.`, retry: true };
+  }
+  if (/not logged in|login|log in|auth|credit|usage limit|rate limit|quota/i.test(error)) {
+    return {
+      what: 'Claude Code could not start a session: it may not be signed in, or your plan has reached its limit.',
+      todo: 'Open a terminal, run claude once to sign in or check your plan, then try again.',
+      retry: true,
+    };
+  }
+  if (/blacklist|skip list/i.test(error)) {
+    return { what: 'This company is on your list of companies to skip, so the job was not checked.', todo: 'It is listed under Companies › Companies to skip. Remove it from data/blacklist.md if you want to check it.', retry: false };
+  }
+  if (/cv-missing|no cv\.md/i.test(error)) {
+    return { what: 'Your CV is missing, so there was nothing to compare the job with.', todo: 'Add your CV in My CV › Content, then try again.', retry: true };
+  }
+  if (/server shutting down/i.test(error)) {
+    return { what: 'The app was closed while this was running.', todo: again, retry: true };
+  }
+  if (/payload was written but cannot be rendered/i.test(error)) {
+    return { what: 'The assistant wrote the CV, but it could not be laid out as a PDF.', todo: 'Try again, or choose another design in My CV › Design.', retry: true };
+  }
+  if (run?.kind === 'scan') {
+    return { what: 'Checking for new openings stopped with an error. Some job boards may not have been checked.', todo: 'Try again in a few minutes.', retry: true };
+  }
+  if (/claude exited with code|is_error|error/i.test(error) || agent) {
+    return { what: 'The assistant stopped with an error before it finished.', todo: again, retry: true };
+  }
+  return { what: 'It stopped before it finished.', todo: again, retry: true };
+}
+
+/**
+ * Whether a finished check was merged into an application that already
+ * existed (F-015), and what it changed. Null for a new application.
+ *
+ * @returns {{rowId: number, before: object, after: object}|null}
+ */
+export function mergeInfo(run, rows = []) {
+  const result = run?.result;
+  if (run?.kind !== 'evaluate' || !result?.trackerBefore?.length || result.reportId === undefined) return null;
+  const row = rows.find((r) => r.reportId === result.reportId);
+  const before = row ? result.trackerBefore.find((b) => b.id === row.id) : null;
+  return before ? { rowId: row.id, before, after: row } : null;
+}
+
+/** "Merged into your application #21 (…): fit 3.3 → 4.1; status stays Applied." */
+export function mergeText(merge) {
+  const { rowId, before, after } = merge;
+  const name = [after.company, after.role].filter(Boolean).join(' — ');
+  const scores = before.score === after.score ? `fit still ${fit(after.score)}` : `fit ${fit(before.score)} → ${fit(after.score)}`;
+  return `Merged into your application #${rowId}${name ? ` (${name})` : ''}: ${scores}; its status stays as it was. It now points to this posting.`;
+}
+
+/**
+ * The outcome of a finished run in words, and where to open it.
+ *
+ * @param {object} run
+ * @param {{rowForReport?: (reportId: number) => object|null}} [ctx]
+ * @returns {{text: string, open: {href: string, label: string}|null}}
+ */
+export function outcome(run, { rowForReport = () => null, all = [], rows = [] } = {}) {
+  const result = run?.result ?? {};
+  // A preview changes nothing, whatever kind it is; a scan's preview names what it found.
+  if (run?.dryRun && run.kind !== 'scan') return { text: 'Preview only: nothing was changed.', open: null };
+  const reportId = result.reportId ?? run?.meta?.reportId ?? null;
+  const row = reportId !== null ? rowForReport(Number(reportId)) : null;
+  const jobHref = row ? `#/applications/${row.id}` : reportId !== null ? `#/applications/report/${reportId}` : null;
+  switch (run?.kind) {
+    case 'evaluate': {
+      const merge = mergeInfo(run, rows);
+      const base = typeof result.score === 'number' ? `Fit ${fit(result.score)} / 5. The fit report is ready.` : 'The fit report is ready.';
+      return {
+        text: merge ? `${base} ${mergeText(merge)}` : base,
+        open: jobHref ? { href: jobHref, label: 'Open the job' } : null,
+      };
+    }
+    case 'pdf': {
+      // Its PDF is laid out by a chained render, which carries the screening verdict.
+      const render = all.find((r) => r.parentId === run.id && r.kind === 'cv-render');
+      const verdict = render?.result?.ats?.verdict;
+      const text =
+        verdict === 'fail'
+          ? 'Your tailored CV is ready, but it fails the screening check: an applicant-tracking system would lose part of it. Choose a design that passes in My CV › Design, then make it again.'
+          : 'Your tailored CV is ready.';
+      return { text, open: jobHref ? { href: `${jobHref}#documents`, label: 'Open the CV' } : null };
+    }
+    case 'cover':
+      return { text: 'Your cover letter is ready.', open: jobHref ? { href: `${jobHref}#documents`, label: 'Open the letter' } : null };
+    case 'cv-render': {
+      const verdict = result.ats?.verdict;
+      const words = verdict === 'fail' ? ' It fails the screening check.' : verdict === 'warn' ? ' Readable, with small issues.' : verdict === 'pass' ? ' Readable by screening systems.' : '';
+      return { text: `The CV was laid out again.${words}`, open: jobHref ? { href: `${jobHref}#documents`, label: 'Open the CV' } : null };
+    }
+    case 'scan': {
+      const added = result.added ?? [];
+      const names = added.slice(0, 4).map((a) => `${a.company} — ${a.title}`).join('; ');
+      const down = result.unreachable ?? [];
+      // Never "every board answered" for a check that reached no company (H8-today-02).
+      const problems =
+        result.checked === 0
+          ? ' No company could be checked: their links aren’t job boards the app can read. Check the links in Companies.'
+          : down.length
+            ? ` ${down.map((d) => d.company).join(', ')}: the job board couldn’t be reached${down.some((d) => d.status === 'slug_gone') ? ' (board not found)' : ''}. Fix it in Companies.`
+            : result.unreachable
+              ? ' Every board answered.'
+              : '';
+      const text = result.preview
+        ? `Preview, nothing saved: ${plural(added.length, 'new opening')} would be added${names ? `: ${names}` : ''}.`
+        : added.length
+          ? `${plural(added.length, 'new opening')}: ${names}${added.length > 4 ? ` and ${added.length - 4} more` : ''}.${problems}`
+          : `No new openings this time.${problems}`;
+      return { text, open: { href: '#/to-review', label: added.length ? `See the ${plural(added.length, 'new opening')}` : 'Open To review' } };
+    }
+    case 'skills-extract':
+      return { text: 'The skills analysis is up to date.', open: { href: '#/skills/learn', label: 'Open Skills' } };
+    case 'skills-cv':
+      return { text: 'Your CV’s skills were read again; Skills uses them now.', open: { href: '#/skills/learn', label: 'Open Skills' } };
+    case 'skills-fetch':
+      // It says what it read, not that all is well: some postings may still fail (R-disc-05).
+      return { text: 'Finished reading postings. The line at the top of Skills says how many could not be loaded.', open: { href: '#/skills/learn', label: 'Open Skills' } };
+    case 'verify-pipeline':
+    case 'validate-portals':
+    case 'verify-portals': {
+      // What it found, in words, when the server could read it from the output (R-final-03).
+      const found = run.result?.findings ?? [];
+      if (found.length) {
+        const total = run.result.total ?? found.length;
+        const shown = found.slice(0, 3).join('; ').replace(/\.$/u, '');
+        return {
+          text: `Found ${plural(total, 'problem')}: ${shown}${total > 3 ? `; and ${total - 3} more` : ''}.`,
+          open: run.kind === 'verify-pipeline' ? { href: '#/workspace#health', label: 'Open Workspace' } : { href: '#/companies', label: 'Open Companies' },
+        };
+      }
+      if (run.result?.clean && run.exitCode === 0) return { text: 'No problems found.', open: null };
+      // Only exit 1 is a known verdict; otherwise the output says what it found (H8-activity-01).
+      return run.exitCode === 1
+        ? { text: 'Found problems. Technical details shows what they are.', open: { href: '#/workspace#health', label: 'Open Workspace' } }
+        : { text: 'Finished. Technical details shows what it found.', open: null };
+    }
+    default:
+      return { text: 'Done.', open: null };
+  }
+}
+
+/** A failure the user still has to act on: not retried, not dismissed. */
+export function needsAttention(run, all, dismissed = []) {
+  if (runState(run) !== 'failed' || dismissed.includes(run.id) || !isTopLevel(run)) return false;
+  return !all.some((r) => r.retryOf === run.id);
+}
+
+/** The Activity button's state and label (ia.md §1). */
+export function activitySummary(all, { dismissed = [], lastOpened = 0 } = {}) {
+  const top = all.filter(isTopLevel);
+  const working = top.filter((r) => ['waiting', 'working'].includes(runState(r))).length;
+  const failed = top.filter((r) => needsAttention(r, all, dismissed)).length;
+  const done = top.filter((r) => runState(r) === 'done' && (r.endedAt ?? 0) > lastOpened).length;
+  if (failed) return { state: 'failed', label: `Activity · ${failed} failed`, failed, working, done };
+  if (working) return { state: 'working', label: `Activity · ${working} working`, failed, working, done };
+  if (done) return { state: 'done', label: `Activity · ${done} done`, failed, working, done };
+  return { state: 'quiet', label: 'Activity', failed, working, done };
+}
+
+/** "then: added to Applications, made tailored CV". */
+/** What a chained run did, in a few words; null for bookkeeping not worth saying. */
+const FOLLOW_UP_WORDS = {
+  'merge-tracker': 'added to Applications',
+  pdf: 'made the tailored CV',
+  cover: 'wrote the cover letter',
+  'cv-render': 'laid out the PDF',
+  'reconcile-auto': null,
+  'mark-pdf-ready': null,
+  'skills-fetch-auto': 'read the new postings for Skills',
+};
+
+export function followUps(run, all, rows = []) {
+  const children = all.filter((r) => r.parentId === run.id && FOLLOW_UP_WORDS[r.kind] !== null);
+  if (!children.length) return '';
+  const merge = mergeInfo(run, rows);
+  const words = children.map((c) => {
+    const verb = c.kind === 'merge-tracker' && merge ? `updated application #${merge.rowId}` : (FOLLOW_UP_WORDS[c.kind] ?? (RUN_NAMES[c.kind] ?? c.label ?? c.kind).toLowerCase());
+    if (c.kind === 'cv-render' && runState(c) === 'done' && c.result?.ats?.verdict === 'fail') return `${verb} (it fails the screening check)`;
+    const layout = c.kind === 'pdf' ? all.find((r) => r.parentId === c.id && r.kind === 'cv-render') : null;
+    if (layout?.result?.ats?.verdict === 'fail') return `${verb} (in a design that fails the screening check: choose one that passes in My CV › Design)`;
+    return runState(c) === 'failed' ? `${verb} (failed)` : runState(c) === 'working' || runState(c) === 'waiting' ? `${verb} (working)` : verb;
+  });
+  return `then: ${words.join(', ')}`;
+}
+
+/** "lane agent · exit 0 · log data/jsc/logs/<id>.jsonl" for Technical details. */
+export function technicalDetails(run) {
+  const parts = [run.kind, `lane ${run.lane ?? 'script'}`];
+  if (run.exitCode !== null && run.exitCode !== undefined) parts.push(`exit ${run.exitCode}`);
+  if (run.error) parts.push(run.error);
+  if (AGENT_KINDS.has(run.kind)) parts.push(`log data/jsc/logs/${run.id}.jsonl`);
+  return parts.join(' · ');
+}
+
+/** "Waiting — 2 others are running". */
+export function waitingText(active) {
+  return active > 0 ? `Waiting — ${plural(active, 'other is', 'others are')} running` : 'Waiting to start';
+}

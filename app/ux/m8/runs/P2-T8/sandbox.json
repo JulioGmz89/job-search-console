@@ -1,0 +1,20 @@
+{
+  "url": "http://127.0.0.1:4478/",
+  "state": "broken",
+  "startedAt": 1791352630475,
+  "root": "C:\\Users\\julio\\AppData\\Local\\Temp\\jsc-ux-broken-Gm5wej",
+  "scenario": "auto",
+  "delayMs": 8000,
+  "failedRun": {
+    "id": "8eaeb20b-5bde-40bd-bf35-f1cad96ad54c",
+    "status": "failed"
+  },
+  "pid": 25672,
+  "flags": {
+    "task": "T8",
+    "state": "broken",
+    "delay": 8000,
+    "scenario": "auto",
+    "budget": 40
+  }
+}

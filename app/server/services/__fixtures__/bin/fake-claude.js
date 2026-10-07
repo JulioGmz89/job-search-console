@@ -16,6 +16,7 @@
  *   FAKE_CLAUDE_DELAY_MS  stream progress lines for this long before acting (default 0), so
  *                         the UX sandbox can show what waiting on a real session is like
  *   FAKE_CLAUDE_ARGV      when set, the argv is written to this file for inspection
+ *   FAKE_CLAUDE_VERSION   what `--version` prints (default 2.1.0), or `fail` to exit 1
  *   CAREER_OPS_ROOT       the data root (set by the runner's confineTo)
  *
  * Scenario queue: when `<root>/data/jsc/fake-scenarios` exists, each session
@@ -36,6 +37,17 @@ const flag = (name) => {
 };
 
 if (process.env.FAKE_CLAUDE_ARGV) writeFileSync(process.env.FAKE_CLAUDE_ARGV, JSON.stringify(args));
+
+// The console's first-run check (`claude --version`). Answered before the
+// scenario queue is read, so a check never uses up a scripted session.
+if (args[0] === '--version') {
+  if (process.env.FAKE_CLAUDE_VERSION === 'fail') {
+    process.stderr.write('fake-claude: cannot start\n');
+    process.exit(1);
+  }
+  process.stdout.write(`${process.env.FAKE_CLAUDE_VERSION || '2.1.0'} (Claude Code)\n`);
+  process.exit(0);
+}
 
 const root = process.env.CAREER_OPS_ROOT ?? process.cwd();
 

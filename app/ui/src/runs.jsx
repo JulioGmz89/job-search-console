@@ -1,70 +1,102 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import { fetchAgentStatus, fetchRuns } from './api.js';
+import { cancelRun, fetchRuns, retryRun, startRun } from './api.js';
+import { filesChanged, reload, useResource } from './data.js';
+import { explainFailure, isTopLevel, outcome, runState, runTitle } from './lib/runs.js';
+import { announce } from './shell/announce.jsx';
 import { useServerEvents } from './useServerEvents.js';
 
 /**
  * The queue as the whole UI sees it: every run the server knows about, kept
- * current by the event feed, plus whether agent runs can work at all.
+ * current by the event feed (ia.md §3 "Run feedback").
  *
- * A context rather than per-component fetches because the same run shows up
- * in several places — the Runs page, the panel under the paste box, a badge on
- * a pipeline row — and they must agree.
+ * The same run shows in several places — the Activity button and panel, Today,
+ * a job's document card, the row it started from — and they must agree, so
+ * there is one copy here. When a run finishes, the live region says so by name,
+ * wherever the user is; failures are assertive.
  */
 const RunsContext = createContext(null);
 
 const byId = (list) => Object.fromEntries(list.map((run) => [run.id, run]));
+const TERMINAL = new Set(['succeeded', 'failed', 'cancelled']);
 
-export function RunsProvider({ children, onChanged }) {
+export function RunsProvider({ children }) {
   const [runs, setRuns] = useState({});
-  const [kinds, setKinds] = useState([]);
-  const [agent, setAgent] = useState(null);
   const [connected, setConnected] = useState(true);
+  const known = useRef({});
+  const pipeline = useResource('pipeline');
+  const rowsRef = useRef([]);
+  rowsRef.current = pipeline.data?.rows ?? [];
 
   const load = useCallback(() => {
     fetchRuns()
       .then((listed) => {
-        setKinds(listed.kinds);
-        setRuns(byId([...listed.queued, ...listed.active, ...listed.recent]));
+        const all = byId([...listed.queued, ...listed.active, ...listed.recent]);
+        known.current = all;
+        setRuns(all);
       })
       .catch(() => {});
-    fetchAgentStatus().then(setAgent).catch(() => setAgent({ bin: { found: false }, profile: {} }));
   }, []);
-
   useEffect(load, [load]);
 
+  const upsert = useCallback((run) => {
+    const before = known.current[run.id];
+    known.current = { ...known.current, [run.id]: run };
+    setRuns(known.current);
+    // Say it once, when a run the user could see finishes.
+    if (TERMINAL.has(run.status) && before && !TERMINAL.has(before.status) && isTopLevel(run)) {
+      const title = runTitle(run);
+      if (run.status === 'failed') announce(`${title} didn't finish. ${explainFailure(run).what}`, { assertive: true });
+      else if (run.status === 'succeeded') announce(`${title}: ${outcome(run, { all: Object.values(known.current), rows: rowsRef.current }).text}`);
+    }
+    if (TERMINAL.has(run.status)) {
+      reload('workspace');
+      // What a finished run changed, refetched now rather than on the watcher's next beat.
+      if (run.kind.startsWith('skills')) reload('skills');
+      if (['evaluate', 'pdf', 'cover', 'cv-render', 'merge-tracker', 'mark-pdf-ready'].includes(run.kind)) reload('pipeline');
+      if (['scan', 'reconcile', 'reconcile-auto', 'evaluate'].includes(run.kind)) reload('inbox');
+      if (['pdf', 'cv-render'].includes(run.kind)) reload('documents');
+    }
+  }, []);
+
   useServerEvents({
-    onHello: (hello) => setRuns(byId([...hello.runs.queued, ...hello.runs.active, ...hello.runs.recent])),
-    onRun: (run) => setRuns((current) => ({ ...current, [run.id]: run })),
-    onChanged: (event) => onChanged?.(event),
+    onHello: (hello) => {
+      const all = byId([...hello.runs.queued, ...hello.runs.active, ...hello.runs.recent]);
+      known.current = all;
+      setRuns(all);
+    },
+    onRun: upsert,
+    onChanged: (event) => filesChanged(event.paths ?? []),
     onConnection: setConnected,
   });
 
   const value = useMemo(() => {
-    const list = Object.values(runs);
-    const order = (a, b) => (b.queuedAt ?? 0) - (a.queuedAt ?? 0);
+    const list = Object.values(runs).sort((a, b) => (b.queuedAt ?? 0) - (a.queuedAt ?? 0));
     return {
       runs,
-      list: list.sort(order),
-      queued: list.filter((r) => r.status === 'queued').sort((a, b) => a.queuedAt - b.queuedAt),
-      active: list.filter((r) => r.status === 'running').sort((a, b) => a.startedAt - b.startedAt),
-      recent: list.filter((r) => !['queued', 'running'].includes(r.status)).sort((a, b) => (b.endedAt ?? 0) - (a.endedAt ?? 0)),
-      kinds,
-      agent,
+      list,
       connected,
       reload: load,
-      /** Whether the buttons that start a Claude session should be enabled, and why not. */
-      agentReady: agent?.bin?.found === true && agent?.cvPresent === true,
-      agentReason:
-        agent === null
-          ? 'Checking for Claude Code…'
-          : agent.bin?.found !== true
-            ? `Claude Code CLI not found (${agent.bin?.display ?? 'claude'}) — install it or set JSC_CLAUDE_BIN`
-            : agent.cvPresent !== true
-              ? 'No cv.md in the data directory yet'
-              : null,
+      /** Start a run and add it at once, before its first event arrives. */
+      async start(kind, options = {}, confirmToken) {
+        const run = await startRun(kind, options, confirmToken);
+        upsert(run);
+        return run;
+      },
+      async retry(id, options) {
+        const run = await retryRun(id, options);
+        upsert(run);
+        return run;
+      },
+      async cancel(id) {
+        const run = await cancelRun(id);
+        upsert(run);
+        return run;
+      },
+      /** Add a run another endpoint started (adding a job by link starts its check). */
+      track: upsert,
     };
-  }, [runs, kinds, agent, connected, load]);
+  }, [runs, connected, load, upsert]);
 
   return <RunsContext.Provider value={value}>{children}</RunsContext.Provider>;
 }
@@ -75,10 +107,19 @@ export function useRuns() {
   return value;
 }
 
-/** The runs that belong to a report: its own, and the ones chained from them. */
-export function runsForReport(list, reportId) {
-  const id = Number(reportId);
-  const direct = list.filter((r) => r.meta?.reportId === id || r.result?.reportId === id);
+/** The runs about one job: by report, or by the posting link before a report exists. */
+export function runsForJob(list, { reportId = null, url = null } = {}) {
+  const id = reportId === null ? null : Number(reportId);
+  const direct = list.filter(
+    (r) => (id !== null && (Number(r.meta?.reportId) === id || Number(r.result?.reportId) === id)) || (url && r.meta?.url === url),
+  );
   const ids = new Set(direct.map((r) => r.id));
   return list.filter((r) => ids.has(r.id) || ids.has(r.parentId));
 }
+
+/** The newest run of a kind among some runs, or null. */
+export function latest(list, kind) {
+  return list.filter((r) => r.kind === kind).sort((a, b) => (b.queuedAt ?? 0) - (a.queuedAt ?? 0))[0] ?? null;
+}
+
+export { runState };

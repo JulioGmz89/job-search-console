@@ -335,3 +335,73 @@ export async function appendInboxUrl({ root, url, company, title, location, note
     throw error;
   }
 }
+
+/** Run `work` under upstream's pipeline lock, turning a timeout into a 503. */
+async function locked(path, work) {
+  try {
+    return await withPipelineLock(path, work);
+  } catch (error) {
+    if (error instanceof LockTimeoutError) {
+      throw new InboxError('The inbox is locked by another process (a scan?) — try again in a moment', { code: 'inbox-locked', status: 503 });
+    }
+    throw error;
+  }
+}
+
+/**
+ * Remove a link from To review (ia.md §2.4). Only a pending row can be removed;
+ * processed rows are upstream's history. The line is returned verbatim so Undo
+ * can put back exactly what was there, labels and all.
+ *
+ * @param {{root?: string, url: string}} input
+ * @returns {Promise<{removed: true, line: string, path: string}>}
+ */
+export async function removeInboxUrl({ root, url } = {}) {
+  const key = normalizeUrl(validateInboxUrl(url));
+  const path = inboxPath(root);
+  return locked(path, () => {
+    const current = readInbox({ root });
+    const row = current.pending.find((r) => normalizeUrl(r.url) === key);
+    if (!row) throw new InboxError('That link is not waiting in To review', { code: 'inbox-entry-missing', status: 404 });
+    const text = readFileSync(path, 'utf-8');
+    const eol = text.includes('\r\n') ? '\r\n' : '\n';
+    const lines = text.split(/\r?\n/);
+    const [line] = lines.splice(row.line - 1, 1);
+    writeFileSync(path, lines.join(eol), 'utf-8');
+    return { removed: true, line, path };
+  });
+}
+
+/**
+ * Undo a removal: put a pending row back at the end of the Pending section.
+ * The line comes from the browser, so it must be one pending row and nothing
+ * else; a link that is back already is not added twice.
+ *
+ * @param {{root?: string, line: string}} input
+ */
+export async function restoreInboxLine({ root, line } = {}) {
+  const text = typeof line === 'string' ? line : '';
+  const match = ROW_RE.exec(text);
+  if (!match || /[\r\n]/.test(text) || match[1].toLowerCase() === 'x' || text.length > 4096) {
+    throw new InboxError('That is not a To review line', { code: 'inbox-line-invalid' });
+  }
+  const { row } = parsePending(match[2].replace(ERROR_SUFFIX_RE, ''), 0);
+  const key = normalizeUrl(validateInboxUrl(row.url));
+  const path = inboxPath(root);
+  return locked(path, () => {
+    const current = readInbox({ root });
+    if (current.pending.some((r) => normalizeUrl(r.url) === key)) return { restored: false, path };
+    const file = readFileSync(path, 'utf-8');
+    const eol = file.includes('\r\n') ? '\r\n' : '\n';
+    const lines = file.split(/\r?\n/);
+    const pendingAt = lines.findIndex((l) => PENDING_MARKERS.includes(l.trim()));
+    if (pendingAt === -1) throw new InboxError('The inbox has no "## Pending" section — fix data/pipeline.md by hand', { code: 'inbox-malformed', status: 409 });
+    let end = pendingAt + 1;
+    while (end < lines.length && !lines[end].trim().startsWith('## ')) end += 1;
+    let insertAt = end;
+    while (insertAt > pendingAt + 1 && lines[insertAt - 1].trim() === '') insertAt -= 1;
+    lines.splice(insertAt, 0, text);
+    writeFileSync(path, lines.join(eol), 'utf-8');
+    return { restored: true, path };
+  });
+}

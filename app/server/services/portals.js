@@ -101,7 +101,8 @@ function scalarLine(key, value) {
 
 /** Locate a top-level key's line range: `[headerLine, endExclusive)`. */
 function sectionRange(lines, key) {
-  const header = new RegExp(`^${key}:\\s*(#.*)?$`);
+  // `key: []` is how a section emptied by the console is written (see deleteEntry).
+  const header = new RegExp(`^${key}:\\s*(\\[\\]\\s*)?(#.*)?$`);
   const start = lines.findIndex((line) => header.test(line));
   if (start === -1) return null;
   let end = lines.length;
@@ -181,12 +182,16 @@ function load(root) {
       code: error.code === 'ENOENT' ? 'portals-missing' : 'portals-unreadable',
       message:
         error.code === 'ENOENT'
-          ? 'No portals.yml yet — add a company to create one.'
+          ? 'No portals.yml yet — follow a company to create one.'
           : `Could not read portals.yml: ${error.message}`,
     });
     return { path, exists: false, text: null, lines: [], doc: null, sections: {}, issues };
   }
+  return index(path, text, issues);
+}
 
+/** Parse and index a portals.yml text. `exists` says whether it is on disk yet. */
+function index(path, text, issues = [], exists = true) {
   let doc = null;
   try {
     // JSON_SCHEMA for the same reason reports.js uses it: the file is user-owned
@@ -207,7 +212,39 @@ function load(root) {
     sections[kind] = { key, range, items: split.items, indent: split.indent };
   }
 
-  return { path, exists: true, text, lines, doc, sections, issues };
+  return { path, exists, text, lines, doc, sections, issues };
+}
+
+/**
+ * The file a first follow starts from, when there is no portals.yml yet.
+ *
+ * Upstream's `templates/portals.example.yml` is one maintainer's search: its
+ * title filter keeps only AI, platform and solutions titles, so copying it would
+ * silently drop most other people's jobs. The seed keeps upstream's format and
+ * its intern exclusions, and leaves `positive` empty, which `scan.mjs` reads as
+ * "every title passes". Only the section being added is written: an empty
+ * top-level key parses as null, which `validate-portals.mjs` rejects.
+ */
+export function seedText(kind) {
+  return [
+    '# Companies and job boards to check for new openings (career-ops portals.yml).',
+    '# Created by Job Search Console when you followed your first company.',
+    '# Every option is documented in templates/portals.example.yml.',
+    '#',
+    '# title_filter: a job title is kept when it contains one of the `positive`',
+    '# keywords (an empty list keeps every title) and none of the `negative` ones.',
+    '# Add the roles you are looking for to `positive` to narrow the scan.',
+    '',
+    'title_filter:',
+    '  positive: []',
+    '  negative:',
+    '    - "word:Intern"',
+    '    - "word:Interns"',
+    '    - "Internship"',
+    '',
+    `${SECTIONS[kind]}:`,
+    '',
+  ].join('\n');
 }
 
 /** Project one parsed entry into the wire shape, keeping unknown keys visible. */
@@ -533,7 +570,7 @@ function checkIdentity(block, expectedName) {
 
 /** Reject edits to a file whose YAML and line index disagree. */
 function requireEditable(state, kind) {
-  if (!state.exists) throw new PortalsError('No portals.yml to edit', { code: 'portals-missing', status: 404 });
+  if (state.text === null) throw new PortalsError('No portals.yml to edit', { code: 'portals-missing', status: 404 });
   if (state.doc === null) {
     throw new PortalsError('portals.yml does not parse; fix it by hand first', { code: 'portals-unparseable', status: 422 });
   }
@@ -553,7 +590,18 @@ function requireEditable(state, kind) {
  */
 export function createEntry({ root, kind, entry, etag }) {
   if (!(kind in SECTIONS)) throw new PortalsError(`Unknown entry kind "${kind}"`, { code: 'kind-unknown' });
-  const state = load(root);
+  let state = load(root);
+  // The first follow creates the file (ia.md §4). A client that loaded the page
+  // while the file was missing sends no etag; one that sends an etag saw a file
+  // that has since gone, which is as stale as an edited one.
+  if (!state.exists && state.issues.some((i) => i.code === 'portals-missing')) {
+    if (etag !== undefined && etag !== null && etag !== '') {
+      throw new PortalsError('portals.yml changed on disk since it was loaded — reload before saving', { code: 'stale-etag', status: 409 });
+    }
+    const text = seedText(kind);
+    state = index(state.path, text, [], false);
+    etag = etagOf(text);
+  }
   requireEditable(state, kind);
 
   const fields = normalizeEntry(entry, { partial: false });
@@ -566,6 +614,8 @@ export function createEntry({ root, kind, entry, etag }) {
   }
 
   const lines = [...state.lines];
+  // An emptied section reads `key: []`; it becomes a list header again.
+  lines[section.range.start] = lines[section.range.start].replace(/^(\w+):\s*\[\]/, '$1:');
   const last = section.items.at(-1);
   const at = last ? last.endLine : section.range.start + 1;
   lines.splice(at, 0, '', ...renderEntry(fields, section.indent));
@@ -648,6 +698,12 @@ export function deleteEntry({ root, kind, index, name, etag }) {
   let count = block.endLine - block.startLine;
   if (lines[block.startLine + count] === '') count += 1;
   lines.splice(block.startLine, count);
+  // A section with nothing left under it would read as null, which upstream's
+  // validator rejects; the last entry out leaves an explicit empty list.
+  if (state.sections[kind].items.length === 1) {
+    const at = state.sections[kind].range.start;
+    lines[at] = lines[at].replace(/^(\w+):\s*(#.*)?$/, (_, key, comment) => `${key}: []${comment ? ` ${comment}` : ''}`);
+  }
 
   const expected = expectedDoc(state.doc, kind, (list) => { list.splice(index, 1); });
   return commit(state, lines.join('\n'), expected, { etag });

@@ -14,6 +14,7 @@
  * Only when none of those work does it fall back to a shell, and it says so.
  */
 
+import { execFile } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { posix, win32 } from 'node:path';
 
@@ -85,4 +86,29 @@ export function resolveClaudeCommand({ env = process.env, platform = process.pla
     }
   }
   return { file: wanted, args: [], source: 'missing', display: wanted, found: false, shell: false };
+}
+
+/**
+ * Ask the CLI for its version: the first-run "AI assistant" check (ia.md §2.1).
+ *
+ * `--version` answers without signing in or spending anything, so it proves the
+ * CLI starts, not that the account works; a sign-in problem surfaces on the
+ * first real check, explained in words by the runner. Never throws.
+ *
+ * @param {{file: string, args: string[], found: boolean, shell: boolean}} cmd - from resolveClaudeCommand
+ * @param {{timeoutMs?: number}} [options]
+ * @returns {Promise<{ok: boolean, version: string|null, error: string|null}>}
+ */
+export function checkClaudeVersion(cmd, { timeoutMs = 5000 } = {}) {
+  if (!cmd?.found) return Promise.resolve({ ok: false, version: null, error: 'not-found' });
+  return new Promise((resolve) => {
+    execFile(cmd.file, [...cmd.args, '--version'], { timeout: timeoutMs, shell: cmd.shell, windowsHide: true }, (error, stdout, stderr) => {
+      if (error) {
+        resolve({ ok: false, version: null, error: error.killed ? 'timeout' : String(stderr || error.message).trim().split(/\r?\n/)[0] || 'failed' });
+        return;
+      }
+      const version = /\d+\.\d+\.\d+\S*/.exec(stdout)?.[0] ?? (stdout.trim() || null);
+      resolve({ ok: true, version, error: null });
+    });
+  });
 }

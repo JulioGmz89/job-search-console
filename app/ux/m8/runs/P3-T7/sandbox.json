@@ -1,0 +1,20 @@
+{
+  "url": "http://127.0.0.1:4487/",
+  "state": "broken",
+  "startedAt": 1791353224330,
+  "root": "C:\\Users\\julio\\AppData\\Local\\Temp\\jsc-ux-broken-ImYSpv",
+  "scenario": "auto",
+  "delayMs": 8000,
+  "failedRun": {
+    "id": "49c5fc60-8fd4-4d1a-8d10-7eda088aaeb7",
+    "status": "failed"
+  },
+  "pid": 20332,
+  "flags": {
+    "task": "T7",
+    "state": "broken",
+    "delay": 8000,
+    "scenario": "auto",
+    "budget": 40
+  }
+}

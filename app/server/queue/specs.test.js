@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 
 import { repoRoot } from '../services/paths.js';
-import { buildSpec, describeKinds, internalSpec, RUN_KINDS, SpecError } from './specs.js';
+import { buildSpec, describeKinds, internalSpec, RUN_KINDS, SpecError, summarizeFindings } from './specs.js';
 
 test('every script kind names a script that exists upstream', () => {
   for (const [kind, def] of Object.entries(RUN_KINDS)) {
@@ -71,6 +71,15 @@ test('a real scan chains the skills fetch; a dry run does not', () => {
   assert.throws(() => buildSpec('skills-fetch-auto'), (e) => e.code === 'kind-unknown');
 });
 
+test('a scan says which openings it added, from its own output', () => {
+  const real = buildSpec('scan', {});
+  const lines = ['Scanning 2 companies', '  + Lumen Grid | Platform Engineer | Remote (US)', 'done'].map((text) => ({ text }));
+  const { result } = real.hooks.after({ dryRun: false, lines }, { provisional: { status: 'succeeded' } });
+  assert.deepEqual(result.added, [{ company: 'Lumen Grid', title: 'Platform Engineer', location: 'Remote (US)' }]);
+  assert.equal(result.preview, false);
+  assert.ok(Array.isArray(result.unreachable));
+});
+
 test('a confined scan runs in the data root, so its relative bookkeeping paths stay there', () => {
   assert.equal(buildSpec('scan', {}, { root: '/tmp/sandbox' }).cwd, '/tmp/sandbox');
   assert.equal(buildSpec('scan', {}).cwd, undefined);
@@ -124,4 +133,33 @@ test('describeKinds is the UI vocabulary and carries no argv builders', () => {
     assert.equal(kind.args, undefined);
     assert.equal(kind.parseProgress, undefined);
   }
+});
+
+test('read-only checks say what they found, in words (R-final-03)', () => {
+  const lines = (...texts) => texts.map((text) => ({ text }));
+  const portals = summarizeFindings(lines('verify-portals: portals.yml', '  ✅ Kestrel Media — greenhouse/kestrelmedia (12 jobs)', '  ❌ Juniper Mobility — greenhouse/junipermobility (slug not found) — HTTP 404'));
+  assert.deepEqual(portals, { findings: ['Juniper Mobility: board not found'], total: 1, clean: false });
+  const pipeline = summarizeFindings(lines('⚠️  Possible duplicates: #4, #24 (Driftwood Analytics)', '📊 Pipeline Health: 0 errors, 1 warnings'));
+  assert.deepEqual(pipeline.findings, ['Possible duplicates: #4, #24 (Driftwood Analytics)']);
+  assert.deepEqual(summarizeFindings(lines('  ❌ Juniper Mobility — greenhouse/junipermobility (slug not found) — HTTP 404 → try lever/juniper')).findings, ['Juniper Mobility: board not found; its board may now be lever/juniper']);
+  assert.equal(summarizeFindings(lines('✅ Statuses', '🟢 Pipeline is clean!')).clean, true);
+  assert.equal(summarizeFindings(lines('something unrecognised')).clean, false, 'silence is not a clean bill');
+});
+
+test('the companies-list check says its findings, or that it is clean', () => {
+  const lines = (...texts) => texts.map((text) => ({ text }));
+  assert.deepEqual(summarizeFindings(lines('validate-portals: /w/portals.yml', 'warning: tracked_companies[2].api: not a URL', 'error: tracked_companies[0]: name is required', '1 errors, 1 warnings')), {
+    findings: ['Company 3 in your list, its data link (API): not a URL', 'Company 1 in your list: name is required'],
+    total: 2,
+    clean: false,
+  });
+  assert.equal(summarizeFindings(lines('validate-portals: /w/portals.yml', '0 errors, 0 warnings')).clean, true);
+  assert.deepEqual(summarizeFindings(lines('validate-portals failed: file not found: /w/portals.yml')).findings, ['There is no companies list yet: follow a company first.']);
+});
+
+test('a findings check says what it found even when it exits non-zero (R-disc-03)', () => {
+  const spec = buildSpec('validate-portals', {}, { root: repoRoot, repoRoot });
+  const run = { lines: [{ text: 'validate-portals failed: file not found: /w/portals.yml' }] };
+  assert.deepEqual(spec.hooks.after(run, { provisional: { status: 'failed' } }).result.findings, ['There is no companies list yet: follow a company first.']);
+  assert.deepEqual(spec.hooks.after(run, { provisional: { status: 'cancelled' } }), {});
 });

@@ -167,11 +167,18 @@ T5 gets a budget of 50 (two documents, a four-question form, and two agent waits
 - **Start state:** `populated`.
 - **Success criterion:** checked against `GET /api/skills` at the end of the run (the data
   can change if the tester starts a reading run):
-  1. The named skill is one of the first three ids of `lists.learn` (whether or not the
-     tester narrowed to strong matches).
-  2. The answer cites evidence that matches that skill's entry: its `demand` count (±1),
-     or at least one company among its `postings` (via `postings[id].company`) or
-     `gapReports`.
+  1. The named skill is one of the top three in any of these rankings:
+     - the first three ids of `lists.learn`;
+     - the Learn next view as the page ranks it (by postings asking for it);
+     - the same view with **Only jobs I'd apply to (fit 4 and up)** on, which re-ranks
+       by good-fit postings (M7 decision D-3, after WP-T6-01).
+
+     The page's two rankings come from `rankSkills()` in `app/ui/src/lib/skills.js`,
+     which the checker imports, so it accepts exactly the order the tester saw.
+  2. The answer cites evidence that matches that skill in the same ranking: its count
+     (±1), or at least one company among the postings counted. For the filtered ranking
+     that means the good-fit postings only. The unfiltered `demand` and `gapReports`
+     companies are also accepted.
 - **Step budget:** 40.
 - **Personas:** P1, P2, P3.
 
@@ -237,122 +244,139 @@ T5 gets a budget of 50 (two documents, a four-question form, and two agent waits
 
 ---
 
+## first-job — From an empty workspace to a first evaluated job (M8 acceptance)
+
+Added in M8 for the acceptance criterion in PROJECT_PLAN.md §8 M8: "in a fresh sandbox,
+a simulated first-time persona gets from an empty workspace to a first evaluated job
+without leaving the app". It chains T1 and T2 in one run and one context, so nothing
+carries over between them except what the app itself shows.
+
+- **Goal (give verbatim):**
+  > You have just installed this app and opened it for the first time. Get it ready for
+  > your job search: it needs your CV (below), and it should keep an eye on one company
+  > for new openings, Kestrel Media, whose careers page is
+  > https://job-boards.greenhouse.io/kestrelmedia
+  >
+  > Then use the app to find out whether this job is a good fit for you:
+  > https://job-boards.greenhouse.io/kestrelmedia/jobs/4134913
+  > Tell me what the app concluded. Do everything inside the app; do not open a
+  > terminal or edit files.
+  >
+  > Your CV:
+  >
+  > ```
+  > # Alex Rivera
+  > Austin, TX (remote) · alex.rivera@example.com · +1 555 010 0199
+  >
+  > ## Summary
+  > Backend engineer with seven years building payment and data platforms in
+  > TypeScript and Go.
+  >
+  > ## Experience
+  > ### Senior Backend Engineer — Northwind Payments (2022–present, remote)
+  > - Rebuilt the settlement pipeline as an event-driven Go service; reconciliation
+  >   went from 4 hours to 25 minutes.
+  > - Moved cron jobs to a queue-backed scheduler with idempotent retries; payment
+  >   incidents fell 60% in two quarters.
+  > ### Backend Engineer — Contoso Analytics (2019–2022, Austin)
+  > - Designed the public REST API (TypeScript, PostgreSQL) used by 3,000 integrations.
+  >
+  > ## Education
+  > B.S. Computer Science, University of Texas at Austin (2017)
+  >
+  > ## Skills
+  > Go, TypeScript, SQL, Python, Kubernetes, Docker, Terraform, AWS, PostgreSQL, Kafka
+  > ```
+- **Start state:** `empty` (default `--delay 8000`).
+- **Success criterion:** all hold (`check-task.mjs --task first-job`):
+  1. `GET /api/agent/status` → `cvPresent: true`.
+  2. `GET /api/portals` → `exists: true` with at least one enabled company.
+  3. `GET /api/runs` → a succeeded `evaluate` run.
+  4. `GET /api/pipeline` → at least one row with a report.
+- **Step budget:** 60.
+- **Personas:** P2 (the first-timer) for acceptance; P1 and P3 optional.
+
 ## Expected paths (never shown to testers)
 
-The shortest path through the current UI, with on-screen labels. Counts are browser
-actions; waits are listed where a run must finish. Inventory row ids in brackets.
+The shortest path through the M8 UI (app/ux/design/ia.md), with on-screen labels. The
+walkthroughs and the ux-reviewer use these; the blind persona-tester never sees them.
+The M6 paths through the old UI are in git history (M6, `app/ux/tasks.md`).
 
 ### T1 (empty)
 
-No path completes the task.
-1. Pipeline shows "1 data issue found" (`tracker-missing`) and "No applications match
-   these filters."; "Evaluate now" is disabled with the reason "No cv.md in the data
-   directory yet" [UI-pipeline-evaluate-now, R-agent-status].
-2. Nowhere accepts CV text [C-cv-md]. CV Studio only offers the fictional sample CV in
-   "CV" [UI-cv-document].
-3. "Sources" → "1 issue(s) in portals.yml"; both "Add" buttons are disabled
-   [UI-sources-add-company, R-portals-create, C-portals-yml].
-
-Expected outcome: fail on both criteria. Record the first place each persona looks for
-"upload my CV" and "add a company", and the step at which they stop.
+1. Today opens on **Welcome. Let’s get you set up.** with **Get set up**: three steps.
+2. **Add your CV**: paste the CV into **Your CV** (or **Choose a file…**) → **Save my CV**.
+   The step shows "Saved: Alex Rivera · Summary, Experience (2 roles), Education, Skills".
+3. **Follow a company**: **Company name** "Kestrel Media", **Careers page link** the
+   Greenhouse URL → **Follow company**. The step shows "Following Kestrel Media ·
+   Greenhouse job board recognised from the link". `portals.yml` is created.
+4. **AI assistant** is already ticked in the sandbox ("Claude Code is installed").
+5. **You’re set up** appears, with focus on it.
 
 ### T2 (populated)
 
-1. Click "Paste a job posting URL…" and paste the URL [UI-pipeline-url].
-2. "PDF if score ≥ 3.5" is already ticked [UI-pipeline-autopdf]; click "Evaluate now"
-   [UI-pipeline-evaluate-now].
-3. Wait for the run panel below the paste box to show "Finished" (~8 s; the merge and
-   inbox reconcile follow, then a PDF run because 4.1 ≥ 3.5).
-4. The new row 41 "Kestrel Media · Senior Backend Engineer · 4.1" appears in the table.
-5. Click the row, scroll to the detail, read "Decision" and the report
-   [UI-pipeline-open-row].
-
-About 5–7 actions.
+1. **Applications** → **Add a job** → **Link to the job posting**: paste the URL.
+2. **Check fit now** (the line under the field says it takes 2–5 minutes and uses the
+   Claude plan). The check's card appears under the button, working (~8 s).
+3. It finishes: "Fit 4.1 / 5. The fit report is ready." → **Open the job** (focus is
+   on it). The job page shows **Fit 4.1 / 5 · Recommendation: Apply**.
+   (Also from Today › **Check your first job** when there are no applications.)
 
 ### T3 (populated)
 
-1. Click the "Evaluated" status chip [UI-pipeline-status-filter]; the table is already
-   sorted by "Score ↓" [UI-pipeline-sort].
-2. Row 12 (Cobalt Freight, 4.2): Status select → "Applied" [UI-pipeline-status-cell].
-   The row leaves the filtered view after the reload.
-3. Row 13 (Driftwood Analytics, 3.9): Status select → "Applied".
-
-3 actions.
+1. **Applications** opens sorted by fit, best first. Optional: the **Reviewed — not
+   applied** chip, or **Fit** "4 and up".
+2. For row 12 and row 13: **Status for … — …** → **Applied** → **When did you apply…?**
+   → **Save as Applied**. "Saved: Applied" shows on the row, with Undo.
 
 ### T4 (populated)
 
-1. "Sources" [UI-nav-sources].
-2. "Scan now" [UI-sources-scan]; wait for "Finished" (seconds; the log arrives all at
-   once).
-3. Read the log summary and the line "<n> URL(s) waiting to be evaluated · last scan
-   <date>: … found, 4 added …"; "Show the inbox" lists the new ones
-   [UI-sources-inbox-toggle].
-4. In "Tracked companies", Juniper Mobility's "Last seen" reads "board not found".
-
-3–4 actions plus reading.
+1. **To review** → **Check for new openings** (a few seconds, no AI).
+2. The summary card: "Last check, …: 4 new openings", naming them, and "Juniper
+   Mobility couldn’t be reached (board not found) — Fix in Companies". The four links
+   carry **New**; the top bar's To review shows the count.
 
 ### T5 (populated)
 
-1. Type "Granite" in "Filter company, role, notes…" [UI-pipeline-search] (or find row 6).
-2. Row 6 (Granite Cloud, Software Engineer, Payments): "PDF" [UI-pipeline-row-pdf].
-3. Same row: "Cover" [UI-pipeline-row-cover] → dialog "Cover letter for Granite Cloud".
-4. Fill "A. Why this role / company?", "B. What problem would you solve for them?",
-   "C. How would you approach it?" [UI-pipeline-cover-why/-problem/-approach].
-5. "D. Tone" → "Direct — …" [UI-pipeline-cover-tone].
-6. "Draft and render the letter" → the app jumps to the Runs page with the letter's log.
-7. Wait for "PDF for Granite Cloud" and "Cover letter for Granite Cloud" to finish (two
-   agent lanes, so they overlap; the PDF chains a "Render CV" and "Mark PDF ready").
-8. "Pipeline", click row 6, scroll to the detail; "PDF" tab and "Cover letter" tab
-   [UI-pipeline-detail-tab-pdf, UI-pipeline-detail-tab-cover].
-
-About 12–14 actions.
+1. **Applications** → open row 6 (or search "Granite Cloud" in the top bar).
+2. **Documents** → Tailored CV: **Make tailored CV** (~8 s) → Ready, with **Open** and
+   **Download**.
+3. Cover letter: **Write cover letter** → answer **Why this role?**, **What problem would
+   you solve for them?**, **How would you start?** → **Write the letter** (~8 s) → Ready.
 
 ### T6 (populated)
 
-1. "Skills" [UI-nav-skills]; the "Learn next" tab is selected [UI-skills-tab-learn].
-2. Optional: tick "Jobs I’d apply to" [UI-skills-strong].
-3. Click "▸ <top skill>" to expand its evidence: "<n> postings ask for <skill>", the
-   companies, and "flagged as a gap in report <nnn>" [UI-skills-expand].
-
-2–3 actions plus reading.
+1. **Skills** opens on **Learn next**, ranked by how many postings ask for each skill.
+2. Optional: **Only jobs I’d apply to (fit 4 and up)** re-ranks by good-fit postings.
+3. The top skill's row: "Asked for in N postings (…)" and **Show the evidence for …**
+   lists the companies.
 
 ### T7 (broken)
 
-1. "CV Studio" [UI-nav-cv].
-2. "CV" select → the Cobalt Freight Staff Software Engineer CV
-   (`cv-alex-rivera-cobaltfreight-012`) [UI-cv-document]. The preview shows "🚨 ATS check
-   failed — an applicant-tracking system will lose part of this CV" and the selected card
-   shows "ATS fail · <n> critical".
-3. Click a theme card marked "ATS pass" [UI-cv-theme-pick]; optionally change "Accent
-   colour" [UI-cv-accent].
-4. "Save & render this CV" [UI-cv-render] (saves `style.yml`, then queues `cv-render`).
-5. Wait for the run panel to show "Finished"; the preview verdict reads "✓ ATS check
-   passed".
-
-5–6 actions.
+1. Today › **Your CV design fails the screening check** → **Choose a design that passes**
+   (or **My CV** › **Design**). The preview says **Screening problems** with what is lost.
+2. Choose a design marked **Readable by screening systems** (or **Show a design that
+   passes**) → **Make this my design for every CV**.
+3. **Preview with** "Cobalt Freight — Staff Software Engineer, …" → **Lay out this CV
+   again in …** (a few seconds, no AI), or **Update existing CVs to this design (6)** →
+   confirm. The CV's verdict is readable.
 
 ### T8 (broken)
 
-1. "Runs" [UI-nav-runs]; under "Finished", the row with status "Failed", run
-   "Evaluate job-boards.greenhouse.io", about the Driftwood Analytics URL.
-2. Click it [UI-runs-open]; the log at the top of the page shows the failure (the session
-   wrote no report).
-3. There is no retry. Shortest recovery: "Sources" → "Show the inbox" → "Evaluate" on
-   "Data Engineer · Driftwood Analytics" [UI-sources-inbox-evaluate]. (Alternative: paste
-   the URL into "Paste a job posting URL…" on Pipeline and click "Evaluate now".)
-4. Wait for the evaluation to finish (~8 s plus chained merge and reconcile).
-
-About 5–6 actions.
+1. Today › **Needs you** → "Check fit · Driftwood Analytics — Data Engineer" with **What
+   happened:** "…stopped before writing the fit report…" and **What to do:** "Try again…"
+   (the Activity button reads **Activity · 1 failed**).
+2. **Try again** (~8 s) → "Tried again: that worked" → **Open the job** (row 41).
 
 ### T9 (populated)
 
-1. "CV Studio" [UI-nav-cv]; scroll to "Voice — writing rules" [UI-cv-voice-text].
-2. In the textarea, under "## Never write", add "- seamless", "- cutting-edge",
-   "- robust".
-3. "Save voice rules" [UI-cv-voice-save]; notice "voice-dna.md saved. It applies to the
-   next cover letter or PDF."
-4. "Pipeline"; row 12 (Cobalt Freight, Staff Software Engineer) → "PDF ↻"
-   [UI-pipeline-row-pdf] (it already has a PDF).
-5. Wait for "PDF for Cobalt Freight" and its "Render CV" to finish.
+1. **My CV** › **Writing rules** → **Words to avoid**: **Add a word** "seamless" → **Add**,
+   then "cutting-edge", then "robust". The five words already there stay.
+2. **When rules apply** lists every tailored CV, best fit first; Cobalt Freight — Staff
+   Software Engineer (#12) says "made before your rules changed" → **Make it again**
+   (~8 s), or from the job page › Documents › **Make it again**.
 
-About 6–7 actions.
+### first-job (empty)
+
+T1, then Today › **Check your first job** → paste the posting link → **Check fit now** →
+"Fit 4.1 / 5" → **Open the job**: it is application #1 in **Applications**.

@@ -24,7 +24,7 @@
 
 import { readFileSync } from 'node:fs';
 
-import { portalHealthPath, scanRunsPath } from './paths.js';
+import { portalHealthPath, scanHistoryPath, scanRunsPath } from './paths.js';
 
 /** `Verifying liveness of 47 new offer(s) with Playwright (sequential)...` */
 const VERIFY_HEADER_RE = /^Verifying liveness of (\d+) new offer\(s\)/;
@@ -160,13 +160,32 @@ export function readLastScanRun({ root } = {}) {
  * page wants only the current state.
  *
  * @param {{root?: string}} [options]
- * @returns {Record<string, {status: string, timestamp: string}>}
+ * @returns {Record<string, {status: string, timestamp: string, since: string}>}
  */
 export function readPortalHealth({ root } = {}) {
   const health = {};
   for (const row of readTsv(portalHealthPath(root))) {
     if (!row.company) continue;
-    health[row.company] = { status: row.status, timestamp: row.timestamp };
+    const before = health[row.company];
+    // `since`: when the current status began, so "board not found since Sep 24"
+    // does not move to today each time the board is checked again.
+    const since = before && before.status === row.status ? before.since : row.timestamp;
+    health[row.company] = { status: row.status, timestamp: row.timestamp, since };
   }
   return health;
+}
+
+/**
+ * URL → the day the scanner first saw it, from `data/scan-history.tsv`. Today's
+ * "New since you last looked" compares this with when the user last looked.
+ *
+ * @param {{root?: string}} [options]
+ * @returns {Map<string, string>}
+ */
+export function readFirstSeen({ root } = {}) {
+  const seen = new Map();
+  for (const row of readTsv(scanHistoryPath(root))) {
+    if (row.url && row.first_seen && !seen.has(row.url)) seen.set(row.url, row.first_seen);
+  }
+  return seen;
 }

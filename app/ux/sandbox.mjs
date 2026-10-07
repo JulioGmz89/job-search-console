@@ -120,7 +120,13 @@ function sweepOrphans() {
       }
     }
     // A copy younger than a minute without a pid file may be another sandbox still starting.
-    const young = Date.now() - statSync(dir).mtimeMs < 60_000;
+    let young;
+    try {
+      young = Date.now() - statSync(dir).mtimeMs < 60_000;
+    } catch {
+      // Another sandbox starting at the same moment removed it first.
+      continue;
+    }
     if (alive || (pid === null && young)) continue;
     try {
       rmSync(dir, { recursive: true, force: true, maxRetries: 3 });
@@ -136,6 +142,8 @@ const root = mkdtempSync(join(tmpdir(), `jsc-ux-${opts.state}-`));
 writeFileSync(join(root, '.sandbox-pid'), String(process.pid), 'utf-8');
 cpSync(seed, root, { recursive: true });
 for (const dir of ['prompts', 'logs', 'tmp']) mkdirSync(join(root, 'data', 'jsc', dir), { recursive: true });
+// As the server's own start does (server/index.js): reconcile-pipeline.mjs needs batch/ to exist.
+mkdirSync(join(root, 'batch'), { recursive: true });
 
 // Read when the server builds its runner and on every spawn: set them first.
 process.env.JSC_CLAUDE_BIN = FAKE_CLAUDE;

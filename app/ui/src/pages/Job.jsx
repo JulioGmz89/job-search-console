@@ -1,0 +1,352 @@
+import { useEffect, useState } from 'react';
+
+import { fetchReport, fetchStatusHistory } from '../api.js';
+import { Documents } from '../components/Documents.jsx';
+import { RunItem } from '../components/RunItem.jsx';
+import { saveStatus, StatusControl, WhenDialog } from '../components/StatusControl.jsx';
+import { ConfirmDialog, CostNote, HelpLink } from '../components/ui.jsx';
+import { useResource } from '../data.js';
+import { fit, jobName, shortDate, statusLabel } from '../lib/labels.js';
+import { mergeInfo, mergeText, needsAttention, runState, runTitle } from '../lib/runs.js';
+import { latest, runsForJob, useRuns } from '../runs.jsx';
+import { announce } from '../shell/announce.jsx';
+import { PageHead, useAnchor } from '../shell/router.jsx';
+
+const CLOSED = new Set(['rejected', 'discarded', 'skip', 'hired', 'offer']);
+
+const FACTS = [
+  ['legitimacy_tier', 'Is the posting real?'],
+  ['risk_level', 'Risk'],
+  ['confidence', 'Confidence'],
+  ['advertised_comp', 'Advertised pay'],
+  ['next_action', 'Suggested next step'],
+];
+const LISTS = [
+  ['hard_stops', 'Hard stops'],
+  ['soft_gaps', 'Gaps'],
+  ['top_strengths', 'Strengths'],
+];
+
+/** The report, refetched whenever the tracker or a run for it changes. */
+/** The row's recorded status changes (status-log.tsv), refetched with the tracker. */
+function useStatusHistory(rowId, version) {
+  const [entries, setEntries] = useState([]);
+  useEffect(() => {
+    if (!rowId) return undefined;
+    let live = true;
+    fetchStatusHistory(rowId)
+      .then((h) => live && setEntries(h.entries ?? []))
+      .catch(() => live && setEntries([]));
+    return () => {
+      live = false;
+    };
+  }, [rowId, version]);
+  return entries;
+}
+
+function useReport(reportId, version) {
+  const [state, setState] = useState({ report: null, error: null });
+  useEffect(() => {
+    if (!reportId) return undefined;
+    let live = true;
+    fetchReport(reportId)
+      .then((report) => live && setState({ report, error: null }))
+      .catch((error) => live && setState((s) => ({ ...s, error })));
+    return () => {
+      live = false;
+    };
+  }, [reportId, version]);
+  return state;
+}
+
+/** The fit report itself: score, facts, lists and the sanitized sections. */
+function ReportBody({ report, score }) {
+  const machine = report.machine ?? {};
+  return (
+    <div className="card">
+      <p>
+        <b>Fit {fit(score)} / 5.</b> The assistant compares the posting with your CV and profile, part by part, and scores the match from 1 to 5; 4 and up is a strong fit, under 3
+        usually means skip.
+      </p>
+      {FACTS.some(([k]) => machine[k]) ? (
+        <dl className="facts">
+          {FACTS.filter(([k]) => machine[k]).map(([k, label]) => (
+            <div key={k} className="contents">
+              <dt>{label}</dt>
+              <dd>{String(machine[k])}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+      {LISTS.filter(([k]) => machine[k]?.length).map(([k, label]) => (
+        <p key={k}>
+          <b>{label}:</b> {machine[k].map(String).join(', ')}
+        </p>
+      ))}
+      <div className="prose">
+        {report.sections.map((section) => (
+          <section key={section.title} aria-label={section.title}>
+            <h3>{section.title}</h3>
+            {/* Sanitized on the server (services/reports.js), the one choke point for posting content. */}
+            <div dangerouslySetInnerHTML={{ __html: section.html }} />
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A fit report with no row in Applications: never merged, or its row removed
+ * (R-reports-list). Readable, with the way back into Applications.
+ */
+function ReportOnly({ reportId, back }) {
+  const { list, start } = useRuns();
+  // The check started here, shown where it was clicked with its result (R-disc-02).
+  const [runId, setRunId] = useState(null);
+  const run = runId ? (list.find((r) => r.id === runId) ?? null) : null;
+  const { report, error } = useReport(reportId, 'once');
+  if (!report) return <PageHead title={error ? 'Fit report not found' : 'Loading…'} back={back} lead={error ? error.message : null} />;
+  const machine = report.machine ?? {};
+  const title = [machine.company ?? report.header?.company, machine.role ?? report.header?.role].filter(Boolean).join(' — ') || `Fit report ${reportId}`;
+  return (
+    <>
+      <PageHead title={title} docTitle={title} back={back} lead={`Fit report ${reportId}${report.header?.date ? ` · ${shortDate(report.header.date)}` : ''}`} />
+      <div className="notice info stack-sm">
+        <p>This fit report isn’t in your Applications. It was never added, or its application was merged into another one or removed.</p>
+        {run ? (
+          <div data-run-home>
+            <RunItem run={run} headingLevel={2} takeFocus />
+          </div>
+        ) : null}
+        {report.url && !run ? (
+          <div className="row">
+            <button
+              type="button"
+              className="btn2 btn-sm"
+              onClick={async () => {
+                try {
+                  const started = await start('evaluate', { url: report.url, autoPdf: false });
+                  setRunId(started.id);
+                  announce(`Started: ${runTitle(started)}`);
+                } catch (e) {
+                  announce(`Could not start the check: ${e.message}`, { assertive: true });
+                }
+              }}
+            >
+              Check fit again and add it to Applications
+            </button>
+            <CostNote />
+            <a href={report.url} target="_blank" rel="noopener noreferrer">
+              Open the posting ↗<span className="visually-hidden"> (opens in a new tab)</span>
+            </a>
+          </div>
+        ) : null}
+      </div>
+      <section aria-labelledby="rep-h" className="stack" id="report">
+        <h2 id="rep-h">Fit report</h2>
+        <ReportBody report={report} score={machine.score ?? report.score ?? null} />
+      </section>
+    </>
+  );
+}
+
+/**
+ * One job (ia.md §2.3): a full page, never below the list. Summary, Documents,
+ * Fit report and History, each a heading with its own anchor.
+ */
+export function JobPage({ params }) {
+  const pipeline = useResource('pipeline');
+  const { list, start } = useRuns();
+  const anchor = useAnchor();
+  const [confirmAgain, setConfirmAgain] = useState(false);
+  const [askSent, setAskSent] = useState(false);
+  const rows = pipeline.data?.rows ?? [];
+  const row = params.id ? rows.find((r) => r.id === params.id) : rows.find((r) => r.reportId === params.reportId);
+
+  // An old link by report number lands on the job's own address.
+  useEffect(() => {
+    if (params.reportId && row) window.history.replaceState(null, '', `#/applications/${row.id}`);
+  }, [params.reportId, row]);
+
+  const runs = row ? runsForJob(list, { reportId: row.reportId, url: row.report?.url }) : [];
+  const finishedCount = runs.filter((r) => ['done', 'failed'].includes(runState(r))).length;
+  const version = `${pipeline.data ? pipeline.at ?? '' : ''}-${finishedCount}-${pipeline.data?.rows?.length}-${row?.status ?? ''}`;
+  const { report, error } = useReport(row?.reportId, version);
+  const changes = useStatusHistory(row?.id, version);
+
+  useEffect(() => {
+    if (anchor && report) document.getElementById(anchor === 'cover' ? 'documents' : anchor)?.scrollIntoView();
+  }, [anchor, report]);
+
+  const back = <a href="#/applications">← Applications</a>;
+  if (!pipeline.data) return <PageHead title="Loading…" back={back} />;
+  if (!row) {
+    // A fit report with no Applications row (R-reports-list) is still readable.
+    if (params.reportId) return <ReportOnly reportId={params.reportId} back={back} />;
+    return (
+      <>
+        <PageHead title="Job not found" back={back} lead="It is not in your applications. It may have been merged into another application or removed from your list." />
+      </>
+    );
+  }
+
+  const name = jobName(row);
+  const statusId = String(row.statusId ?? row.status).toLowerCase();
+  const checking = runs.find((r) => r.kind === 'evaluate' && ['waiting', 'working'].includes(runState(r)));
+  const failedCheck = runs.find((r) => r.kind === 'evaluate' && needsAttention(r, list));
+  const lastCheck = latest(runs.filter((r) => runState(r) === 'done'), 'evaluate');
+  // A check merged into a row that already existed (F-015): say what it changed.
+  const merged = lastCheck ? mergeInfo(lastCheck, rows) : null;
+  const machine = report?.machine ?? {};
+  const decision = machine.final_decision ?? row.report?.decision ?? null;
+
+  const checkAgain = async () => {
+    setConfirmAgain(false);
+    const url = report?.url ?? row.report?.url;
+    try {
+      const run = await start('evaluate', { url, autoPdf: false });
+      announce(`Started: ${runTitle(run)}`);
+    } catch (e) {
+      announce(`Could not start the check: ${e.message}`, { assertive: true });
+    }
+  };
+
+  const sent = async (extra) => {
+    setAskSent(false);
+    await saveStatus(row, 'applied', extra);
+    // The button goes away with the status; focus moves to the status it set.
+    setTimeout(() => document.querySelector('#summary .status-control button')?.focus(), 0);
+  };
+
+  return (
+    <>
+      <PageHead title={name} docTitle={name} back={back} lead={[report?.header?.archetype, machine.advertised_comp].filter(Boolean).join(' · ') || null} />
+
+      {merged ? (
+        <p className="notice info">
+          <span className="badge new">Updated</span> {mergeText(merged)} It was first added {shortDate(row.date)}.
+        </p>
+      ) : null}
+      {failedCheck ? (
+        <div className="stack-sm" aria-label="Needs you">
+          <p className="tag attn">Needs you · the last check of this job didn’t finish</p>
+          <RunItem run={failedCheck} headingLevel={2} />
+        </div>
+      ) : null}
+
+      <section aria-labelledby="sum-h" className="card" id="summary">
+        <h2 id="sum-h" className="visually-hidden">
+          Summary
+        </h2>
+        <div className="row between">
+          <p className="big">
+            <b>Fit {fit(row.score)} / 5</b>
+            {decision ? (
+              <>
+                {' '}
+                · Recommendation: <b>{decision}</b>
+              </>
+            ) : null}{' '}
+            <HelpLink topic="fit">How the fit is worked out</HelpLink>
+          </p>
+          {report?.url ? (
+            <a href={report.url} target="_blank" rel="noopener noreferrer">
+              Open the posting ↗<span className="visually-hidden"> (opens in a new tab)</span>
+            </a>
+          ) : null}
+        </div>
+        <div className="row">
+          <span className="label inline-label" id="status-label">
+            Status
+          </span>
+          <StatusControl row={row} statuses={pipeline.data.statuses} />
+        </div>
+        {/* Beside the status it sets, in view on arrival (UI-job-sent). */}
+        {statusId === 'evaluated' ? (
+          <div className="row">
+            <button type="button" className="btn2 btn-sm" onClick={() => setAskSent(true)}>
+              I’ve sent my application
+            </button>
+            <span className="hint inline">Sets the status to Applied, with the date you sent it.</span>
+          </div>
+        ) : null}
+        <div className="row" id="check-again" data-run-home>
+          {checking ? (
+            <RunItem run={checking} headingLevel={3} takeFocus />
+          ) : (
+            <>
+              <button type="button" className="btn2 btn-sm" onClick={() => (CLOSED.has(statusId) ? setConfirmAgain(true) : checkAgain())}>
+                Check fit again
+              </button>
+              <CostNote />
+            </>
+          )}
+        </div>
+        {row.notes ? (
+          <p className="small">
+            <b>Your note:</b> {row.notes}
+          </p>
+        ) : null}
+      </section>
+
+      <section aria-labelledby="docs-h" className="stack" id="documents">
+        <h2 id="docs-h">Documents</h2>
+        {report ? <Documents row={row} report={report} openCover={anchor === 'cover'} /> : <p className="muted">{error ? `Could not load the report: ${error.message}` : 'Loading…'}</p>}
+      </section>
+
+      <section aria-labelledby="rep-h" className="stack" id="report">
+        <h2 id="rep-h">Fit report</h2>
+        {report ? <ReportBody report={report} score={row.score} /> : null}
+      </section>
+
+      <section aria-labelledby="his-h" className="stack" id="history">
+        <h2 id="his-h">History</h2>
+        {/* One list, newest first: this job's runs, its recorded status changes, and when it was added (R-disc-06). */}
+        <ul className="small">
+          {[
+            ...runs
+              .filter((r) => !['merge-tracker', 'mark-pdf-ready', 'reconcile-auto'].includes(r.kind))
+              .map((r) => ({
+                key: r.id,
+                at: r.endedAt ?? r.queuedAt ?? 0,
+                body: (
+                  <>
+                    {shortDate(r.endedAt ?? r.queuedAt)} · <a href={`#/activity/${r.id}`}>{runTitle(r)}</a> — {runState(r)}
+                  </>
+                ),
+              })),
+            ...changes.map((c, i) => ({
+              key: `status-${i}`,
+              // A ledger day sorts after that day's "added" and before the next day's events.
+              at: Date.parse(`${c.date}T12:00:00`) + i,
+              body: (
+                <>
+                  {shortDate(c.date)} · {c.from && c.from !== c.to ? `${statusLabel(c.from)} → ${statusLabel(c.to)}` : statusLabel(c.to)}
+                  {c.source && !['set-status', 'web'].includes(c.source) ? <span className="muted"> · by {c.source}</span> : null}
+                </>
+              ),
+            })),
+            { key: 'added', at: Date.parse(`${row.date}T00:00:00`), body: <>{shortDate(row.date)} · added to Applications</> },
+          ]
+            .sort((x, y) => y.at - x.at)
+            .map((item) => (
+              <li key={item.key}>{item.body}</li>
+            ))}
+        </ul>
+        <p className="small muted">Now {statusLabel(statusId)}.</p>
+      </section>
+
+      <WhenDialog isOpen={askSent} row={row} onConfirm={sent} onCancel={() => setAskSent(false)} />
+      <ConfirmDialog
+        isOpen={confirmAgain}
+        title={`Check ${name} again?`}
+        confirmLabel="Check fit again"
+        onConfirm={checkAgain}
+        onCancel={() => setConfirmAgain(false)}
+      >
+        <p>This job is marked {statusLabel(statusId)}. Checking it again takes 2–5 minutes and uses your Claude plan.</p>
+      </ConfirmDialog>
+    </>
+  );
+}

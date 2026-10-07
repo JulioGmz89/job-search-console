@@ -1,0 +1,239 @@
+/*
+ * tokens.css — Job Search Console design tokens (M7, PROJECT_PLAN.md §8).
+ * Copied from app/ux/design/tokens.css, the approved source (decision D-2);
+ * change both together: design.test.js checks the contrast pairs there.
+ *
+ * The chosen direction ("C + A patterns", ia.md): a graphite top bar, a violet
+ * accent, high-contrast type and A's dense tables. Code-ready. M8 copies this
+ * file into app/ui/src/ and builds every component on these names. The M7
+ * prototypes (prototypes/) already use it.
+ *
+ * Rules:
+ *   - Colours are defined once per scheme, under the same names.
+ *   - Light is the default.
+ *   - Dark follows prefers-color-scheme unless data-theme="light" pins light,
+ *     and data-theme="dark" pins dark. This is the same structure as the old
+ *     styles.css plus an explicit override.
+ *   - Every pair a component uses is listed in CONTRAST PAIRS below and checked
+ *     by design.test.js: text ≥ 4.5:1, UI boundaries and focus ≥ 3:1. This fixes
+ *     A-08 (white text on a light accent in dark mode), A-09, A-14 and F-063 by
+ *     construction.
+ *   - Fonts are local system stacks: no web fonts, no CDN (§9.2).
+ *
+ * CONTRAST PAIRS (foreground on background : minimum)
+ *   text:     --text on --bg, --surface, --surface-2                  4.5
+ *             --text-muted on --bg, --surface, --surface-2            4.5
+ *             --accent-text on --bg, --surface, --accent-soft         4.5
+ *             --on-accent on --accent, --accent-hover                 4.5
+ *             --danger-text on --surface, --danger-soft               4.5
+ *             --on-danger on --danger                                 4.5
+ *             --success-text on --surface, --success-soft             4.5
+ *             --on-success on --success                               4.5
+ *             --warning-text on --surface, --warning-soft             4.5
+ *             --info-text on --surface, --info-soft                   4.5
+ *             --topbar-text on --topbar-bg                            4.5
+ *             --topbar-current-text on --topbar-current-bg            4.5
+ *   ui:       --border-strong on --bg, --surface                      3
+ *             --focus on --bg, --surface                              3
+ *             --topbar-focus on --topbar-bg                           3
+ *             --accent on --surface                                   3
+ *             --danger on --surface                                   3
+ *             --success on --surface                                  3
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ── colour: surfaces ─────────────────────────────── */
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --surface-2: #f4f4f5;
+  --border: #e4e4e7;          /* decorative dividers only, never a control's boundary */
+  --border-strong: #71717a;   /* inputs, selects, chips, secondary buttons */
+
+  /* ── colour: text ─────────────────────────────────── */
+  --text: #18181b;
+  --text-muted: #52525b;
+
+  /* ── colour: accent (primary actions, links, selection) ── */
+  --accent: #6d28d9;
+  --accent-hover: #5b21b6;
+  --accent-soft: #ede9fe;
+  --accent-text: #5b21b6;
+  --on-accent: #ffffff;
+
+  /* ── colour: states ───────────────────────────────── */
+  --danger: #b91c1c;
+  --danger-soft: #fef2f2;
+  --danger-text: #991b1b;
+  --on-danger: #ffffff;
+  --success: #15803d;
+  --success-soft: #f0fdf4;
+  --success-text: #166534;
+  --on-success: #ffffff;
+  --warning: #b45309;
+  --warning-soft: #fffbeb;
+  --warning-text: #92400e;
+  --info: #1d4ed8;
+  --info-soft: #eff6ff;
+  --info-text: #1e40af;
+
+  /* ── colour: top bar (graphite in both schemes) ────── */
+  --topbar-bg: #18181b;
+  --topbar-text: #e4e4e7;
+  --topbar-hover-bg: #3f3f46;
+  --topbar-current-bg: #ffffff;
+  --topbar-current-text: #18181b;
+  --topbar-focus: #c4b5fd;
+
+  /* ── focus ────────────────────────────────────────── */
+  --focus: #6d28d9;
+  --focus-width: 3px;
+  --focus-offset: 2px;
+
+  /* ── type ─────────────────────────────────────────── */
+  --font-sans: system-ui, -apple-system, "Segoe UI", "Noto Sans", "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --text-xs: 0.8125rem;   /* 13px: badges, table meta */
+  --text-sm: 0.9375rem;   /* 15px: tables, hints */
+  --text-md: 1rem;        /* 16px: body */
+  --text-lg: 1.1875rem;   /* 19px: lead, card titles */
+  --text-xl: 1.5rem;      /* 24px: section headings */
+  --text-2xl: 2rem;       /* 32px: page titles */
+  --text-3xl: 2.375rem;   /* 38px: Today greeting */
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --weight-normal: 400;
+  --weight-medium: 600;
+  --weight-bold: 700;
+  --weight-heavy: 800;
+
+  /* ── space (4px base) ─────────────────────────────── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* ── size ─────────────────────────────────────────── */
+  --control-height: 2.5rem;     /* 40px primary and secondary buttons, inputs */
+  --control-height-sm: 2rem;    /* 32px chips, row actions (≥ 24px target, WCAG 2.5.8) */
+  --topbar-height: 3.5rem;
+  --content-max: 75rem;         /* 1200px */
+  --panel-width: 25rem;         /* 400px Activity panel */
+
+  /* ── shape ────────────────────────────────────────── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --border-width-strong: 2px;
+
+  /* ── elevation ────────────────────────────────────── */
+  --shadow-1: 0 1px 2px rgb(24 24 27 / 0.08);
+  --shadow-2: 0 4px 12px rgb(24 24 27 / 0.12);
+  --shadow-panel: -8px 0 24px rgb(24 24 27 / 0.16);
+  --scrim: rgb(24 24 27 / 0.45);
+
+  /* ── motion ───────────────────────────────────────── */
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0f0f11;
+    --surface: #18181b;
+    --surface-2: #27272a;
+    --border: #3f3f46;
+    --border-strong: #a1a1aa;
+    --text: #f4f4f5;
+    --text-muted: #a1a1aa;
+    --accent: #a78bfa;
+    --accent-hover: #c4b5fd;
+    --accent-soft: #2e1065;
+    --accent-text: #c4b5fd;
+    --on-accent: #18181b;       /* dark text on the light accent: never white (A-08) */
+    --danger: #f87171;
+    --danger-soft: #450a0a;
+    --danger-text: #fca5a5;
+    --on-danger: #18181b;
+    --success: #4ade80;
+    --success-soft: #052e16;
+    --success-text: #86efac;
+    --on-success: #18181b;
+    --warning: #fbbf24;
+    --warning-soft: #422006;
+    --warning-text: #fcd34d;
+    --info: #60a5fa;
+    --info-soft: #172554;
+    --info-text: #93c5fd;
+    --topbar-bg: #09090b;
+    --topbar-text: #e4e4e7;
+    --topbar-hover-bg: #27272a;
+    --topbar-current-bg: #f4f4f5;
+    --topbar-current-text: #18181b;
+    --topbar-focus: #c4b5fd;
+    --focus: #c4b5fd;
+    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.5);
+    --shadow-2: 0 4px 12px rgb(0 0 0 / 0.5);
+    --shadow-panel: -8px 0 24px rgb(0 0 0 / 0.6);
+    --scrim: rgb(0 0 0 / 0.6);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f0f11;
+  --surface: #18181b;
+  --surface-2: #27272a;
+  --border: #3f3f46;
+  --border-strong: #a1a1aa;
+  --text: #f4f4f5;
+  --text-muted: #a1a1aa;
+  --accent: #a78bfa;
+  --accent-hover: #c4b5fd;
+  --accent-soft: #2e1065;
+  --accent-text: #c4b5fd;
+  --on-accent: #18181b;
+  --danger: #f87171;
+  --danger-soft: #450a0a;
+  --danger-text: #fca5a5;
+  --on-danger: #18181b;
+  --success: #4ade80;
+  --success-soft: #052e16;
+  --success-text: #86efac;
+  --on-success: #18181b;
+  --warning: #fbbf24;
+  --warning-soft: #422006;
+  --warning-text: #fcd34d;
+  --info: #60a5fa;
+  --info-soft: #172554;
+  --info-text: #93c5fd;
+  --topbar-bg: #09090b;
+  --topbar-text: #e4e4e7;
+  --topbar-hover-bg: #27272a;
+  --topbar-current-bg: #f4f4f5;
+  --topbar-current-text: #18181b;
+  --topbar-focus: #c4b5fd;
+  --focus: #c4b5fd;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-2: 0 4px 12px rgb(0 0 0 / 0.5);
+  --shadow-panel: -8px 0 24px rgb(0 0 0 / 0.6);
+  --scrim: rgb(0 0 0 / 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+  }
+}

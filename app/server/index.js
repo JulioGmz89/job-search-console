@@ -30,6 +30,10 @@ const app = buildApp({ logger: { transport: { target: 'pino-pretty' } } });
 function prepare() {
   const dataRoot = resolveDataRoot();
   for (const dir of ['prompts', 'logs', 'tmp']) mkdirSync(join(dataRoot, 'data', 'jsc', dir), { recursive: true });
+  // reconcile-pipeline.mjs refuses to run when batch/ is missing (its --state
+  // path cannot be resolved), which a data root outside the repository is
+  // until its first evaluation. An empty folder is all it needs.
+  mkdirSync(join(dataRoot, 'batch'), { recursive: true });
   execFile(process.execPath, [join(repoRoot, 'reserve-report-num.mjs'), '--gc'], { cwd: repoRoot, windowsHide: true }, (error) => {
     if (error) app.log.warn(`reserve-report-num.mjs --gc failed: ${error.message}`);
   });

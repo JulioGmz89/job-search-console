@@ -32,7 +32,7 @@ import { fileURLToPath } from 'node:url';
 import fastifyStatic from '@fastify/static';
 import Fastify from 'fastify';
 
-import { resolveClaudeCommand } from './agents/claude-bin.js';
+import { checkClaudeVersion, resolveClaudeCommand } from './agents/claude-bin.js';
 import { readProfile } from './agents/profile.js';
 import { createRunner } from './queue/runner.js';
 import { buildSpec, describeKinds, RUN_KINDS } from './queue/specs.js';
@@ -41,14 +41,18 @@ import { readAtsRecord } from './services/ats.js';
 import { createBrowserPool } from './services/browser.js';
 import { listCvDocuments } from './services/cvdocs.js';
 import { getPreview, listThemes, renderPreview, thumbPath } from './services/cvrender.js';
-import { listCvTemplates, listWritingSamples, readStyle, readVoice, writeStyle, writeVoice } from './services/cvstyle.js';
-import { appendInboxUrl, readInbox } from './services/inbox.js';
+import { addAvoidWord, listCvTemplates, listWritingSamples, readStyle, readVoice, removeAvoidWord, restoreVoice, writeStyle, writeVoice } from './services/cvstyle.js';
+import { appendInboxUrl, readInbox, removeInboxUrl, restoreInboxLine } from './services/inbox.js';
+import { readSkipList, readStatusHistory, readWritingSample } from './services/ledgers.js';
 import { repoRoot, resolveDataRoot } from './services/paths.js';
 import { readPipeline, SCORE_BANDS } from './services/pipeline.js';
+import { readCvContent, readProfileForm, releaseDesignKeys, restoreDesignKeys, writeCvContent, writeProfileForm } from './services/profile.js';
 import { createEntry, deleteEntry, readPortals, updateEntry } from './services/portals.js';
 import { listReports, readReport, resolveReportPdf } from './services/reports.js';
-import { readLastScanRun, readPortalHealth } from './services/scanner.js';
+import { readFirstSeen, readLastScanRun, readPortalHealth } from './services/scanner.js';
 import { setStatus } from './services/status.js';
+import { subjectFor } from './services/subjects.js';
+import { readToday, writeToday } from './services/today.js';
 import { BATCH_SIZE, pendingLlm, readCv, readPostingsWithSkills, readSkillsOverview } from './skills/service.js';
 import { writeOverride } from './skills/store.js';
 import { createWatcher } from './watch.js';
@@ -103,7 +107,13 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
   // One runner per app instance, not a module singleton: each test file builds
   // its own app, and shared mutable run state across parallel test files would
   // be a flake generator.
-  const runner = createRunner({ repoRoot, root });
+  const runner = createRunner({
+    repoRoot,
+    root,
+    // data/jsc/ is the fork's own folder, created at server start (index.js).
+    historyFile: join(resolveDataRoot(root), 'data', 'jsc', 'runs.jsonl'),
+    describe: (spec) => subjectFor(spec, { root }),
+  });
   app.addHook('onClose', async () => runner.close());
 
   // The server-wide event feed: file changes under the data root and run
@@ -138,10 +148,23 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     eventSockets.clear();
   });
 
-  // Resolved once: the CLI does not move while the server runs, and an agent
-  // run refused because the CLI is missing should say so at request time.
-  const claude = agent ?? resolveClaudeCommand();
+  // Resolved at start, and again when the user asks the app to check (the
+  // first-run "Check again" after installing Claude Code), so installing the
+  // CLI never needs a server restart. Tests pin `agent` and it never changes.
+  let claude = agent ?? resolveClaudeCommand();
   const specContext = { root, repoRoot, agent: claude };
+  /** The last `--version` answer; checked once on first ask, then on request. */
+  let versionCheck = null;
+  const checkAgent = ({ refresh = false } = {}) => {
+    if (refresh && !agent) {
+      claude = resolveClaudeCommand();
+      specContext.agent = claude;
+    }
+    if (refresh || !versionCheck) {
+      versionCheck = checkClaudeVersion(claude).then((result) => ({ ...result, checkedAt: new Date().toISOString() }));
+    }
+    return versionCheck;
+  };
 
   // The built SPA is served by this same process, so M1's acceptance criterion
   // ("browse the pipeline without touching a terminal") is one command on one
@@ -171,6 +194,38 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
    * would buy nothing and go stale exactly when it matters. (M3 adds file
    * watching for push updates.)
    */
+  /**
+   * A job's documents, even after its fit was checked again (H8-job-01).
+   *
+   * Every check writes a new report, and upstream's merge-tracker.mjs points
+   * the tracker row at it; the tailored CV and the letter stay tied to the
+   * earlier report (pdf-index.tsv, the covers record). So a report without
+   * documents of its own falls back to the newest earlier report for the same
+   * posting link that has them. Nothing on disk changes.
+   */
+  const reportsForLink = (report, reports) =>
+    report?.url ? [report, ...reports.filter((r) => r.id !== report.id && r.url === report.url).sort((a, b) => b.id - a.id)] : report ? [report] : [];
+  const pdfFor = (report, reports) => {
+    for (const r of reportsForLink(report, reports)) {
+      const pdf = resolveReportPdf(r.id, { root });
+      if (pdf) return { ...pdf, reportId: r.id };
+    }
+    return null;
+  };
+  const coverFor = (report, reports) => {
+    for (const r of reportsForLink(report, reports)) {
+      const cover = resolveReportCover(r.id, { root });
+      if (cover) return { ...cover, reportId: r.id };
+    }
+    return null;
+  };
+  /** The same, for a route that only has a report id. */
+  const byReportId = (id, find) => {
+    const { reports } = listReports({ root });
+    const report = reports.find((r) => r.id === Number.parseInt(id, 10)) ?? null;
+    return report ? find(report, reports) : null;
+  };
+
   const load = () => {
     const pipeline = readPipeline({ root });
     const { reports, issues: reportIssues } = listReports({ root });
@@ -197,7 +252,13 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
             }
           : null,
         hasReport: report !== null,
-        pdf: report?.pdf?.exists ? { format: report.pdf.format } : null,
+        // `reportId`: the check the CV was made from, which may be an earlier one (R-final-01).
+        pdf: (() => {
+          const found = report ? pdfFor(report, reports) : null;
+          return found ? { format: report.pdf?.format ?? null, reportId: found.reportId } : null;
+        })(),
+        // Today's "replied without a tailored CV or letter" needs both documents per row.
+        cover: report ? coverFor(report, reports) !== null : false,
       };
     });
 
@@ -234,6 +295,57 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     };
   });
 
+  /**
+   * Everything first run and the Workspace page need in one read (ia.md §2.1,
+   * §2.9): which of the user's files exist, the set-up steps, counts, and the
+   * data problems in words. Missing files are normal on day one, not errors.
+   */
+  app.get('/api/workspace', async () => {
+    const dataRoot = resolveDataRoot(root);
+    const { reports, rows, issues } = load();
+    const portals = readPortals({ root });
+    const inbox = readInbox({ root });
+    const companies = portals.companies.filter((c) => c.enabled);
+    const check = await checkAgent();
+    const has = (rel) => existsSync(join(dataRoot, rel));
+    return {
+      dataRoot,
+      files: {
+        cv: has('cv.md'),
+        profile: has(join('config', 'profile.yml')),
+        portals: portals.exists,
+        tracker: has(join('data', 'applications.md')),
+        inbox: has(join('data', 'pipeline.md')),
+        voice: has('voice-dna.md'),
+      },
+      setup: {
+        cv: has('cv.md'),
+        company: companies.length > 0,
+        assistant: claude.found && check.ok,
+        done: has('cv.md') && companies.length > 0 && claude.found && check.ok,
+      },
+      counts: {
+        applications: rows.length,
+        reports: reports.length,
+        pdfs: reports.filter((r) => r.pdf?.exists).length,
+        companies: companies.length,
+        toReview: inbox.pending.length,
+      },
+      issues,
+    };
+  });
+
+  app.get('/api/today', async () => readToday({ root }));
+
+  app.put('/api/today', async (request, reply) => {
+    try {
+      const input = body(request);
+      return { ok: true, ...writeToday({ root, lastSeen: input.lastSeen, dismiss: input.dismiss, undismiss: input.undismiss }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
   app.get('/api/pipeline', async () => {
     const { pipeline, rows, issues } = load();
     return {
@@ -249,6 +361,16 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     };
   });
 
+  /** A job's recorded status changes, from set-status.mjs's ledger (Job › History). */
+  app.get('/api/pipeline/:id/history', async (request, reply) => {
+    const rowId = Number.parseInt(request.params.id, 10);
+    if (!Number.isInteger(rowId) || rowId < 1) return reply.code(400).send({ error: 'Expected an application number', code: 'id-invalid' });
+    return readStatusHistory({ root, rowId });
+  });
+
+  /** data/blacklist.md, read-only (Companies › Companies to skip). */
+  app.get('/api/skip-list', async () => readSkipList({ root }));
+
   app.get('/api/reports', async () => {
     const { reports, issues } = load();
     return { reports, issues };
@@ -261,14 +383,23 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     // The row carries tracker-only facts (status, applied date in notes) that
     // the report file itself does not know about.
     const row = readPipeline({ root }).rows.find((r) => r.reportId === report.id) ?? null;
-    const cover = resolveReportCover(report.id, { root });
-    const pdf = resolveReportPdf(report.id, { root });
+    const { reports } = listReports({ root });
+    const listed = reports.find((r) => r.id === report.id) ?? report;
+    const cover = coverFor(listed, reports);
+    const pdf = pdfFor(listed, reports);
     // The ATS verdict the console recorded when it rendered this PDF (M5); none for older PDFs.
     const ats = pdf ? readAtsRecord(resolveDataRoot(root), pdf.fileName) : null;
+    // When the PDF was written, to the second: the document card compares it with
+    // the last change to the writing rules ("made under your current rules").
+    const pdfModified = pdf ? (await stat(pdf.absolutePath)).mtime.toISOString() : null;
     return {
       ...report,
-      ats: ats ? { verdict: ats.verdict, score: ats.score, issues: ats.issues, checkedAt: ats.checkedAt } : null,
-      cover: cover ? { path: cover.path, date: cover.date } : null,
+      // `fromReport`: the documents belong to an earlier check of the same posting.
+      pdf: pdf
+        ? { ...(report.pdf ?? {}), exists: true, modified: pdfModified, fileName: pdf.fileName, fromReport: pdf.reportId === report.id ? null : pdf.reportId }
+        : report.pdf,
+      ats: ats ? { verdict: ats.verdict, score: ats.score, issues: ats.issues, checkedAt: ats.checkedAt, template: ats.template ?? null } : null,
+      cover: cover ? { path: cover.path, date: cover.date, fromReport: cover.reportId === report.id ? null : cover.reportId } : null,
       tracker: row
         ? { id: row.id, status: row.status, statusId: row.statusId, date: row.date, notes: row.notes }
         : null,
@@ -276,7 +407,7 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
   });
 
   app.get('/api/reports/:id/pdf', async (request, reply) => {
-    const pdf = resolveReportPdf(request.params.id, { root });
+    const pdf = byReportId(request.params.id, pdfFor);
     if (!pdf) return reply.code(404).send({ error: 'No PDF for this report' });
 
     const { size } = await stat(pdf.absolutePath);
@@ -292,7 +423,7 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
 
   /** The cover letter PDF, tracked by the console rather than pdf-index.tsv (see services/covers.js). */
   app.get('/api/reports/:id/cover', async (request, reply) => {
-    const cover = resolveReportCover(request.params.id, { root });
+    const cover = byReportId(request.params.id, coverFor);
     if (!cover) return reply.code(404).send({ error: 'No cover letter for this report' });
 
     const { size } = await stat(cover.absolutePath);
@@ -301,6 +432,45 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
       .header('Content-Length', size)
       .header('Content-Disposition', `inline; filename="${cover.fileName.replace(/["\r\n]/g, '')}"`)
       .send(createReadStream(cover.absolutePath));
+  });
+
+  // ── My CV, M8: the CV text and the profile (ia.md §2.7) ────────────
+
+  app.get('/api/cv/content', async () => readCvContent({ root }));
+
+  app.put('/api/cv/content', async (request, reply) => {
+    try {
+      return { ok: true, ...writeCvContent({ root, text: body(request).text }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.get('/api/profile', async () => readProfileForm({ root }));
+
+  app.put('/api/profile', async (request, reply) => {
+    try {
+      return { ok: true, ...writeProfileForm({ root, fields: body(request).fields }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  /** Let My CV › Design decide: drop profile.yml's own style and section order (Undo below). */
+  app.post('/api/profile/design/release', async (request, reply) => {
+    try {
+      return { ...releaseDesignKeys({ root }), style: readStyle({ root }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.post('/api/profile/design/restore', async (request, reply) => {
+    try {
+      return { ...restoreDesignKeys({ root }), style: readStyle({ root }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
   });
 
   // ── CV Studio: style tokens, voice rules, templates, samples ───────
@@ -328,9 +498,44 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     }
   });
 
+  /** Words to avoid: one bullet under `## Never write` added or removed, nothing else rewritten. */
+  app.post('/api/cv/voice/words', async (request, reply) => {
+    try {
+      return { ok: true, ...addAvoidWord({ root, word: body(request).word }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.delete('/api/cv/voice/words', async (request, reply) => {
+    try {
+      return { ok: true, ...removeAvoidWord({ root, word: body(request).word }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  /** Undo for the rules: swap voice-dna.md with the .bak its last save kept. */
+  app.post('/api/cv/voice/restore', async (request, reply) => {
+    try {
+      return { ok: true, ...restoreVoice({ root }) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
   app.get('/api/cv/templates', async () => listCvTemplates({ root }));
 
   app.get('/api/cv/writing-samples', async () => listWritingSamples({ root }));
+
+  /** One sample's text, for My CV › Writing rules › Open. */
+  app.get('/api/cv/writing-samples/:name', async (request, reply) => {
+    try {
+      return readWritingSample({ root, name: request.params.name });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
 
   // ── CV Studio, M5: documents, live preview, the theme gallery ──────
 
@@ -364,6 +569,38 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
       .header('Cache-Control', 'no-store')
       .header('Content-Disposition', 'inline; filename="cv-preview.pdf"')
       .send(preview.pdf);
+  });
+
+  /**
+   * Does the saved design pass the screening check? (Today's "Needs you" card,
+   * ia.md §2.1; F-007.) Renders the newest CV once in the saved style through
+   * the warm preview pool and remembers the answer until the style or the
+   * newest CV changes, so Today can ask on every visit for free.
+   */
+  let designCheck = { key: null, result: null };
+  app.get('/api/cv/design-check', async (request, reply) => {
+    try {
+      const { style } = readStyle({ root });
+      const doc = listCvDocuments({ root })[0] ?? null;
+      if (!doc) return { template: style.template, documentId: null, verdict: null };
+      const key = JSON.stringify([style, doc.id, doc.modified]);
+      if (designCheck.key !== key) {
+        const preview = await renderPreview({ documentId: doc.id, style, root, pool: cvPool });
+        designCheck = {
+          key,
+          result: {
+            template: style.template,
+            documentId: doc.id,
+            verdict: preview.ats?.verdict ?? null,
+            issues: (preview.ats?.issues ?? []).filter((i) => i.severity === 'critical').map((i) => i.message),
+            checkedAt: new Date().toISOString(),
+          },
+        };
+      }
+      return designCheck.result;
+    } catch (error) {
+      return fail(reply, error);
+    }
   });
 
   /** The gallery: every theme rendered with this document and the given tokens, each with its ATS verdict. */
@@ -506,7 +743,12 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
 
   app.get('/api/inbox', async () => {
     const inbox = readInbox({ root });
-    return { ...inbox, lastScan: readLastScanRun({ root }) };
+    const firstSeen = readFirstSeen({ root });
+    return {
+      ...inbox,
+      pending: inbox.pending.map((item) => ({ ...item, firstSeen: firstSeen.get(item.url) ?? null })),
+      lastScan: readLastScanRun({ root }),
+    };
   });
 
   /**
@@ -526,10 +768,27 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
       });
       let run = null;
       if (input.evaluate === true) {
-        const spec = buildSpec('evaluate', { url: input.url, autoPdf: input.autoPdf !== false }, specContext);
-        run = runner.start(spec);
+        const asked = { kind: 'evaluate', options: { url: input.url, autoPdf: input.autoPdf !== false } };
+        run = runner.start({ ...buildSpec(asked.kind, asked.options, specContext), request: asked });
       }
       return reply.code(201).send({ ok: true, ...added, run });
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  /** To review › Remove. The removed line comes back so Undo can restore it exactly. */
+  app.delete('/api/inbox/urls', async (request, reply) => {
+    try {
+      return { ok: true, ...(await removeInboxUrl({ root, url: body(request).url })) };
+    } catch (error) {
+      return fail(reply, error);
+    }
+  });
+
+  app.post('/api/inbox/urls/restore', async (request, reply) => {
+    try {
+      return { ok: true, ...(await restoreInboxLine({ root, line: body(request).line })) };
     } catch (error) {
       return fail(reply, error);
     }
@@ -538,11 +797,14 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
   // ── the agent ──────────────────────────────────────────────────────
 
   /** Whether agent runs can work at all, for the UI to enable its buttons honestly. */
-  app.get('/api/agent/status', async () => {
+  app.get('/api/agent/status', async (request) => {
     const dataRoot = resolveDataRoot(root);
     const profile = readProfile({ root: dataRoot });
+    const check = await checkAgent({ refresh: request.query?.refresh === '1' });
     return {
       bin: { display: claude.display, source: claude.source, found: claude.found, shell: claude.shell },
+      // ready: found and answered --version. Sign-in is only proven by a real run.
+      check: { ready: claude.found && check.ok, version: check.version, error: check.error, checkedAt: check.checkedAt },
       maxAgents: Number.parseInt(process.env.JSC_MAX_AGENTS ?? '', 10) || 2,
       profile: {
         exists: profile.exists,
@@ -622,11 +884,12 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
   app.post('/api/runs', async (request, reply) => {
     try {
       const input = body(request);
-      const spec = buildSpec(input.kind, input.options ?? {}, specContext);
+      const asked = { kind: input.kind, options: input.options ?? {} };
+      const spec = buildSpec(asked.kind, asked.options, specContext);
       // Burn the confirmation before spawning: if the token is bad, nothing has
       // run, and a valid token can never authorise a second write.
       if (spec.confirmRequired) runner.consumeConfirmation(input.confirmToken, spec.kind);
-      return reply.code(202).send(runner.start(spec));
+      return reply.code(202).send(runner.start({ ...spec, request: asked }));
     } catch (error) {
       return fail(reply, error);
     }
@@ -636,6 +899,35 @@ export function buildApp({ root, logger = false, serveUi = true, agent, watch = 
     const run = runner.get(request.params.id);
     if (!run) return reply.code(404).send({ error: 'No such run' });
     return run;
+  });
+
+  /**
+   * "Try again" (ia.md §2.8): queue the same request as a failed or cancelled
+   * run, linked to it by `retryOf`. Follow-up runs the browser never asked for
+   * (the automatic tailored CV) are rebuilt from their meta. A run that needs a
+   * preview first is not retried blind: the user previews it again.
+   */
+  app.post('/api/runs/:id/retry', async (request, reply) => {
+    try {
+      const failed = runner.get(request.params.id);
+      if (!failed) return reply.code(404).send({ error: 'No such run' });
+      if (!['failed', 'cancelled'].includes(failed.status)) {
+        return reply.code(409).send({ error: 'Only a run that failed or was cancelled can be tried again', code: 'run-not-failed' });
+      }
+      const again = failed.request
+        ?? (failed.kind === 'evaluate' && failed.meta?.url ? { kind: 'evaluate', options: { url: failed.meta.url, autoPdf: failed.meta.autoPdf !== false } } : null)
+        ?? (failed.kind === 'pdf' && failed.meta?.reportId ? { kind: 'pdf', options: { reportId: failed.meta.reportId } } : null);
+      if (!again) return reply.code(422).send({ error: 'This run cannot be repeated from here', code: 'retry-unsupported' });
+      // The UI asks for no automatic tailored CV when the design fails screening (R-final-07).
+      const options = again.kind === 'evaluate' && request.body?.autoPdf === false ? { ...again.options, autoPdf: false } : again.options;
+      const spec = buildSpec(again.kind, options, specContext);
+      if (spec.confirmRequired) {
+        return reply.code(409).send({ error: 'Preview it again, then confirm', code: 'confirm-required' });
+      }
+      return reply.code(202).send(runner.start({ ...spec, request: { ...again, options }, retryOf: failed.id }));
+    } catch (error) {
+      return fail(reply, error);
+    }
   });
 
   app.post('/api/runs/:id/cancel', async (request, reply) => {

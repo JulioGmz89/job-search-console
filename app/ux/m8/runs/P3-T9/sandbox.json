@@ -1,0 +1,16 @@
+{
+  "url": "http://127.0.0.1:4489/",
+  "state": "populated",
+  "startedAt": 1791353398737,
+  "root": "C:\\Users\\julio\\AppData\\Local\\Temp\\jsc-ux-populated-a8x4oD",
+  "scenario": "auto",
+  "delayMs": 8000,
+  "pid": 6488,
+  "flags": {
+    "task": "T9",
+    "state": "populated",
+    "delay": 8000,
+    "scenario": "auto",
+    "budget": 40
+  }
+}

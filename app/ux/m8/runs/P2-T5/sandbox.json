@@ -1,0 +1,16 @@
+{
+  "url": "http://127.0.0.1:4475/",
+  "state": "populated",
+  "startedAt": 1791352395455,
+  "root": "C:\\Users\\julio\\AppData\\Local\\Temp\\jsc-ux-populated-0Xpepy",
+  "scenario": "auto",
+  "delayMs": 8000,
+  "pid": 2572,
+  "flags": {
+    "task": "T5",
+    "state": "populated",
+    "delay": 8000,
+    "scenario": "auto",
+    "budget": 50
+  }
+}
