@@ -25,7 +25,7 @@ M8 persona runs were made on 0a32cd5a (P1), 21e77352 (P2) and 5f430776 (P3). The
 | axe serious/critical, light | 0 | 3 critical + 18 serious | 0 + 0 | Yes |
 | axe serious/critical, dark | 0 | 3 critical + 14 serious | 0 + 0 | Yes |
 | Open severity-3/4 findings | 0 | 22 | 0 | Yes |
-| First-job acceptance run | passes | — (task added in M8) | success; 12/60 steps; SEQ 7/7 | Yes |
+| First-job acceptance run | passes | — (task added in M8) | success; 12/60 steps, SEQ 7/7 on d5abd208; re-run on e039c489: success, 17/60 steps, SEQ 7/7, no wrong turns | Yes |
 | Task success, real | ≥ 80% per task | measured in M8 (§12.5) | **pending (stage B)** | Pending |
 | SEQ, real | mean ≥ 5.5 per task | measured in M8 | **pending (stage B)** | Pending |
 | SUS, real | ≥ 75 | measured in M8 | **pending (stage B)** | Pending |
