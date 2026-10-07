@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { addAvoidWord, pdfUrl, removeAvoidWord, restoreVoice, saveVoice } from '../../api.js';
+import { useLeaveGuard } from '../../components/LeaveGuard.jsx';
 import { RunItem } from '../../components/RunItem.jsx';
 import { ConfirmDialog, CostNote, HelpLink } from '../../components/ui.jsx';
 import { reload, setResource, useResource } from '../../data.js';
@@ -186,6 +187,9 @@ export function WritingSection() {
   const [confirm, setConfirm] = useState(false);
   const savedRef = useRef(null);
 
+  // Unsaved edits to All rules warn before leaving (ia.md §2.7).
+  const leaveDialog = useLeaveGuard(edited && text !== voice.data?.text, { what: 'your writing rules' });
+
   // The editor follows the file (a word added above, an outside edit) until the user types in it.
   const fileText = voice.data?.text;
   useEffect(() => {
@@ -307,6 +311,7 @@ export function WritingSection() {
         </p>
       </section>
 
+      {leaveDialog}
       <ConfirmDialog isOpen={confirm} title="Start from the example rules?" confirmLabel="Replace my rules" danger onConfirm={useExample} onCancel={() => setConfirm(false)}>
         <p>
           This replaces your {plural(ruleCount, 'rule')} with the example rules. Your current rules are kept as voice-dna.md.bak, and you can undo this right after.

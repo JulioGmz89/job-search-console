@@ -1,14 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { cvPreviewUrl, cvThumbUrl, fetchCvThemes, renderAllCvs, renderCvPreview, saveCvStyle } from '../../api.js';
+import { useLeaveGuard } from '../../components/LeaveGuard.jsx';
 import { RunItem } from '../../components/RunItem.jsx';
 import { ConfirmDialog, HelpLink } from '../../components/ui.jsx';
 import { reload, setResource, useResource } from '../../data.js';
+import { designName } from '../../lib/designs.js';
 import { jobName, plural, shortDate } from '../../lib/labels.js';
 import { runState, runTitle } from '../../lib/runs.js';
 import { useRuns } from '../../runs.jsx';
 import { announce } from '../../shell/announce.jsx';
-import { navigate, setLeaveGuard } from '../../shell/router.jsx';
 
 const DEBOUNCE_MS = 300;
 
@@ -82,6 +83,7 @@ function SectionOrder({ value, keys, onChange }) {
 export function DesignSection() {
   const style = useResource('style');
   const documents = useResource('documents');
+  const templates = useResource('templates');
   const pipeline = useResource('pipeline');
   const { list, start } = useRuns();
   const [form, setForm] = useState(null);
@@ -94,7 +96,6 @@ export function DesignSection() {
   const [notice, setNotice] = useState(null);
   const [errors, setErrors] = useState([]);
   const [confirm, setConfirm] = useState(null);
-  const [leaving, setLeaving] = useState(null);
   const [batch, setBatch] = useState(null);
   const previewSeq = useRef(0);
   const noticeRef = useRef(null);
@@ -153,25 +154,7 @@ export function DesignSection() {
   const dirty = form && style.data && JSON.stringify(form) !== JSON.stringify(style.data.style);
 
   // Unsaved changes warn before leaving (ia.md §2.7).
-  const guard = useCallback(
-    (target) => {
-      if (!dirty) return true;
-      setLeaving(target);
-      return false;
-    },
-    [dirty],
-  );
-  useEffect(() => {
-    setLeaveGuard(guard);
-    const unload = (e) => {
-      if (dirty) e.preventDefault();
-    };
-    window.addEventListener('beforeunload', unload);
-    return () => {
-      setLeaveGuard(null);
-      window.removeEventListener('beforeunload', unload);
-    };
-  }, [guard, dirty]);
+  const leaveDialog = useLeaveGuard(Boolean(dirty), { what: 'your design', onDiscard: () => setForm(style.data.style) });
 
   if (!style.data || !form) return <p className="muted">Loading…</p>;
 
@@ -180,6 +163,7 @@ export function DesignSection() {
   const chosen = form.template ?? 'standard';
   const saved = style.data.style.template ?? 'standard';
   const chosenTheme = themes?.find((t) => t.name === chosen) ?? null;
+  const chosenName = chosenTheme?.displayName ?? designName(chosen, templates.data?.templates);
   // The live preview is the chosen design with the fine-tuning applied; the gallery is the fallback.
   const chosenAts = preview?.ats ?? chosenTheme?.ats ?? null;
   const reportDocs = docs.filter((d) => d.reportId !== null);
@@ -187,7 +171,7 @@ export function DesignSection() {
   const docLabel = (d) => {
     if (d.sample) return 'Sample CV (fictional)';
     const row = rows.find((r) => r.reportId === d.reportId);
-    return row ? `${jobName(row)}, ${shortDate(d.modified)}` : `${d.id}, ${shortDate(d.modified)}`;
+    return row ? `${jobName(row)}, ${shortDate(d.modified)}` : `A CV made ${shortDate(d.modified)}`;
   };
   const passing = (themes ?? []).filter((t) => t.ats?.verdict !== 'fail' && !t.error);
   const relaying = list.filter((r) => r.kind === 'cv-render' && ['waiting', 'working'].includes(runState(r)));
@@ -221,7 +205,7 @@ export function DesignSection() {
       if (dirty) await persist();
       const result = await renderAllCvs(chosen);
       setBatch(result);
-      announce(`Updating ${plural(result.queued.length, 'CV')} to the ${chosen} design. A few seconds each; no AI.`);
+      announce(`Updating ${plural(result.queued.length, 'CV')} to the ${chosenName} design. A few seconds each; no AI.`);
     } catch (e) {
       setPreviewError(e.message);
     }
@@ -232,6 +216,7 @@ export function DesignSection() {
       if (dirty) await persist();
       const run = await start('cv-render', { documentId, template: chosen });
       announce(`Started: ${runTitle(run)}`);
+      setTimeout(() => document.querySelector('.design-preview .act-title a')?.focus(), 0);
     } catch (e) {
       setPreviewError(e.message);
     }
@@ -346,7 +331,15 @@ export function DesignSection() {
                 <>
                   An applicant-tracking system reading this CV loses part of it{failCritical.length ? `: ${failCritical.slice(0, 2).map((i) => i.message).join(' ')}` : '.'}{' '}
                   {passing.length ? (
-                    <button type="button" className="btn-link" onClick={() => set('template', passing[0].name)}>
+                    <button
+                      type="button"
+                      className="btn-link"
+                      onClick={() => {
+                        set('template', passing[0].name);
+                        // The choice moved to another card; focus follows it.
+                        setTimeout(() => document.querySelector('.designs [aria-pressed="true"]')?.focus(), 0);
+                      }}
+                    >
                       Show a design that passes
                     </button>
                   ) : null}
@@ -369,7 +362,7 @@ export function DesignSection() {
             </div>
           ) : null}
           {previewError ? <p className="notice attn">{previewError}</p> : null}
-          {preview ? <iframe className="doc" src={cvPreviewUrl(preview.id)} title={`Preview of ${doc ? docLabel(doc) : 'your CV'} in the ${chosen} design`} /> : <div className="preview-empty muted">{rendering ? 'Drawing your CV…' : 'No CV to preview yet.'}</div>}
+          {preview ? <iframe className="doc" src={cvPreviewUrl(preview.id)} title={`Preview of ${doc ? docLabel(doc) : 'your CV'} in the ${chosenName} design`} /> : <div className="preview-empty muted">{rendering ? 'Drawing your CV…' : 'No CV to preview yet.'}</div>}
           <div className="stack-sm">
             <div className="row">
               <button type="button" className="btn" disabled={!dirty} onClick={() => (chosenAts?.verdict === 'fail' ? setConfirm('fail') : makeDefault())}>
@@ -389,7 +382,7 @@ export function DesignSection() {
             ) : null}
             {batch ? (
               <p className="notice info" role="status">
-                Updating {plural(batch.queued.length, 'CV')} to {chosen}
+                Updating {plural(batch.queued.length, 'CV')} to {chosenName}
                 {batch.skipped.length ? ` (${batch.skipped.length} already updating)` : ''}. Each takes a few seconds; follow them in Activity.
               </p>
             ) : null}
@@ -399,7 +392,7 @@ export function DesignSection() {
               {lastRelay && ['waiting', 'working', 'failed'].includes(runState(lastRelay)) ? <RunItem run={lastRelay} headingLevel={3} /> : null}
               <div className="row">
                 <button type="button" className="btn2 btn-sm" onClick={updateThis} disabled={relaying.some((r) => r.meta?.documentId === documentId)}>
-                  Lay out this CV again in {chosen}
+                  Lay out this CV again in {chosenName}
                 </button>
                 <span className="hint inline">A few seconds · no AI · wording unchanged</span>
               </div>
@@ -421,7 +414,7 @@ export function DesignSection() {
 
       <ConfirmDialog
         isOpen={confirm === 'fail'}
-        title={`Use ${chosenTheme?.displayName ?? chosen} even though it fails screening?`}
+        title={`Use ${chosenName} even though it fails screening?`}
         confirmLabel="Use it anyway"
         danger
         onConfirm={makeDefault}
@@ -432,31 +425,17 @@ export function DesignSection() {
       </ConfirmDialog>
       <ConfirmDialog
         isOpen={confirm === 'all'}
-        title={`Update ${plural(reportDocs.length, 'CV')} to the ${chosen} design?`}
+        title={`Update ${plural(reportDocs.length, 'CV')} to the ${chosenName} design?`}
         confirmLabel={`Update ${plural(reportDocs.length, 'CV')}`}
+        focusConfirm={false}
         onConfirm={updateAll}
         onCancel={() => setConfirm(null)}
       >
-        <p>This lays out {plural(reportDocs.length, 'PDF')} again in {chosen}; the wording does not change and no AI is used. A few seconds each.</p>
+        <p>This lays out {plural(reportDocs.length, 'PDF')} again in {chosenName}; the wording does not change and no AI is used. A few seconds each.</p>
         {chosenAts?.verdict === 'fail' ? <p className="notice attn">This design fails the screening check. The updated PDFs would lose part of their text for applicant-tracking systems.</p> : null}
         {dirty ? <p>Your unsaved changes are saved first, so this becomes your design for every CV.</p> : null}
       </ConfirmDialog>
-      <ConfirmDialog
-        isOpen={leaving !== null}
-        title="Leave without saving your design?"
-        confirmLabel="Leave without saving"
-        cancelLabel="Stay"
-        onConfirm={() => {
-          const target = leaving;
-          setLeaving(null);
-          setLeaveGuard(null);
-          setForm(style.data.style);
-          navigate(target);
-        }}
-        onCancel={() => setLeaving(null)}
-      >
-        <p>Your changes to the design are only in the preview. Make it your design to keep them.</p>
-      </ConfirmDialog>
+      {leaveDialog}
     </div>
   );
 }

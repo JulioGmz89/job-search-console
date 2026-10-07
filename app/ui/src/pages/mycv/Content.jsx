@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { saveCvContent } from '../../api.js';
+import { useLeaveGuard } from '../../components/LeaveGuard.jsx';
 import { EmptyState } from '../../components/ui.jsx';
 import { reload, setResource, useResource } from '../../data.js';
 import { dateTime } from '../../lib/labels.js';
@@ -18,6 +19,9 @@ export function ContentSection() {
   const [saved, setSaved] = useState(null);
   const [busy, setBusy] = useState(false);
   const savedRef = useRef(null);
+
+  // Unsaved edits warn before leaving (ia.md §2.7).
+  const leaveDialog = useLeaveGuard(Boolean(cv.data && text !== null && text !== cv.data.text), { what: 'your CV' });
 
   // Start from the file, and follow it when it changes on disk while unedited.
   useEffect(() => {
@@ -90,6 +94,7 @@ export function ContentSection() {
           <button type="submit" className="btn" disabled={busy || !dirty}>
             Save
           </button>
+          {!dirty ? <span className="small muted">Nothing to save yet: edit your CV above.</span> : null}
           <label htmlFor="cv-import" className="btn2 file-button">
             Import from a file
           </label>
@@ -125,6 +130,7 @@ export function ContentSection() {
           <p>{cvSummaryText(cv.data.summary) || 'No name or sections found. Start your CV with “# Your Name” and use “## Experience”, “## Skills” and so on.'}</p>
         </section>
       ) : null}
+      {leaveDialog}
     </div>
   );
 }

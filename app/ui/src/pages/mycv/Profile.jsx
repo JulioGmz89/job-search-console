@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { saveProfile } from '../../api.js';
+import { useLeaveGuard } from '../../components/LeaveGuard.jsx';
 import { reload, setResource, useResource } from '../../data.js';
 import { dateTime } from '../../lib/labels.js';
 import { announce } from '../../shell/announce.jsx';
@@ -57,6 +58,12 @@ export function ProfileSection() {
   useEffect(() => {
     if (saved) savedRef.current?.focus();
   }, [saved]);
+  // Unsaved edits warn before leaving (ia.md §2.7).
+  const [savedDraft, setSavedDraft] = useState(null);
+  useEffect(() => {
+    if (draft !== null && savedDraft === null) setSavedDraft(draft);
+  }, [draft, savedDraft]);
+  const leaveDialog = useLeaveGuard(savedDraft !== null && JSON.stringify(draft) !== JSON.stringify(savedDraft), { what: 'your profile' });
 
   if (!profile.data || draft === null) return <p className="muted">Loading…</p>;
   if (profile.data.error) {
@@ -75,6 +82,7 @@ export function ProfileSection() {
       const fields = Object.fromEntries(Object.entries(draft).map(([k, v]) => [k, v === '' ? null : v]));
       const result = await saveProfile(fields);
       setResource('profile', result);
+      setSavedDraft(draft);
       reload('agent');
       setSaved(`Profile saved ${dateTime(result.modified)}.`);
       announce('Profile saved.');
@@ -160,6 +168,7 @@ export function ProfileSection() {
           </li>
         </ul>
       </details>
+      {leaveDialog}
     </form>
   );
 }
