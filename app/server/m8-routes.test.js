@@ -278,18 +278,18 @@ test('checking a job again keeps its tailored CV and letter in view (H8-job-01)'
   // the same link, and the tracker row pointing at it (merge-tracker.mjs).
   const old = readFileSync(join(root, 'reports', '012-cobaltfreight-2026-08-25.md'), 'utf-8');
   const { writeFileSync } = await import('node:fs');
-  writeFileSync(join(root, 'reports', '041-cobaltfreight-2026-10-07.md'), old);
+  writeFileSync(join(root, 'reports', '042-cobaltfreight-2026-10-07.md'), old);
   const tracker = join(root, 'data', 'applications.md');
-  writeFileSync(tracker, readFileSync(tracker, 'utf-8').replace('[012](../reports/012-cobaltfreight-2026-08-25.md)', '[041](../reports/041-cobaltfreight-2026-10-07.md)'));
+  writeFileSync(tracker, readFileSync(tracker, 'utf-8').replace('[012](../reports/012-cobaltfreight-2026-08-25.md)', '[042](../reports/042-cobaltfreight-2026-10-07.md)'));
 
   const app = buildApp({ root, serveUi: false, watch: false });
   apps.push(app);
   const get = async (url) => app.inject({ method: 'GET', url });
-  const report = (await get('/api/reports/41')).json();
+  const report = (await get('/api/reports/42')).json();
   assert.equal(report.pdf.exists, true);
   assert.equal(report.pdf.fromReport, 12, 'the CV belongs to the earlier check');
-  assert.equal((await get('/api/reports/41/pdf')).statusCode, 200);
+  assert.equal((await get('/api/reports/42/pdf')).statusCode, 200);
   const row = (await get('/api/pipeline')).json().rows.find((r) => r.id === 12);
-  assert.equal(row.reportId, 41);
+  assert.equal(row.reportId, 42);
   assert.ok(row.pdf, 'the row still shows its CV');
 });

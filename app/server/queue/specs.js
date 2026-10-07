@@ -34,7 +34,7 @@ import { buildCoverSpec, buildEvaluateSpec, buildPdfSpec } from './agent-specs.j
 import { buildCvRenderSpec } from './cv-specs.js';
 
 const FINDING = /^\s*(❌|⚠️)\s*/u;
-const CLEAN = /pipeline is clean|no problems found|all .* (ok|valid)/i;
+const CLEAN = /pipeline is clean|no problems found|all .* (ok|valid)|^0 errors, 0 warnings$/i;
 const MAX_FINDINGS = 8;
 
 /**
@@ -52,6 +52,23 @@ export function summarizeFindings(lines = []) {
   for (const { text } of lines) {
     const raw = String(text ?? '');
     if (CLEAN.test(raw)) clean = true;
+    // validate-portals prints "error: <path>: <message>" and "warning: …", or
+    // "validate-portals failed: file not found: …" when there is no list yet.
+    const plainLine = raw.match(/^(?:error|warning): (.+)$/u)?.[1] ?? null;
+    if (plainLine) {
+      found.push(
+        plainLine
+          .replace(/^tracked_companies\[(\d+)\]/u, (_, n) => `Company ${Number(n) + 1} in your list`)
+          .replace(/^search_queries\[(\d+)\]/u, (_, n) => `Job-board search ${Number(n) + 1}`)
+          .replace(/\.api:/u, ', its data link (API):')
+          .replace(/\.careers_url:/u, ', its careers page link:'),
+      );
+      continue;
+    }
+    if (/^validate-portals failed: file not found/u.test(raw)) {
+      found.push('There is no companies list yet: follow a company first.');
+      continue;
+    }
     const icon = raw.match(FINDING);
     if (!icon) continue;
     // verify-portals ends a moved board's line with "→ try ats/slug"; keep it in words.

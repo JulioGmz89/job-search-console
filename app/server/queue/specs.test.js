@@ -145,3 +145,14 @@ test('read-only checks say what they found, in words (R-final-03)', () => {
   assert.equal(summarizeFindings(lines('✅ Statuses', '🟢 Pipeline is clean!')).clean, true);
   assert.equal(summarizeFindings(lines('something unrecognised')).clean, false, 'silence is not a clean bill');
 });
+
+test('the companies-list check says its findings, or that it is clean', () => {
+  const lines = (...texts) => texts.map((text) => ({ text }));
+  assert.deepEqual(summarizeFindings(lines('validate-portals: /w/portals.yml', 'warning: tracked_companies[2].api: not a URL', 'error: tracked_companies[0]: name is required', '1 errors, 1 warnings')), {
+    findings: ['Company 3 in your list, its data link (API): not a URL', 'Company 1 in your list: name is required'],
+    total: 2,
+    clean: false,
+  });
+  assert.equal(summarizeFindings(lines('validate-portals: /w/portals.yml', '0 errors, 0 warnings')).clean, true);
+  assert.deepEqual(summarizeFindings(lines('validate-portals failed: file not found: /w/portals.yml')).findings, ['There is no companies list yet: follow a company first.']);
+});
