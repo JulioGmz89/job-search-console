@@ -6,7 +6,7 @@ import { RunItem } from '../components/RunItem.jsx';
 import { HelpLink, Tag } from '../components/ui.jsx';
 import { reload, setResource, useResource } from '../data.js';
 import { fit, jobName, plural, shortDate, statusLabel } from '../lib/labels.js';
-import { isTopLevel, outcome, runTitle } from '../lib/runs.js';
+import { isTopLevel, outcome, runState, runTitle } from '../lib/runs.js';
 import { todayCards } from '../lib/today.js';
 import { useRuns } from '../runs.jsx';
 import { announce } from '../shell/announce.jsx';
@@ -454,6 +454,9 @@ export function TodayPage() {
   };
 
   const { needs, fresh, waiting, working } = cards;
+  // A failure the user just tried again stays here, "still working", until the
+  // retry ends, so Try again shows its progress where it was clicked.
+  const retrying = list.filter((r) => runState(r) === 'failed' && list.some((x) => x.retryOf === r.id && ['waiting', 'working'].includes(runState(x))));
   const noJobs = (pipeline.data?.rows ?? []).length === 0;
   const firstCompany = (portals.data?.companies ?? []).find((c) => c.enabled)?.name ?? '';
 
@@ -465,13 +468,16 @@ export function TodayPage() {
       />
       {justSetUp ? <SetupDone cvSummary={cvSummaryText(cv.data?.summary)} company={firstCompany} onClose={() => setJustSetUp(false)} /> : null}
 
-      {needs.count ? (
+      {needs.count || retrying.length ? (
         <section aria-labelledby="needs-h" className="stack">
           <h2 id="needs-h" className="group-title">
             Needs you
           </h2>
           {needs.failures.map((r) => (
             <FailureCard key={r.id} run={r} onDismiss={dismiss} />
+          ))}
+          {retrying.map((r) => (
+            <RunItem key={r.id} run={r} headingLevel={3} />
           ))}
           {needs.unreadable.length ? (
             <article className="card attn" aria-labelledby="unread-h">

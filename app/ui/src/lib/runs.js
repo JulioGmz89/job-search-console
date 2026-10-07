@@ -183,11 +183,15 @@ export function outcome(run, { rowForReport = () => null, all = [], rows = [] } 
     case 'scan': {
       const added = result.added ?? [];
       const names = added.slice(0, 4).map((a) => `${a.company} — ${a.title}`).join('; ');
+      const down = result.unreachable ?? [];
+      const problems = down.length
+        ? ` ${down.map((d) => d.company).join(', ')}: the job board couldn’t be reached${down.some((d) => d.status === 'slug_gone') ? ' (board not found)' : ''}. Fix it in Companies.`
+        : ' Every board answered.';
       const text = result.preview
         ? `Preview, nothing saved: ${plural(added.length, 'new opening')} would be added${names ? `: ${names}` : ''}.`
         : added.length
-          ? `${plural(added.length, 'new opening')}: ${names}${added.length > 4 ? ` and ${added.length - 4} more` : ''}.`
-          : 'No new openings this time.';
+          ? `${plural(added.length, 'new opening')}: ${names}${added.length > 4 ? ` and ${added.length - 4} more` : ''}.${problems}`
+          : `No new openings this time.${problems}`;
       return { text, open: { href: '#/to-review', label: added.length ? `See the ${plural(added.length, 'new opening')}` : 'Open To review' } };
     }
     case 'skills-extract':

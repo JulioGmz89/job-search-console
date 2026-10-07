@@ -27,7 +27,7 @@
  * - `lane` and `exclusive` tell the queue how a kind may overlap with others.
  */
 
-import { parseProgress, scanArgs } from '../services/scanner.js';
+import { parseProgress, readPortalHealth, scanArgs } from '../services/scanner.js';
 import { parseFetchProgress } from '../skills/cli.js';
 import { buildSkillsCvSpec, buildSkillsExtractSpec } from '../skills/extract-spec.js';
 import { buildCoverSpec, buildEvaluateSpec, buildPdfSpec } from './agent-specs.js';
@@ -83,12 +83,23 @@ export const RUN_KINDS = Object.freeze({
     // real scan chains it: a dry run added nothing to the inbox.
     // The openings this check added, by name, so To review and Today can say
     // which ones are new without comparing dates (T4).
-    after: (run) => {
+    after: (run, ctx = {}) => {
       const added = (run.lines ?? [])
         .map((line) => parseProgress(line.text))
         .filter((p) => p?.type === 'offer')
         .map(({ company, title, location }) => ({ company, title, location }));
-      return { result: { ...(run.result ?? {}), added, preview: run.dryRun === true }, ...(run.dryRun ? {} : { next: ['skills-fetch-auto'] }) };
+      // Boards this check recorded as not answering, from data/portal-health.tsv
+      // (which scan.mjs writes), so the result itself says what went wrong.
+      let unreachable = [];
+      try {
+        const since = run.startedAt ?? 0;
+        unreachable = Object.entries(readPortalHealth({ root: ctx.root }))
+          .filter(([, h]) => !['reachable', 'empty'].includes(h.status) && Date.parse(h.timestamp) >= since - 1000)
+          .map(([company, h]) => ({ company, status: h.status }));
+      } catch {
+        // No health file: nothing to say.
+      }
+      return { result: { ...(run.result ?? {}), added, unreachable, preview: run.dryRun === true }, ...(run.dryRun ? {} : { next: ['skills-fetch-auto'] }) };
     },
     // scan.mjs writes data/scan-runs.tsv, data/portal-health.tsv and reads
     // data/blacklist.md as bare relative paths, so they follow the cwd, not

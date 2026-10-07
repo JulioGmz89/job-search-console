@@ -271,7 +271,7 @@ export function SkillsPage({ params }) {
       <p className="small" role="status">
         {goodFitOnly
           ? `Counting only the ${counted} postings whose fit is 4 or more: every number, the evidence and the order below use just those.${hidden ? ` ${plural(hidden, 'skill')} with no good-fit posting ${hidden === 1 ? 'is' : 'are'} hidden.` : ''}`
-          : `Counting all ${counted} postings that have been read.`}
+          : `Counting all ${counted} postings that could be read${cov.postings > counted ? ` (of the ${cov.postings} found)` : ''}.`}
       </p>
       <p className="small muted">Each bar’s length is how many {what} ask for the skill, against the most-asked one.</p>
       <section className="card flush" id="skills-list" tabIndex={-1} aria-label={`${SKILL_VIEWS[view].label}: skills list`}>

@@ -82,6 +82,9 @@ const VIEWS = {
     { id: 'workspace', hash: '#/workspace', m6: null },
     { id: 'help', hash: '#/help/fit', m6: null },
     { id: 'search-results', hash: '#/today', open: async (page) => {
+      // Below 960 px the field folds into a Search button (ia.md §1).
+      const toggle = page.getByRole('button', { name: 'Search', exact: true });
+      if (await toggle.isVisible()) await toggle.click();
       await page.getByRole('combobox', { name: /Find a job/ }).fill('Granite');
       await page.waitForTimeout(200);
     }, m6: null },

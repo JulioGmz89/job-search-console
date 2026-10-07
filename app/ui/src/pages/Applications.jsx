@@ -228,6 +228,7 @@ export function ApplicationsPage() {
                 className="apps-table stackable"
                 sortDescriptor={filters.sort}
                 onSortChange={(sort) => setFilters({ sort })}
+                onRowAction={(key) => navigate(`#/applications/${key}`)}
               >
                 <TableHeader>
                   <Column id="number" allowsSorting>
