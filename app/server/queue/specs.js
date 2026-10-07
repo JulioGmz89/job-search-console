@@ -81,7 +81,15 @@ export const RUN_KINDS = Object.freeze({
     parseProgress,
     // New postings mean new text to read for the skills analysis (M4). Only a
     // real scan chains it: a dry run added nothing to the inbox.
-    after: (run) => (run.dryRun ? {} : { next: ['skills-fetch-auto'] }),
+    // The openings this check added, by name, so To review and Today can say
+    // which ones are new without comparing dates (T4).
+    after: (run) => {
+      const added = run.lines
+        .map((line) => parseProgress(line.text))
+        .filter((p) => p?.type === 'offer')
+        .map(({ company, title, location }) => ({ company, title, location }));
+      return { result: { ...(run.result ?? {}), added, preview: run.dryRun === true }, ...(run.dryRun ? {} : { next: ['skills-fetch-auto'] }) };
+    },
     // scan.mjs writes data/scan-runs.tsv, data/portal-health.tsv and reads
     // data/blacklist.md as bare relative paths, so they follow the cwd, not
     // CAREER_OPS_ROOT. A confined app (tests, the UX sandbox) must launch it

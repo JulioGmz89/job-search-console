@@ -26,7 +26,7 @@ import { recordCover } from '../services/covers.js';
 import { isCvPayload } from '../services/cvdocs.js';
 import { validateInboxUrl } from '../services/inbox.js';
 import { resolveDataRoot } from '../services/paths.js';
-import { ensureTracker } from '../services/pipeline.js';
+import { ensureTracker, readPipeline } from '../services/pipeline.js';
 import { releaseReportNumber, removeStrayAdditions, reserveReportNumber } from '../services/report-numbers.js';
 import { indexReportFiles, readReport, resolveReportPdf } from '../services/reports.js';
 import { internalSpec, SpecError } from './specs.js';
@@ -214,6 +214,14 @@ export function buildEvaluateSpec({ url, autoPdf = true, model = null } = {}, { 
 
         // First run: there is no tracker yet, and merge-tracker.mjs will not create one.
         if (ensureTracker({ root: dataRoot })) record('Created data/applications.md (your first application)');
+        // The rows this company already has, as they are before the merge, so the
+        // UI can say "merged into #21: fit 3.3 → 4.1" instead of "added" (F-015).
+        const company = String(report?.machine?.company ?? '').trim().toLowerCase();
+        const trackerBefore = company
+          ? readPipeline({ root: dataRoot })
+              .rows.filter((r) => String(r.company ?? '').trim().toLowerCase() === company)
+              .map((r) => ({ id: r.id, role: r.role, score: r.score, status: r.status, reportId: r.reportId }))
+          : [];
         const next = [internalSpec('merge-tracker', { root, repoRoot })];
         const threshold = plumbing.profile.autoPdfThreshold;
         if (run.meta.autoPdf && score !== null && score >= threshold) {
@@ -234,6 +242,7 @@ export function buildEvaluateSpec({ url, autoPdf = true, model = null } = {}, { 
             score,
             company: report?.machine?.company ?? null,
             role: report?.machine?.role ?? null,
+            trackerBefore,
           },
           next,
         };
