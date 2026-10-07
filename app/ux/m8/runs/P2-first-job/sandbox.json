@@ -1,0 +1,16 @@
+{
+  "url": "http://127.0.0.1:4460/",
+  "state": "empty",
+  "startedAt": 1791350220270,
+  "root": "C:\\Users\\julio\\AppData\\Local\\Temp\\jsc-ux-empty-Iq68ge",
+  "scenario": "auto",
+  "delayMs": 8000,
+  "pid": 32500,
+  "flags": {
+    "task": "first-job",
+    "state": "empty",
+    "delay": 8000,
+    "scenario": "auto",
+    "budget": 60
+  }
+}
