@@ -626,6 +626,12 @@ function writePopulated(root) {
   write(root, 'data/applications.md', trackerMarkdown(tracked));
   for (const r of tracked) write(root, `reports/${r.report}`, reportMarkdown(r));
 
+  // A fit report whose job never reached Applications (its merge failed), for
+  // Workspace › "Fit reports not in Applications". Number 41 follows the rows.
+  const loosePosting = seen[PLAN.length + 13];
+  const loose = { p: loosePosting, num: PLAN.length + 1, status: 'Evaluated', score: 3.7, date: day(54), note: '' };
+  write(root, `reports/${pad(loose.num)}-${loosePosting.company.slug.replace(/[^a-z0-9]+/g, '-')}-${loose.date}.md`, reportMarkdown(loose));
+
   // set-status.mjs's transition ledger, beside the tracker, for Job › History:
   // each row that moved on walked the usual path from Evaluated, three days a step.
   const PATH = ['Evaluated', 'Applied', 'Responded', 'Interview', 'Offer', 'Hired'];
