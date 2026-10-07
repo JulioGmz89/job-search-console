@@ -405,6 +405,7 @@ export function TodayPage() {
   const [ackd, setAckd] = useState([]);
   const [justSetUp, setJustSetUp] = useState(false);
   const firstJobVisit = useRef(false);
+  const openedAt = useRef(Date.now());
   const wasDone = useRef(null);
   const setupDone = workspace.data?.setup?.done;
   useEffect(() => {
@@ -464,7 +465,9 @@ export function TodayPage() {
   const { needs, fresh, waiting, working } = cards;
   // A failure the user just tried again stays here, "still working", until the
   // retry ends, so Try again shows its progress where it was clicked.
-  const retrying = list.filter((r) => runState(r) === 'failed' && list.some((x) => x.retryOf === r.id && ['waiting', 'working'].includes(runState(x))));
+  const retrying = list.filter(
+    (r) => runState(r) === 'failed' && !dismissed.includes(r.id) && list.some((x) => x.retryOf === r.id && (['waiting', 'working'].includes(runState(x)) || (x.endedAt ?? 0) > openedAt.current)),
+  );
   const noJobs = (pipeline.data?.rows ?? []).length === 0;
   // The first check's section stays for the visit, so its result and Open the job
   // stay where the user started it (W8-first-job-02).

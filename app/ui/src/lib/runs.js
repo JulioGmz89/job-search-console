@@ -255,6 +255,8 @@ export function followUps(run, all, rows = []) {
   const words = children.map((c) => {
     const verb = c.kind === 'merge-tracker' && merge ? `updated application #${merge.rowId}` : (FOLLOW_UP_WORDS[c.kind] ?? (RUN_NAMES[c.kind] ?? c.label ?? c.kind).toLowerCase());
     if (c.kind === 'cv-render' && runState(c) === 'done' && c.result?.ats?.verdict === 'fail') return `${verb} (it fails the screening check)`;
+    const layout = c.kind === 'pdf' ? all.find((r) => r.parentId === c.id && r.kind === 'cv-render') : null;
+    if (layout?.result?.ats?.verdict === 'fail') return `${verb} (in a design that fails the screening check: choose one that passes in My CV › Design)`;
     return runState(c) === 'failed' ? `${verb} (failed)` : runState(c) === 'working' || runState(c) === 'waiting' ? `${verb} (working)` : verb;
   });
   return `then: ${words.join(', ')}`;

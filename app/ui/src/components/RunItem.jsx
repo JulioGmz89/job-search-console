@@ -71,6 +71,7 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
   const [error, setError] = useState(null);
   const retried = list.find((r) => r.retryOf === run.id) ?? null;
   const retriedRef = useRef(null);
+  const retriedOpenRef = useRef(null);
   const [justRetried, setJustRetried] = useState(false);
   // Try again replaces its own button; focus moves to what replaced it.
   useEffect(() => {
@@ -110,6 +111,12 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
 
   const why = state === 'failed' ? explainFailure(run) : null;
   const done = state === 'done' ? outcome(run, { rowForReport, all: list, rows: pipelineRows }) : null;
+  const retriedDone = retried && runState(retried) === 'done';
+  const retriedOutcome = retriedDone ? outcome(retried, { rowForReport, all: list, rows: pipelineRows }) : null;
+  useEffect(() => {
+    // The retry finished: focus its result if the user is still here.
+    if (retriedDone && justRetried) retriedOpenRef.current?.focus();
+  }, [retriedDone, justRetried]);
   const then = followUps(run, list, pipelineRows);
   const started = run.startedAt ?? run.queuedAt;
 
@@ -166,10 +173,29 @@ export function RunItem({ run, headingLevel = 3, link = true, onRetried = null }
         </>
       ) : null}
       {why && retried ? (
-        <p className="small">
-          Tried again:{' '}
-          <a href={`#/activity/${retried.id}`} ref={retriedRef}>{runState(retried) === 'done' ? 'that worked' : runState(retried) === 'failed' ? 'that failed too' : 'still working'}</a>.
-        </p>
+        <>
+          {/* What happened stays in view after the retry (W8-T8-02). */}
+          <p className="small">
+            <b>What happened the first time:</b> {why.what}
+          </p>
+          <p className="small">
+            Tried again:{' '}
+            <a href={`#/activity/${retried.id}`} ref={retriedRef}>{runState(retried) === 'done' ? 'that worked' : runState(retried) === 'failed' ? 'that failed too' : 'still working'}</a>.
+          </p>
+          {/* And the retry's result shows here, where the user clicked (W8-T8-01). */}
+          {retriedOutcome ? (
+            <>
+              <p>{retriedOutcome.text}</p>
+              {retriedOutcome.open ? (
+                <div className="row">
+                  <a className="btn btn-sm" href={retriedOutcome.open.href} ref={retriedOpenRef}>
+                    {retriedOutcome.open.label}
+                  </a>
+                </div>
+              ) : null}
+            </>
+          ) : null}
+        </>
       ) : null}
 
       {done ? <p>{done.text}</p> : null}

@@ -190,7 +190,7 @@ export function DesignSection() {
     try {
       await persist();
       const name = themes?.find((t) => t.name === chosen)?.displayName ?? chosen;
-      setNotice(`${name} is now your design for every new CV.`);
+      setNotice(`${name} is now your design for every new CV. CVs you already have keep their old layout until you update them: Update existing CVs, or Lay out this CV again beside the preview.`);
       announce(`${name} is now your design for every new CV.`);
     } catch (e) {
       setErrors(Array.isArray(e.detail) ? e.detail : []);
@@ -398,7 +398,7 @@ export function DesignSection() {
               </div>
               {lastRelay && runState(lastRelay) === 'done' ? (
                 <p className="small">
-                  Laid out again {shortDate(lastRelay.endedAt)} in {lastRelay.result?.template ?? chosen}: {verdictWords(lastRelay.result?.ats)}.
+                  Laid out again {shortDate(lastRelay.endedAt)} in {designName(lastRelay.result?.template ?? chosen, templates.data?.templates)}: {verdictWords(lastRelay.result?.ats)}.
                   {doc.reportId ? (
                     <>
                       {' '}

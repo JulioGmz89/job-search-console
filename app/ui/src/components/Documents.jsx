@@ -69,7 +69,9 @@ function CvCard({ row, report }) {
   const design = designName(style.data?.style?.template ?? 'standard', templates.data?.templates);
   const madeIn = report.ats?.template ?? null;
   const doc = (documents.data?.documents ?? []).find((d) => d.reportId === report.id) ?? null;
-  const rulesChanged = voice.data?.modified && pdf?.modified && Date.parse(voice.data.modified) > Date.parse(pdf.modified);
+  // When the wording was written (the CV's data file), not when its PDF was last laid out (W8-T7-03).
+  const writtenAt = doc?.modified ?? pdf?.modified;
+  const rulesChanged = voice.data?.modified && writtenAt && Date.parse(voice.data.modified) > Date.parse(writtenAt);
   const name = jobName(row);
   useFocusOnChange(making ? 'making' : pdf ? `ready-${pdf.modified}` : 'none', stateRef);
 
@@ -153,7 +155,7 @@ function CvCard({ row, report }) {
             Make it again
           </button>
           <CostNote minutes="3" />
-          {doc && madeIn && madeIn !== style.data?.style?.template ? (
+          {doc && madeIn !== (style.data?.style?.template ?? 'standard') ? (
             <button type="button" className="btn2" onClick={() => go('cv-render', { documentId: doc.id, template: style.data?.style?.template ?? 'standard' })}>
               Update the layout to {design}
             </button>
@@ -170,7 +172,7 @@ function CvCard({ row, report }) {
       {!making && pdf ? (
         <p className="small muted">
           <b>Make it again</b> rewrites the CV for this role with your current CV and writing rules (AI, about 3 min).
-          {doc && madeIn && madeIn !== style.data?.style?.template ? ` Update the layout only re-draws it in ${design} (no AI, wording unchanged).` : ''}
+          {doc && madeIn !== (style.data?.style?.template ?? 'standard') ? ` Update the layout only re-draws it in ${design} (no AI, wording unchanged).` : ''}
         </p>
       ) : null}
       {block && !making ? <p className="small muted">{block}</p> : null}
