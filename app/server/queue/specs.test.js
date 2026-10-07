@@ -71,6 +71,13 @@ test('a real scan chains the skills fetch; a dry run does not', () => {
   assert.throws(() => buildSpec('skills-fetch-auto'), (e) => e.code === 'kind-unknown');
 });
 
+test('a scan says which openings it added, from its own output', () => {
+  const real = buildSpec('scan', {});
+  const lines = ['Scanning 2 companies', '  + Lumen Grid | Platform Engineer | Remote (US)', 'done'].map((text) => ({ text }));
+  const { result } = real.hooks.after({ dryRun: false, lines }, { provisional: { status: 'succeeded' } });
+  assert.deepEqual(result, { added: [{ company: 'Lumen Grid', title: 'Platform Engineer', location: 'Remote (US)' }], preview: false });
+});
+
 test('a confined scan runs in the data root, so its relative bookkeeping paths stay there', () => {
   assert.equal(buildSpec('scan', {}, { root: '/tmp/sandbox' }).cwd, '/tmp/sandbox');
   assert.equal(buildSpec('scan', {}).cwd, undefined);

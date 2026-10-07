@@ -84,7 +84,7 @@ export const RUN_KINDS = Object.freeze({
     // The openings this check added, by name, so To review and Today can say
     // which ones are new without comparing dates (T4).
     after: (run) => {
-      const added = run.lines
+      const added = (run.lines ?? [])
         .map((line) => parseProgress(line.text))
         .filter((p) => p?.type === 'offer')
         .map(({ company, title, location }) => ({ company, title, location }));
